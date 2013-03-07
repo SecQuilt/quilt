@@ -2,7 +2,7 @@ quilt 0.1 requirements
 ----------------------
 
 Quilt is a system which brings together multiple types of data and provides
-a distributed mechanism for quering the data.
+a distributed mechanism for querying the data.
 
 * Queries are submitted from an analyst system with no local data
 * Queries reference multiple types of data

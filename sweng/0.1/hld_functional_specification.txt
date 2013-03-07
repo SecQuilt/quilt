@@ -18,15 +18,18 @@ Query Master
 
     quilt_submit
         -q QUERY    # A query to run on the system
-        -e EMAIL    # comma seperated list of emails to supply notifications
+        [-e EMAIL]  # comma seperated list of emails to supply notifications
+        [-y]        # whether to automatically confirm the query
 
         Quilt Submit will allow submission of a query.  It will communicate with
-        the query master, deliver the query, and then exit.
+        the query master, recieve estimated time/space metrics of teh query,
+        get user confirmation (if no -y), then deliver the query, to the master
+        for processing, print the query id, and then exit.
 
     quilt_q
         [-qid QUERY_ID]     # optional argument, which query to check
 
-        Quilt status will display information about queries in the q.  If id
+        Quilt status will display information about queries in the queue.  If id
         is specified, only that query's information will be displayed
 
     quilt_status

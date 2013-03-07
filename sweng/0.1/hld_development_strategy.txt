@@ -1,0 +1,52 @@
+quilt 0.1 development strategy
+------------------------------
+
+c1.Infrastructure
+    Setup shells of Query Master, Source Master, and Source1
+
+    Design
+        Design integration with condor
+        Design testing framework
+        Design initial deployment strategy
+    
+    Develop
+        create shell applications
+        create testing framework
+        
+    Test
+        Execute basic operations ad hoc
+        Run automated test suite
+        
+
+c2.Communication
+    Provide 2-way communication between components
+    
+    Design
+        Design data interchange formats
+        Design schema sharing system
+        Design tests of the functionality
+
+    Implement
+
+    Test
+
+c3.Adapation
+    Adopt a data source in the query master
+
+c4.Execution
+    Execute query specified from Query Master on the Source Master
+
+    Design
+        formalize query format
+
+c4.Return
+    Return query results from Source Master to Query Master
+
+c5.Evaluation
+    Determine and fix weak points and refactor
+
+c6.UI
+    Polish user interaction points
+
+c7.Integration
+    Perform integration of entire workflow, fill in TODO's
