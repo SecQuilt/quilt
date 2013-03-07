@@ -1,0 +1,27 @@
+quilt 0.1 conceptual design
+---------------------------
+
+
+Query Master
+    Parser          (Very Large)
+    Translater      (Large)
+    Dispatcher      (Large)
+    Collector       (Large)
+    Combiner        (Very Large)
+    Outputter       (Very Large)
+    Registrar       (Large)
+
+Source Master
+    Registration    (Large)
+    Accept          (Large)
+    Return          (Large)
+    Schema          (Very Large)
+
+Source1
+    Interpreter     (Large)
+    Executor        (Medium)
+    Adapter         (Very Large)
+
+Support Scripts
+    startup         (Smallx3)
+    setup           (Mediumx3)

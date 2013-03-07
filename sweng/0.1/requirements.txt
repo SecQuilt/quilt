@@ -1,0 +1,16 @@
+quilt 0.1 requirements
+----------------------
+
+Quilt is a system which brings together multiple types of data and provides
+a distributed mechanism for quering the data.
+
+* Queries are submitted from an analyst system with no local data
+* Queries reference multiple types of data
+* Differnt types of data can be housed at differnt locations
+* A Minnimum ammount of data should be brought back to a central system
+* Queries should support specification based on temporal order of events
+* Pattern matching of events supports temporal operators (BEFORE, CONCURRENT, 
+        UNTIL)
+* results of query will be accessable as an list of strings of events
+
+   
