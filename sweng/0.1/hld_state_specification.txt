@@ -1,0 +1,32 @@
+quilt 0.1 state specification
+-----------------------------
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+Source Master
+
+State           Condition                   Next State
+-----           ---------                   ----------
+init            no errors                   listen
+listen          query recieved              [listen,translate]
+translate       query resolved              run
+run             query performed             return
+return          transmission complete       end
+end             -                           -
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+Query Master
+
+
+State           Condition                   Next State
+-----           ---------                   ----------
+init            no errors                   listen
+listen          query recieved              [listen,validate]
+validate        syntatic correct            confirmation
+validate        syntatic incorrect          report
+confirm         user acceptance             execute
+execute         results returned            report
+execute         error occured               report
+report          report complete             end
+end             -                           -

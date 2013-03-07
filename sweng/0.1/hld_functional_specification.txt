@@ -1,0 +1,60 @@
+quilt 0.1 functional specification
+----------------------------------
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+Query Master
+------------
+
+    quilt_qmd
+        start       # start the daemon
+        stop        # stop the daemon
+        status      # print status of the daemon
+        restart     # stop then start the daemon
+
+        The Query master daemon will run in the background and support the
+        statefullness of the system.  It will listen for user queries and
+        support returning the results to the user.  It does the coordination
+
+    quilt_submit
+        -q QUERY    # A query to run on the system
+        -e EMAIL    # comma seperated list of emails to supply notifications
+
+        Quilt Submit will allow submission of a query.  It will communicate with
+        the query master, deliver the query, and then exit.
+
+    quilt_q
+        [-qid QUERY_ID]     # optional argument, which query to check
+
+        Quilt status will display information about queries in the q.  If id
+        is specified, only that query's information will be displayed
+
+    quilt_status
+        
+        Display information about the quilt system, including registered
+        source managers
+        
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+Source Manager
+--------------
+    
+    quilt_smd
+        start       # start the daemon
+        stop        # stop the daemon
+        status      # print status of the daemon
+        restart     # stop then start the daemon
+
+        The source manager daemon holds the statefull information needed to
+        manage the query source.  I will listen for requests from the query 
+        master and return query results to it.
+ 
+    quilt_source_query
+        conditions  # the conditions of the query
+
+        quilt_source_query will be invoked by the source manager daemon when a
+        query is requested.  The conditions of the query are used to filter
+        the data source, and results are returned to the query master
+
+    

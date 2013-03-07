@@ -1,0 +1,47 @@
+quilt 0.1 use cases
+-------------------
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Use Case 1: Setup Query Master
+
+
+Step    Actor               Action
+----    -----               ------
+1       netadmin            Determine host for Query Master
+2       netadmin            Install query Master
+3       netadmin            Setup firewall and credentials to allow operation
+
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Use Case 2: Setup Log Source
+
+Step    Actor               Action
+----    -----               ------
+1       sysadmin            Determines which logs should be accessable
+2       sysadmin            install source manager (SM)
+3       SM                  query user for which logs
+4       sysadmin            supply log paths
+5       SM                  query user for Query Master(s) locations
+6       sysadmin            provide ip address of query master
+7       sysadmin            Setup firewall and credentials to allow operation
+8       SM                  Enter Run State
+
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Use Case 3: Perform Logfile Query 
+
+Preconditions: Use Case 1 && 2
+
+Step    Actor               Action
+----    -----               ------
+1       analyst             Decide on log file query to make
+                                which=systemlog
+                                what=ntpd.*syncronized
+                                when=PAST_24
+                                scope=ALL_SYSTEMS
+2       analyst             Specify Query to Query Master (QM)
+3       QM                  Validate Query, present estimaged space/time
+                            requriements
+4       analyst             confirm query
+5       QM                  Dispatch Query, Notify and present results
+6       analyst             interpret results
