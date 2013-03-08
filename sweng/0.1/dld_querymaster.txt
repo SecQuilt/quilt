@@ -1,0 +1,156 @@
+quilt 0.1 Query Master design
+-----------------------------
+
+Dependencies
+    python-daemon
+        Comes as an RPM for redhat, helps implementation of well behaved
+        daemon process.
+    python-pyro
+        python remote objects, allows us to have cross machine/process
+        communication
+
+Module: quilt_core
+
+    Type: Library
+
+    External Dependencies:
+        python-configparser
+
+    Responsibilities:
+        utility functions common to all quilt modules
+
+    Classes:
+
+        # Responsible for access to quilt configuration
+        class QuiltConfig():
+            
+            ###########
+            # Constants
+            ###########
+
+            # The name of the environment variable that defines the location
+            # of the quilt config file.  This will be the filesystem path to a 
+            # config file.
+            QUILT_CFG_LOC_VAR='QUILT_CFG'
+
+            ############
+            # Operations
+            ############
+            
+            # Constructor, reads the configuration 
+            def __init__():
+                # default configuration location to /etc/quilt/quilt.conf
+                # if QUILT_CFG_LOC_VAR set, set location to that value
+                # if config file exists at location, read it in
+            
+            # Access a configuration value.  Configuraiton values can be
+            # specified with a section and a name.  The configuration value is
+            # returned.  If the specified value is not present the passed in
+            # default is returned.
+            def getValue(        # [out] string
+                self,
+                sectionName,     # [in] string, name of section
+                valueName,       # [in] string, name of value
+                default)         # [in] string, value of default
+    
+            
+    Schema:
+
+        # Configuration file has the following defined sections values and
+        # defaults
+
+        [registrar]
+        port : ''           # port used by nameserver 'name' default is random
+
+        [query_master]
+        registrar_host : ''      # hostname of the registrar default is
+                                 # localhost
+        registrar_port : ''      # port of the registrar default search for
+                                 # registrar port (could be wrong if multiple
+                                 # pyro nameservers on system)
+    
+
+Module: quilt_registrar
+
+    Type: Daemon Process
+
+    Internal Dependencies:
+        quilt_core
+
+    External Dependenies:
+        python-pyro(4)
+        python-daemon
+
+    Responsibilities:
+        behave like a good Daemon process
+        run a PyRo name server
+    
+    Prototype : testnamed
+
+    Gotchas:
+        Prototyping revealed a general behavior not to relase the port for the
+        nameserver right away.  This may be an annoyance during testing, but
+        ideally we won't ever really have to restart the nameserver.  Keep an
+        eye on this issue, and elevate if needed, this is solvable
+
+    Notes:
+        To increase scalability, every machine will have its own name server.
+        Any remotely accessible objects will be registered with the name
+        server on the machine that hosts that object.  This is configurable
+        and the interface will allow for using one nameserver for testing.
+
+    Functions:
+        
+        def Run():
+            # Use QuiltConfig to read in configuration 
+            # access the registrar's port number from config
+            # start the pyro nameserver
+            
+    
+Module: quilt_qmd
+
+    Type: Daemon Process
+
+    Internal Dependencies:
+        quilt_core
+
+    External Dependenies:
+        python-pyro(4)
+        python-daemon
+
+    Responsibilities:
+        behave like a good Daemon process
+        run a PyRo daemon to host QueryMaster as a remote object 
+    
+    Prototype : testd
+
+
+    Classes:
+
+        class QueryMaster
+
+            # Register a source manager with the query master
+            string RegisterSourceManager(
+                string nameServerHost,      # ip address of nameserver
+                int nameServerPort,         # port for the nameserver
+                string sourceManagerName    # name of the source manager on
+                                            # the specified nameserver
+            )
+                # get the handle to the remote object 
+                #### STOPPED HERE
+
+    Functions:
+
+        def run():
+            # Use QuiltConfig to read in configuration 
+            # access the registrar's host and port number from config
+            # Create the Query Master object
+            # register the Query Master with the PyRo Daemon
+            # start the Daemon's event loop
+
+    
+quilt_smd
+    Daemon process,
+        At startup, registers itself with qmd
+        
+
