@@ -1,0 +1,63 @@
+quilt 0.1 quilt_core design
+-----------------------------
+
+Module: quilt_core
+
+Type: Library
+
+External Dependencies:
+    python-configparser
+
+Responsibilities:
+    utility functions common to all quilt modules
+
+Classes:
+
+    # Responsible for access to quilt configuration
+    class QuiltConfig():
+        
+        ###########
+        # Constants
+        ###########
+
+        # The name of the environment variable that defines the location
+        # of the quilt config file.  This will be the filesystem path to a 
+        # config file.
+        QUILT_CFG_LOC_VAR='QUILT_CFG'
+
+        ############
+        # Operations
+        ############
+        
+        # Constructor, reads the configuration 
+        def __init__():
+            # default configuration location to /etc/quilt/quilt.conf
+            # if QUILT_CFG_LOC_VAR set, set location to that value
+            # if config file exists at location, read it in
+        
+        # Access a configuration value.  Configuraiton values can be
+        # specified with a section and a name.  The configuration value is
+        # returned.  If the specified value is not present the passed in
+        # default is returned.
+        def getValue(        # [out] string
+            self,
+            sectionName,     # [in] string, name of section
+            valueName,       # [in] string, name of value
+            default)         # [in] string, value of default
+
+        
+Schema:
+
+    # Configuration file has the following defined sections values and
+    # defaults
+
+    [registrar]
+    port : ''           # port used by nameserver 'name' default is random
+
+    [query_master]
+    registrar_host : ''      # hostname of the registrar default is
+                             # localhost
+    registrar_port : ''      # port of the registrar default search for
+                             # registrar port (could be wrong if multiple
+                             # pyro nameservers on system)
+

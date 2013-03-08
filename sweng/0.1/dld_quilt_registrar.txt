@@ -1,0 +1,40 @@
+quilt 0.1 quilt registrar design
+--------------------------------
+
+Module: quilt_registrar
+
+Type: Daemon Process
+
+Internal Dependencies:
+    quilt_core
+
+External Dependenies:
+    python-pyro(4)
+    python-daemon
+
+Responsibilities:
+    behave like a good Daemon process
+    run a PyRo name server
+
+Prototype : testnamed
+
+Gotchas:
+    Prototyping revealed a general behavior not to relase the port for the
+    nameserver right away.  This may be an annoyance during testing, but
+    ideally we won't ever really have to restart the nameserver.  Keep an
+    eye on this issue, and elevate if needed, this is solvable
+
+Notes:
+    To increase scalability, every machine will have its own name server.
+    Any remotely accessible objects will be registered with the name
+    server on the machine that hosts that object.  This is configurable
+    and the interface will allow for using one nameserver for testing.
+
+Functions:
+    
+    def Run():
+        # Use QuiltConfig to read in configuration 
+        # access the registrar's port number from config
+        # start the pyro nameserver
+        
+

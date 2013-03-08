@@ -1,0 +1,50 @@
+quilt 0.1 Query Master daemon design
+------------------------------------
+
+Module: quilt_qmd
+
+Type: Daemon Process
+
+Internal Dependencies:
+    quilt_core
+
+External Dependenies:
+    python-pyro(4)
+    python-daemon
+
+Responsibilities:
+    behave like a good Daemon process
+    run a PyRo daemon to host QueryMaster as a remote object 
+
+Prototype : testd
+
+
+Classes:
+
+    class QueryMaster
+
+        # Register a source manager with the query master
+        string RegisterSourceManager(
+            string nameServerHost,      # ip address of nameserver
+            int nameServerPort,         # port for the nameserver
+            string sourceManagerName    # name of the source manager on
+                                        # the specified nameserver
+        )
+            # get the handle to the remote object 
+            #### STOPPED HERE
+
+Functions:
+
+    def run():
+        # Use QuiltConfig to read in configuration 
+        # access the registrar's host and port number from config
+        # Create the Query Master object
+        # register the Query Master with the PyRo Daemon
+        # start the Daemon's event loop
+
+    
+quilt_smd
+    Daemon process,
+        At startup, registers itself with qmd
+        
+

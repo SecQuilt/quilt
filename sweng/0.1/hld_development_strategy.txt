@@ -25,10 +25,27 @@ c2.Communication
         Design data interchange formats
         Design schema sharing system
         Design tests of the functionality
+	    Design prototype pattern input format
+            in-fix pattern specification language (e.g., some logical
+                expressions)
+            query-by example (e.g., collection of data samples with query
+                attributes/relations identified)
+            SQL-form query (e.g., closer to a programming language)
+            other (e.g., whatever bright ideas we have later)
+	
 
     Implement
 
     Test
+        1. Single-source pattern (e.g., restatement to rwfilter)
+        2. Null pattern (e.g., TRUE (producing whole database) or FALSE 
+            (producing no events)) on small database
+        3. Dual-source pattern without cross-reference (e.g. flow.sip=1.2.3.4 
+            and dns.resolution=1.2.3.4)
+        4. Dual-source pattern with cross-reference (e.g., flow.sip=1.2.3.4 and
+            dns.resolution=flow.dip)
+        5. Multiple source pattern without cross-reference
+        6. Multiple source pattern with cross reference
 
 c3.Adapation
     Adopt a data source in the query master
@@ -38,12 +55,14 @@ c4.Execution
 
     Design
         formalize query format
+        formalize result format
 
 c4.Return
     Return query results from Source Master to Query Master
 
 c5.Evaluation
     Determine and fix weak points and refactor
+    Demo Prototype to likely adopting staeholders and gather reactions
 
 c6.UI
     Polish user interaction points

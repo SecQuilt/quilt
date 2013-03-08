@@ -1,0 +1,8 @@
+quilt 0.1 source manager daemon design
+--------------------------------------
+    
+quilt_smd
+    Daemon process,
+        At startup, registers itself with qmd
+        
+

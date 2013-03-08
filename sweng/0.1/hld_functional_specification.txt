@@ -1,6 +1,14 @@
 quilt 0.1 functional specification
 ----------------------------------
 
+Quilt is a system that consists of three phases: retreival, reasoning, and
+resolution. The retrieval phase provides for a pattern-driven distributed
+query across multiple data types. The reasoning phase filters query results
+using an abductive logic filter to determine complete and meaningfully partial
+matches between the results and the original pattern. The resolution phase
+permits further exploration of the results via analytics, including (but not
+restricted to) summation, time-series, and contingency-table. 
+
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 Query Master
