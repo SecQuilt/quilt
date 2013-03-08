@@ -7,6 +7,7 @@ Type: Library
 
 External Dependencies:
     python-configparser
+    python-pyro
 
 Responsibilities:
     utility functions common to all quilt modules
@@ -45,6 +46,63 @@ Classes:
             valueName,       # [in] string, name of value
             default)         # [in] string, value of default
 
+
+    class QueryMasterClient
+        
+        # Connect to the query master
+        void ConnectToQueryMaster():
+            # Access the QueryMaster's registrar's host and port from the config            
+            # access the Query Master's instance name, create a proxy to it
+            # store a reference to the query master as a member variable
+            # register the client with the query master
+            # record the name the master assigned us as a member variable
+            # call OnConnectionComplete()
+        
+
+        # funciton called when registration of this client is complete.
+        # Inteded for overriding by the implementing client.
+        void OnConnectionComplete()
+
+
+        # Constructor
+        void __init__()
+
+        def GetType()
+            # return the type id of this class
+
+        string GetRegisteredName()
+            # return the name the query manager assigned to this client
+
+    # Disconnect from the query Master
+    void DisconnectFromQueryMaster()
+        # call query master's unregister function
+
+Functions:
+
+    # Used to publish the client as a remote object, and complete the
+    #   connection with the query master
+    static query_master_client_main_helper(
+            clientObject        # the object to use as the client)
+        # Use QuiltConfig to read in configuration 
+        # access the registrar's host and port number from config
+        # register the clientObject with the local PyRo Daemon with 
+        # call the ConnectToQueryMaster to complete registration
+        # start the Daemon's event loop
+    
+        Notes:
+            We wouldn't necessarily have to register the client for two way
+            communicaiton if it was going to perform a non validating submit.
+            However, I feel that in the future we will care more about security of
+            the system, and forcing it to register will enable the two way calling
+            likely used for a secret handshake
+
+            Is there a potential timing issue here?  If the master makes a return
+            call after we submit the query before our daemon event loop gets
+            rolling?  Keep and eye on this.
+
+            TODO hardening:
+            The clients are not hardened to unregister themselves when
+            exceptions are thrown at this time. 
         
 Schema:
 
@@ -60,4 +118,5 @@ Schema:
     registrar_port : ''      # port of the registrar default search for
                              # registrar port (could be wrong if multiple
                              # pyro nameservers on system)
+    name : 'query_master'    # name for of the query master instance
 

@@ -1,0 +1,45 @@
+quilt 0.1 quilt_status design
+-----------------------------
+
+Module: quilt_status
+
+Type: Executable Script
+
+External Dependencies:
+    python-argparse
+
+Internal Dependencies:
+    quilt_core
+
+Responsibilities:
+    Display information about source managers that the query master knows
+
+Classes:
+    class QuiltStatus : QuiltMasterClient
+
+        __init__(
+            args    # see functional_specification of query_q
+        )
+            # store args as member variable
+
+         OnConnectionComplete()
+            # print out statistics about the manager's sources
+            # GetSourceManagerStats() from query master
+            # print results
+            # DisconnectFromQueryMaster
+
+
+Functions:
+
+    # main function of the script, which is passed command line variables
+    def main(argc,argv)
+        # setup argument parser in accordance with funcitonal specification
+        # parse the arguments, exit with error message if unparseable
+        # create the quilt q object
+        # call query_master_client_main_helper
+
+
+
+
+
+

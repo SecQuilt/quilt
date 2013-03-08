@@ -1,8 +1,30 @@
 quilt 0.1 source manager daemon design
 --------------------------------------
     
-quilt_smd
-    Daemon process,
-        At startup, registers itself with qmd
-        
+Module: quilt_smd
 
+Type: Daemon process
+        
+Internal Dependencies:
+    quilt_core
+
+External Dependenies:
+    python-pyro(4)
+    python-daemon
+
+Responsibilities:
+    behave like a good Daemon process
+    run a PyRo daemon to host QueryMaster as a remote object 
+
+Classes:
+
+    class SourceManager : QueryMasterClient
+    
+    
+Functions:
+
+    def run():
+        # Create the Source Manager object
+        # call util function query_master_client_main_helper
+
+           

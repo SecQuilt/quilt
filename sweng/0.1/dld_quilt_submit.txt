@@ -1,0 +1,56 @@
+quilt 0.1 quilt_submit design
+-----------------------------
+
+Module: quilt_submit
+
+Type: Executable Script
+
+External Dependencies:
+    python-argparse
+
+Internal Dependencies:
+    quilt_core
+
+Responsibilities:
+    Submit queries to query master
+
+Classes:
+    class QuiltSubmitter : QuiltMasterClient
+
+        __init__(
+            args    # see functional_specification of query_submit
+        )
+            # store args as member variable
+
+        bool ValidateQuery(
+            string queryMetricMsg   # message to user about time and space
+                                    # requirements for the generated query
+            string queryID          # the ID that the query master assigned to
+                                    #   the query
+        )
+            # print out query ID
+
+            # if args specify validation should occur
+                # display message to std output
+                # read y/n from std input
+                # if n return false to stop the query
+            # return true to continue the query
+
+        void OnConnectionComplete()
+            # submit args.query to the query master
+            # DisconnectFromQueryMaster
+
+Functions:
+
+    # main function of the script, which is passed command line variables
+    def main(argc,argv)
+        # setup argument parser in accordance with funcitonal specification
+        # parse the arguments, exit with error message if unparseable
+        # create the quilt submitter object
+        # call query_master_client_main_helper
+
+
+
+
+
+

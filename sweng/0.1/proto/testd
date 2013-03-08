@@ -9,7 +9,11 @@ class Messages(object):
     def put(self, msg):
         print 'adding msg', msg
         self._q.put(msg)
-    def get(self, msg):
+        print 'q now size', self._q.qsize()
+
+        raise Exception("mark of the beast")
+
+    def get(self):
         return self._q.get()
 
 

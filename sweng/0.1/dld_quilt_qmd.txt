@@ -7,7 +7,7 @@ Type: Daemon Process
 
 Internal Dependencies:
     quilt_core
-
+    
 External Dependenies:
     python-pyro(4)
     python-daemon
@@ -24,27 +24,76 @@ Classes:
     class QueryMaster
 
         # Register a source manager with the query master
-        string RegisterSourceManager(
+        string RegisterSourceManager(   # return master's key name for the
+                                        #   source
             string nameServerHost,      # ip address of nameserver
             int nameServerPort,         # port for the nameserver
             string sourceManagerName    # name of the source manager on
                                         # the specified nameserver
-        )
-            # get the handle to the remote object 
-            #### STOPPED HERE
+            )
+            # get the proxy handle to the remote object 
+            # determine unique name for source master (hopefuly just using the
+            # passed in name, but double check registered list.
+            # Store in list of registered source masters
+            # use object's name and type to key it in the registerd list
+            # return the determined name
 
-Functions:
+            Notes:
+               The returned name should be stored by smd so that it knows how
+               itself is known to the QMD
+             
+        # UnRegister a source manager with the query master
+        void UnRegisterSourceManager(
+            string sourceManagerNameKey     # key that the qwmd knows ro
+                                            #   recognize a smd
+        )
+            # remove the specified sm from registered list
+            # if not found in the list, do nothing
+            # call the remote object's shutdown method
+
+        string Query(                       # return the ID of the query
+            string submitterNameKey         # key that the submitter recieved
+                                            #   when it was registered with this
+                                            #   master
+            string query                    # the content of the query
+            string notificatoinAddress      # the email addresses for
+                                            #   notification
+        )
+            # create proxy to the submitter
+            # generate a query id
+            # call submitter's validate function
+            # if submitter refuses to validate, return early
+            # store queryid  notificationAddress in a member list
+            # terminate the submitter's daemon
+
+
+            # Process query, TODO Decide what this means in c1
+            #   This might be where we start thinking about
+            #   schema or condor etc...
+
+        # format a string with information about all the Query's in the q
+        string GetQueryQueueStats()
+
+        # format a string with information abour the specified query
+        string GetQueryStats(
+            string queryID          # the query we are interested in
+        )
+
+        # format a string with information about all source managers
+        string GetSourceManagerStats(
+            # describe all of the source managers, and return as string 
+        )
+
+Functions
 
     def run():
         # Use QuiltConfig to read in configuration 
         # access the registrar's host and port number from config
         # Create the Query Master object
+        # access the query master's name from the config file
         # register the Query Master with the PyRo Daemon
         # start the Daemon's event loop
 
     
-quilt_smd
-    Daemon process,
-        At startup, registers itself with qmd
         
 
