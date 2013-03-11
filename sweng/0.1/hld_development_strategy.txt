@@ -5,7 +5,6 @@ c1.Infrastructure
     Setup shells of Query Master, Source Master, and Source1
 
     Design
-        Design integration with condor
         Design testing framework
         Design initial deployment strategy
     
@@ -22,6 +21,7 @@ c2.Communication
     Provide 2-way communication between components
     
     Design
+        Design integration with condor
         Design data interchange formats
         Design schema sharing system
         Design tests of the functionality

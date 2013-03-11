@@ -1,0 +1,68 @@
+quilt 0.1 test design
+---------------------
+
+Module: quilt_test
+
+Type: Executable Script / daemon process
+
+
+Internal Dependencies:
+    quilt_core
+
+External Dependenies:
+    python-pyro(4)
+    python-daemon
+
+Prototpe:
+    testd
+    seiscripts/tests/run_all_tests
+
+
+Responsibilities:
+    Provide an Integration Testing Framework.  
+
+
+Functions:
+
+    def run
+        # set QUILT_CFG_DIR environment variable to expanded path equal to 
+        # etc folder inside of test folder
+        
+        # start registrar
+        # start qmd
+        # start smd
+
+
+        # Repeat Forever
+            # Read quilt config (should be quilt test config)
+            # access value "testing", "includes"
+            # iterate each file in the test directory
+                # skip file if it does not match includes
+                # load unit tests from those files
+            # run the tests
+            # read sleep value between tests
+            # sleep before repeating
+            
+            
+            
+
+        
+
+    def at_exit
+        # stop smd
+        # stop qmd
+        @ stop registrar
+    
+        
+Schema:
+    # Provide configuration dir which sets up one local  registrar.  Then sets
+up an smd, for testing
+qmd, that use it
+
+quilt.conf
+[query_master]
+name : 'test'
+
+smd.d/test_smd.conf
+[test_smd]
+asd : asdasd

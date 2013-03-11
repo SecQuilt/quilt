@@ -19,12 +19,22 @@ Responsibilities:
 Classes:
 
     class SourceManager : QueryMasterClient
+
+        def Query(string query)
+            # print out the source manager's name and the query string
+            # Store query in member variable
+
+        
+        def GetLastQuery()  # returns the last query string
     
     
 Functions:
 
     def run():
-        # Create the Source Manager object
+        # Create Instance of QuiltConfig
+        # call GetSourceManagers and iterate through them
+        #   Create the Source Manager objects
+        #   store them in a dictionary
         # call util function query_master_client_main_helper
 
            

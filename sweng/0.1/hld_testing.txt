@@ -1,0 +1,10 @@
+quilt 0.1 testing specification
+-------------------------------
+    
+Complex logic will be Unit Tested
+
+This is a distributed system, and a lot of functionality will need integration
+testing
+
+
+           

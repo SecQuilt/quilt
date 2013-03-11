@@ -67,9 +67,9 @@ Classes:
             # terminate the submitter's daemon
 
 
-            # Process query, TODO Decide what this means in c1
-            #   This might be where we start thinking about
-            #   schema or condor etc...
+            # Process query, 
+            # iterate the source master's that are registered.  Send them
+            # the query
 
         # format a string with information about all the Query's in the q
         string GetQueryQueueStats()
@@ -83,6 +83,11 @@ Classes:
         string GetSourceManagerStats(
             # describe all of the source managers, and return as string 
         )
+
+        # return the list of reistered object names
+        string[] getRegistedObjects(        #return list of names
+            type                            #type id of object's class
+            
 
 Functions
 

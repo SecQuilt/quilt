@@ -22,9 +22,10 @@ Classes:
         ###########
 
         # The name of the environment variable that defines the location
-        # of the quilt config file.  This will be the filesystem path to a 
-        # config file.
-        QUILT_CFG_LOC_VAR='QUILT_CFG'
+        # of the quilt config directory.  This will be the filesystem path to a 
+        # directory containing a quilt.cfg file.  ALso it may have a smd.d 
+        # subdirectory where sourcemaster configurations may be
+        QUILT_CFG_DIR_VAR='QUILT_CFG_DIR'
 
         ############
         # Operations
@@ -33,18 +34,23 @@ Classes:
         # Constructor, reads the configuration 
         def __init__():
             # default configuration location to /etc/quilt/quilt.conf
-            # if QUILT_CFG_LOC_VAR set, set location to that value
+            # if QUILT_CFG_DIR_VAR set, set location off of that value
             # if config file exists at location, read it in
         
         # Access a configuration value.  Configuraiton values can be
         # specified with a section and a name.  The configuration value is
         # returned.  If the specified value is not present the passed in
         # default is returned.
-        def getValue(        # [out] string
+        def GetValue(        # [out] string
             self,
             sectionName,     # [in] string, name of section
             valueName,       # [in] string, name of value
             default)         # [in] string, value of default
+
+        # iterate through the source managers defined in the configuration
+        # these will be the files inside of $QUILT_CFG/smd.d
+        def GetSourceManagers(  # [out] list of all defined source managers
+            self)
 
 
     class QueryMasterClient
@@ -82,11 +88,14 @@ Functions:
     # Used to publish the client as a remote object, and complete the
     #   connection with the query master
     static query_master_client_main_helper(
-            clientObject        # the object to use as the client)
+            clientObjectDic        # map of names to instances of objects to
+                                   # host as pyro objects)
         # Use QuiltConfig to read in configuration 
         # access the registrar's host and port number from config
-        # register the clientObject with the local PyRo Daemon with 
-        # call the ConnectToQueryMaster to complete registration
+        # iterate the names and objects in clientObjectDic
+            # register the clientObject with the local PyRo Daemon with 
+            # use the key name as the object name        
+            # call the ConnectToQueryMaster to complete registration
         # start the Daemon's event loop
     
         Notes:
@@ -106,6 +115,9 @@ Functions:
         
 Schema:
 
+    Main Config File
+    ----------------
+
     # Configuration file has the following defined sections values and
     # defaults
 
@@ -120,3 +132,15 @@ Schema:
                              # pyro nameservers on system)
     name : 'query_master'    # name for of the query master instance
 
+    [source_managers]
+    config_dir  : '$QUILT_CFG/smd.d'    # directory containing smd configs
+
+    [testing]
+    includes    :   '*'     # files to run as testing scripts
+    sleep       :   '1'     # minutes to sleep between test 
+
+    Soure Manager Config File
+    -------------------------
+
+    [NAME]      # the name of the source manager
+    key         :   value   # specific per source manager

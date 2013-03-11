@@ -1,0 +1,39 @@
+quilt 0.1 project architecture
+------------------------------
+   
+Source Control: 
+    Quilt is a git module.  To get a sandbox copy:
+    git clone git@10.27.112.10:quilt
+
+    Password can be retrieved from anyone on Innovation Center team, or email
+    dhkarimi@sei.cmu.edu
+
+
+Continuous Integration:
+    Builds provided by Hudson
+    http://10.27.112.10:8181/quilt
+
+
+Packaging:
+    Packaging provided seibuild via CMake
+    https://wiki-int.sei.cmu.edu/confluence/display/CYBINV/seibuild
+
+
+Project Layout:
+
+    quilt               # project root
+        sweng           # software engineering (design, planning artifacts)
+            0.1         # artifacts for version 0.1
+                proto   # prototyping code 
+        bin             # executables and executable scripts
+        lib             # library definitions
+        etc             # flat files
+        test            # testing artifacts         
+            bin         # test scripts/executables
+            etc         # flat files needed for testing
+
+
+
+
+
+           
