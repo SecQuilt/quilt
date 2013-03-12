@@ -14,7 +14,7 @@ External Dependenies:
 
 Responsibilities:
     behave like a good Daemon process
-    run a PyRo daemon to host QueryMaster as a remote object 
+    run a PyRo daemon to host SourceMaster as a remote object 
 
 Classes:
 

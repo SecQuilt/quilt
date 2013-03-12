@@ -17,7 +17,7 @@ Prototype:
     see any unittest in seiscripts
 
 Responsibilities:
-    Perform a basic query to conifirm basic funcitoning of components
+    Perform a basic operations to conifirm basic funcitoning of components
 
 Classes:
 
@@ -28,7 +28,7 @@ Classes:
             # Use QuiltConfig, Call GetSourceManagers, for each one
                 # use pyro, create proxy for the smd
                 # call GetLastQuery()
-                # assure it is equal to "find me again"
+                # assure it is equal to "find me again [uniqueval]"
             # check qmd to be sure that all quilt_submit's have unregistered
             # do this by accessing Config, finding qmd name,
             # create pyro proxy for qmd, call
@@ -38,12 +38,13 @@ Classes:
             # running simultaneiously
 
         def BasicQueueTest()
-            # call quilt_submit "find me again" (check return code, capture
-            #       query id output)
+            # call quilt_submit "find me again [uniqueval]" (check return 
+            #       code, capture query id output)
             # sleep 2 seconds
             # call quilt_q (check return code, capture output)
             # assure output contains same query id as before
             # call quilt_q -q query_id (check return code, capture output)
+            # assure output contains same query id as before
             # call quilt_q -q FAKEid (check return code, capture output)
             # assure no output
             # check qmd to be sure that all quilt_q's have unregistered
@@ -56,7 +57,7 @@ Classes:
         def BasicStatusTest()
             # call quilt_status (check return code, capture output)
             # assure that name of the test source manager appears in the
-            # output
+            # output, test source name specified int testing etc smd.d dir
             # check qmd to be sure that all quilt_status's have unregistered
             # do this by accessing Config, finding qmd name,
             # create pyro proxy for qmd, call

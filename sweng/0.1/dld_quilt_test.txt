@@ -51,7 +51,7 @@ Functions:
     def at_exit
         # stop smd
         # stop qmd
-        @ stop registrar
+        # stop registrar
     
         
 Schema:

@@ -33,7 +33,7 @@ Classes:
         
         # Constructor, reads the configuration 
         def __init__():
-            # default configuration location to /etc/quilt/quilt.conf
+            # default configuration location to /etc/quilt
             # if QUILT_CFG_DIR_VAR set, set location off of that value
             # if config file exists at location, read it in
         

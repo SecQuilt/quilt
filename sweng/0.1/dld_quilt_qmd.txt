@@ -23,12 +23,11 @@ Classes:
 
     class QueryMaster
 
-        # Register a source manager with the query master
-        string RegisterSourceManager(   # return master's key name for the
-                                        #   source
+        # Register a client with the query master
+        string RegisterClient(   # return key name for the client
             string nameServerHost,      # ip address of nameserver
             int nameServerPort,         # port for the nameserver
-            string sourceManagerName    # name of the source manager on
+            string clientName           # name of the source manager on
                                         # the specified nameserver
             )
             # get the proxy handle to the remote object 
@@ -36,16 +35,18 @@ Classes:
             # passed in name, but double check registered list.
             # Store in list of registered source masters
             # use object's name and type to key it in the registerd list
+            # TODO, verify we can get type from proxy obj, otherwise
+            #   will have to pass it in.
             # return the determined name
 
             Notes:
-               The returned name should be stored by smd so that it knows how
+               The returned name should be stored by client so that it knows how
                itself is known to the QMD
              
-        # UnRegister a source manager with the query master
-        void UnRegisterSourceManager(
-            string sourceManagerNameKey     # key that the qwmd knows ro
-                                            #   recognize a smd
+        # UnRegister a client with the query master
+        void UnRegisterClient(
+            string clientNameKey            # key that the qwmd knows ro
+                                            #   recognize a client
         )
             # remove the specified sm from registered list
             # if not found in the list, do nothing
