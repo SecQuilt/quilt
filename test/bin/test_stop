@@ -1,0 +1,6 @@
+#!/bin/sh
+
+scriptPath=$(dirname $0)
+export PYTHONPATH=$scriptPath/../../lib:$scriptPath/../lib
+$scriptPath/../lib/quilt_test.py stop
+
