@@ -14,6 +14,13 @@ Responsibilities:
 
 Classes:
 
+    # responsible for common daemon functionality
+    class QuiltDaemon:
+        setup_process(name)
+            # perform common daemon setup stuff
+            # set stdin, stdout, stderr to TTY or to null if no TTY
+            # set the pid file path and the pid timeout
+
     # Responsible for access to quilt configuration
     class QuiltConfig():
         
@@ -119,15 +126,22 @@ Schema:
     ----------------
 
     # Configuration file has the following defined sections values and
-    # defaults
+    # defaults, all pyro objects hosted on this machine will use this
+    # registrar
 
     [registrar]
-    port : ''           # port used by nameserver 'name' default is random
+    port : None           # port used by nameserver 'name' default is random
+    host : None           # host used by nameserver default is localhost
 
+    # the location of the query master.  This section is for the client's
+    # to be able to find the query master.  The query master machine does
+    # not use this section for registrat informaiton, it will be 
+    # regestered at location specified in [registrar] section with the
+    # name specified in this section.
     [query_master]
-    registrar_host : ''      # hostname of the registrar default is
+    registrar_host : None      # hostname of the registrar default is
                              # localhost
-    registrar_port : ''      # port of the registrar default search for
+    registrar_port : None      # port of the registrar default search for
                              # registrar port (could be wrong if multiple
                              # pyro nameservers on system)
     name : 'query_master'    # name for of the query master instance

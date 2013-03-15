@@ -1,0 +1,32 @@
+quilt 0.1 test core design
+--------------------------
+
+Module: quilt_test_core
+
+Type: Library
+
+
+Internal Dependencies:
+
+External Dependenies:
+    argparse
+    logging
+
+Prototpe:
+    seiscripts/tests/unittest_main_helper.pu
+
+
+Responsibilities:
+    Reusable utility funcionality for testing
+
+
+Functions:
+
+    def get_quilt_lib_dir
+        return the directory that quilt libraries (py files) are in
+
+    def main_helper
+        parse partial arguments for log level
+        set the log leverl accordingly
+        pup off used argument
+        return remainder of arguments

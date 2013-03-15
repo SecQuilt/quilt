@@ -1,19 +1,43 @@
 #!/usr/bin/env python
 import os
+import sys
 import logging
 from daemon import runner
 import quilt_core
+import Pyro4
+import query_master
 
-class Qmd(object):
+class Qmd(quilt_core.QuiltDaemon):
     def __init__(self):
-        self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/tty'
-        self.stderr_path = '/dev/tty'
-        self.pidfile_path =  '/tmp/qmd.pid'
-        self.pidfile_timeout = 5
-    def run(_self):
-        pass
+        self.setup_process("qmd")
 
-qmd = Qmd()
-quilt_core.query_master_client_main_helper(
-    { Qmd() : "asd" }
+    def run(_self):
+
+        # Use QuiltConfig to read in configuration
+        cfg = quilt_core.QuiltConfig()
+        # access the registrar's host and port number from config
+        registrarHost = cfg.GetValue(
+            'registrar', 'host', None)
+        registrarPort = cfg.GetValue(
+            'registrar', 'port', None) 
+       
+        # access the query master's name from the config file
+        qmname = cfg.GetValue(
+            'query_master', 'name', 'QueryMaster')
+
+        qm = query_master.QueryMaster()
+ 
+        daemon=Pyro4.Daemon()
+        ns=Pyro4.locateNS(registrarHost, registrarPort)   
+        # register the query master with the local PyRo Daemon with
+        uri=daemon.register(qm)
+        # use the key name as the object name
+        ns.register(qmname,uri)
+            
+        # start the Daemon's event loop
+        daemon.requestLoop() 
+
+
+
+daemon_runner = runner.DaemonRunner(Qmd())
+daemon_runner.do_action()

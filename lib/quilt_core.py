@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-import re
 import os
-import time
+import sys
 import ConfigParser
 import logging
 from os import listdir
@@ -25,38 +24,41 @@ class QuiltConfig:
         cfgdir = '/etc/quilt'
         
         # if QUILT_CFG_DIR_VAR set, set location off of that value
-        if QUILT_CFG_DIR_VAR in os.environ:
-            cfgdir = os.environ[QUILT_CFG_DIR_VAR]        
+        if self.QUILT_CFG_DIR_VAR in os.environ:
+            cfgdir = os.environ[self.QUILT_CFG_DIR_VAR]        
+
+        return cfgdir
 
     def __init__(self):
         """Construct the object, read in the main quilt.cfg file"""
        
         # if config file exists at location, read it in
-        quiltcfg = os.path.join(GetCfgDir(), 'quilt.cfg')
+        quiltcfg = os.path.join(self.GetCfgDir(), 'quilt.cfg')
 
         if not os.path.exists(quiltcfg):
-            raise Exception("quilt config not found at: " + quiltcfg)
-
-        self._config = Config.ConfigParser()
-        self._config.read(quiltcfg)
+            logging.warning("quilt config not found at: " + quiltcfg)
+        else:
+            self._config = Config.ConfigParser()
+            self._config.read(quiltcfg)
 
     def GetValue(        # [out] string
         self,
         sectionName,     # [in] string, name of section
         valueName,       # [in] string, name of value
-        default)         # [in] value of default
+        default):        # [in] value of default
         """Access a configuration value.  Configuraiton values can be
         specified with a section and a name.  The configuration value is
         returned.  If the specified value is not present the passed in
         default is returned."""
        
-        if self._config.has_optiony(sectionName,valueName):
-            return self._config.get(sectionName,valueName)
+        if (    self._config == None or
+                not self._config.has_section(sectionName) or
+                not self._config.has_option(sectionName,valueName)):
+            return default
 
-        return default
+        return self._config.get(sectionName,valueName)
 
-
-    def GetSourceManagers(self)
+    def GetSourceManagers(self):
         """get list of all defined source managers"""
     
         # iterate through the source managers defined in the configuration
@@ -76,42 +78,55 @@ class QuiltConfig:
         smdnames = []
         for f in smdcfgs:
             c = ConfigParser.ConfigParser()
-            c.read(join(smdcfgdir, f)
-                for s in c.sections():
-                    smdnames.append(s)
+            c.read(join(smdcfgdir, f))
+            sections = c.sections()
+            for s in sections:
+                smdnames.append(s)
         return smdnames
                     
 
-    
-    
-    def static query_master_client_main_helper(
-            clientObjectDict       # map of instances to names of objects to
-                                   # host as pyro objects
-        ):
-        """Used to publish the client as a remote object, and complete the
-        connection with the query master"""
+class QuiltDaemon(object):
+   
+    def setup_process(self, name):
+        if sys.stdin.isatty():
+            outdev = '/dev/tty'
+        else:
+            outdev = '/dev/null'
 
-        # Use QuiltConfig to read in configuration
-        cfg = QuiltConfig()
-        # access the registrar's host and port number from config
-        registrarHost = cfg.GetValue(
-            'registrar', 'registrar_host', 'localhost')
-        registrarPort = cfg.GetValue(
-            'registrar', 'registrar_port', None) 
+        self.stdin_path = '/dev/null'
+        self.stdout_path = outdev
+        self.stderr_path = outdev
+        self.pidfile_path =  '/tmp/' + name + '.pid'
+        self.pidfile_timeout = 5
+
+def query_master_client_main_helper(
+        clientObjectDict       # map of instances to names of objects to
+                               # host as pyro objects
+    ):
+    """Used to publish the client as a remote object, and complete the
+    connection with the query master"""
+
+    # Use QuiltConfig to read in configuration
+    cfg = QuiltConfig()
+    # access the registrar's host and port number from config
+    registrarHost = cfg.GetValue(
+        'registrar', 'host', None)
+    registrarPort = cfg.GetValue(
+        'registrar', 'port', None) 
+    
+    daemon=Pyro4.Daemon()
+    ns=Pyro4.locateNS(registrarHost, registrarPort)   
+    # iterate the names and objects in clientObjectDict
+    for name,obj in clientObjectDict:
+        # register the clientObject with the local PyRo Daemon with
+        uri=daemon.register(obj)
+        # use the key name as the object name
+        ns.register(name,uri)
+        # call the ConnectToQueryMaster to complete registration
+        obj.ConnectToQueryMaster()
         
-        daemon=Pyro4.Daemon()
-        ns=Pyro4.locateNS(registrarHost, registrarPort)   
-        # iterate the names and objects in clientObjectDict
-        for name,obj in clientObjectDict:
-            # register the clientObject with the local PyRo Daemon with
-            uri=daemon.register(obj)
-            # use the key name as the object name
-            ns.register(name,uri)
-            # call the ConnectToQueryMaster to complete registration
-            obj.ConnectToQueryMaster()
-            
-        # start the Daemon's event loop
-        daemon.requestLoop() 
+    # start the Daemon's event loop
+    daemon.requestLoop() 
 
 
         
