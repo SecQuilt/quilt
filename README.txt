@@ -8,9 +8,9 @@ The rest should be std python, but if you find something, add it above.
 
 To run:
 
-$ test/bin/start_test
+$ test/bin/test_start
 
 
 Then after you are satisfied:
 
-$ test/bin/stop_test
+$ test/bin/test_stop
