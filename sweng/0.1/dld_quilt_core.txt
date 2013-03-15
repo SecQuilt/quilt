@@ -88,7 +88,7 @@ Functions:
     # Used to publish the client as a remote object, and complete the
     #   connection with the query master
     static query_master_client_main_helper(
-            clientObjectDic        # map of names to instances of objects to
+            clientObjectDic        # map of instances to names of objects to
                                    # host as pyro objects)
         # Use QuiltConfig to read in configuration 
         # access the registrar's host and port number from config

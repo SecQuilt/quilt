@@ -69,7 +69,8 @@ class QuiltConfig:
                 "Source Manager config file directory does not exist" +
                 smdcfgdir)
         
-        smdcfgs = [ f for f in listdir(smdcfgdir) if isfile(join(smdcfgdir,f)) ]
+        smdcfgs = [ f for f in listdir(smdcfgdir) 
+            if isfile(join(smdcfgdir,f)) ]
 
         # read all sections from all config file sin the smd directory
         smdnames = []
@@ -84,33 +85,33 @@ class QuiltConfig:
     
     
     def static query_master_client_main_helper(
-            clientObjectDict       # map of names to instances of objects to
+            clientObjectDict       # map of instances to names of objects to
                                    # host as pyro objects
         ):
         """Used to publish the client as a remote object, and complete the
         connection with the query master"""
 
         # Use QuiltConfig to read in configuration
+        cfg = QuiltConfig()
         # access the registrar's host and port number from config
-        # iterate the names and objects in clientObjectDic
+        registrarHost = cfg.GetValue(
+            'registrar', 'registrar_host', 'localhost')
+        registrarPort = cfg.GetValue(
+            'registrar', 'registrar_port', None) 
+        
+        daemon=Pyro4.Daemon()
+        ns=Pyro4.locateNS(registrarHost, registrarPort)   
+        # iterate the names and objects in clientObjectDict
+        for name,obj in clientObjectDict:
             # register the clientObject with the local PyRo Daemon with
+            uri=daemon.register(obj)
             # use the key name as the object name
+            ns.register(name,uri)
             # call the ConnectToQueryMaster to complete registration
+            obj.ConnectToQueryMaster()
+            
         # start the Daemon's event loop
+        daemon.requestLoop() 
 
-        Notes:
-            We wouldn't necessarily have to register the client for two way
-            communicaiton if it was going to perform a non validating submit.
-            However, I feel that in the future we will care more about security of
-            the system, and forcing it to register will enable the two way calling
-            likely used for a secret handshake
-
-            Is there a potential timing issue here?  If the master makes a return
-            call after we submit the query before our daemon event loop gets
-            rolling?  Keep and eye on this.
-
-            TODO hardening:
-            The clients are not hardened to unregister themselves when
-            exceptions are thrown at this time.
 
         
