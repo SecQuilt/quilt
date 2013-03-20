@@ -36,7 +36,7 @@ Functions:
         # Repeat Forever
             # Read quilt config (should be quilt test config)
             # access value "testing", "includes"
-            # iterate each file in the test directory
+            # iterate each file in the test globs
                 # skip file if it does not match includes
                 # load unit tests from those files
             # run the tests

@@ -11,6 +11,7 @@ Internal Dependencies:
 External Dependenies:
     python-pyro(4)
     python-daemon
+    threading
 
 Responsibilities:
     behave like a good Daemon process
@@ -21,15 +22,20 @@ Prototype : testd
 
 Classes:
 
-    class QueryMaster
+    class QueryMaster 
+
+        # create a lock for this class, coarse grained but
+        # proably good enough.
+        self._lock = threading.lock()
 
         # Register a client with the query master
         string RegisterClient(   # return key name for the client
             string nameServerHost,      # ip address of nameserver
-            int nameServerPort,         # port for the nameserver
+            string nameServerPort,         # port for the nameserver
             string clientName           # name of the source manager on
                                         # the specified nameserver
             )
+            # acquire lock
             # get the proxy handle to the remote object 
             # determine unique name for source master (hopefuly just using the
             # passed in name, but double check registered list.
@@ -45,9 +51,11 @@ Classes:
              
         # UnRegister a client with the query master
         void UnRegisterClient(
+            string clientType               # client type
             string clientNameKey            # key that the qwmd knows ro
                                             #   recognize a client
         )
+            # acquire lock
             # remove the specified sm from registered list
             # if not found in the list, do nothing
             # call the remote object's shutdown method
@@ -60,6 +68,7 @@ Classes:
             string notificatoinAddress      # the email addresses for
                                             #   notification
         )
+            # acquire lock
             # create proxy to the submitter
             # generate a query id
             # call submitter's validate function
@@ -74,20 +83,24 @@ Classes:
 
         # format a string with information about all the Query's in the q
         string GetQueryQueueStats()
+            # acquire lock
 
         # format a string with information abour the specified query
         string GetQueryStats(
             string queryID          # the query we are interested in
         )
+            # acquire lock
 
         # format a string with information about all source managers
         string GetSourceManagerStats(
             # describe all of the source managers, and return as string 
         )
+            # acquire lock
 
         # return the list of reistered object names
         string[] getRegistedObjects(        #return list of names
             type                            #type id of object's class
+            # acquire lock
             
 
 Functions

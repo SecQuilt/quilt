@@ -60,8 +60,15 @@ Classes:
             self)
 
 
-    class QueryMasterClient
+    class QueryMasterClient : Pyro.core.SynchronizedObjBase
         
+        Note: To avoid having to deal with theading and locking, all
+            methods are considered locked, we are using SynchronizedObjBase
+            
+        # create a lock for this class, coarse grained but
+        # proably good enough.
+        self._lock = threading.lock()
+
         # Connect to the query master
         void ConnectToQueryMaster():
             # Access the QueryMaster's registrar's host and port from the config            
@@ -78,7 +85,9 @@ Classes:
 
 
         # Constructor
-        void __init__()
+        void __init__( basename )
+            # set a local name based off the base name that will be 
+            # unique for this machine
 
         def GetType()
             # return the type id of this class
@@ -86,9 +95,9 @@ Classes:
         string GetRegisteredName()
             # return the name the query manager assigned to this client
 
-    # Disconnect from the query Master
-    void DisconnectFromQueryMaster()
-        # call query master's unregister function
+        # Disconnect from the query Master
+        void DisconnectFromQueryMaster()
+            # call query master's unregister function
 
 Functions:
 
@@ -150,8 +159,11 @@ Schema:
     config_dir  : '$QUILT_CFG/smd.d'    # directory containing smd configs
 
     [testing]
-    includes    :   '*'     # files to run as testing scripts
-    sleep       :   '1'     # minutes to sleep between test 
+    includes    :   ['*_testcase.py']    # file globs to run as testing 
+                                         # scripts (no pathing
+                                #     needed assumed to be in test lib dir)
+                                #     like ['*TestSuite1*', *TestSuite2* ] 
+    sleep       :   1     # minutes to sleep between test (float supported)
 
     Soure Manager Config File
     -------------------------

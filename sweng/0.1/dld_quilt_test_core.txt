@@ -25,6 +25,12 @@ Functions:
     def get_quilt_lib_dir
         return the directory that quilt libraries (py files) are in
 
+    def get_test_cfg_dir():
+       """Get the location of the quilt testing configuration file"""
+
+    def get_quilt_test_lib_dir():
+        """grab the location of quilt test scritps"""
+
     def main_helper
         parse partial arguments for log level
         set the log leverl accordingly

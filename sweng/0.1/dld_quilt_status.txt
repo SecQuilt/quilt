@@ -21,6 +21,7 @@ Classes:
             args    # see functional_specification of query_q
         )
             # store args as member variable
+            # chain to call base constructor
 
          OnConnectionComplete()
             # print out statistics about the manager's sources
@@ -35,7 +36,7 @@ Functions:
     def main(argc,argv)
         # setup argument parser in accordance with funcitonal specification
         # parse the arguments, exit with error message if unparseable
-        # create the quilt q object
+        # create the quilt status object
         # call query_master_client_main_helper
 
 

@@ -54,7 +54,7 @@ Classes:
             # TODO parameterize this test if needed, could fail if anyone is
             # running Q simultaneiously
 
-        def BasicStatusTest()
+        def test_basic_status()
             # call quilt_status (check return code, capture output)
             # assure that name of the test source manager appears in the
             # output, test source name specified int testing etc smd.d dir

@@ -28,6 +28,7 @@ Query Master
         -q QUERY    # A query to run on the system
         [-e EMAIL]  # comma seperated list of emails to supply notifications
         [-y]        # whether to automatically confirm the query
+        [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
 
         Quilt Submit will allow submission of a query.  It will communicate with
         the query master, recieve estimated time/space metrics of teh query,
@@ -36,11 +37,13 @@ Query Master
 
     quilt_q
         [-qid QUERY_ID]     # optional argument, which query to check
+        [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
 
         Quilt status will display information about queries in the queue.  If id
         is specified, only that query's information will be displayed
 
     quilt_status
+        [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
         
         Display information about the quilt system, including registered
         source managers

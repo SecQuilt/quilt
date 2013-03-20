@@ -3,8 +3,11 @@ import os
 import sys
 import ConfigParser
 import logging
+import Pyro4
 from os import listdir
 from os.path import isfile, join
+import threading
+import getpass
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -38,7 +41,7 @@ class QuiltConfig:
         if not os.path.exists(quiltcfg):
             logging.warning("quilt config not found at: " + quiltcfg)
         else:
-            self._config = Config.ConfigParser()
+            self._config = ConfigParser.ConfigParser()
             self._config.read(quiltcfg)
 
     def GetValue(        # [out] string
@@ -46,10 +49,12 @@ class QuiltConfig:
         sectionName,     # [in] string, name of section
         valueName,       # [in] string, name of value
         default):        # [in] value of default
-        """Access a configuration value.  Configuraiton values can be
+        """
+        Access a configuration value.  Configuraiton values can be
         specified with a section and a name.  The configuration value is
         returned.  If the specified value is not present the passed in
-        default is returned."""
+        default is returned.
+        """
        
         if (    self._config == None or
                 not self._config.has_section(sectionName) or
@@ -99,12 +104,67 @@ class QuiltDaemon(object):
         self.pidfile_path =  '/tmp/' + name + '.pid'
         self.pidfile_timeout = 5
 
+class QueryMasterClient:
+    
+    _lock = threading.Lock()
+
+    def __init__(self, basename):
+        """
+        use user name and pid in the name of the object
+        to generate a unique enough name for this machine
+        """
+        self._localname = '_'.join(
+            basename, getpass.getuser(), str(os.getpid()))
+
+    def OnConnectionComplete(self):
+        pass
+
+    def GetType(self):
+        raise Exception("""Abstract function is rquired to be implemented by
+            subclass""")
+
+    def ConnectToQueryMaster(self):
+        """Connect to the query master, register this client"""
+        
+        # Access the QueryMaster's registrar's host and port from the config
+        config = QuiltConfig()
+        qmhost = config.GetValue("query_master", "registrar_host", None)
+        qmport = config.GetValue("query_master", "registrar_port", None)
+
+        # access the Query Master's instance name, create a proxy to it
+        qmname = config.GetValue("query_master", "name", None)
+        ns = Pyro4.locateNS(qmhost, qmport)
+        #TODO think about adding cleanup code to client to nicly disconnect
+        # store a reference to the query master as a member variable
+        _qm = Pyro4.proxy(ns.lookup(qmname))
+        
+        # register the client with the query master, record the name
+        # record the name the master assigned us as a member variable
+        rport = config.GetValue("registrar", "port", None)
+        if rport != None:
+            rport = int(rport)
+        _remotename = _qm.RegisterClient(
+            config.GetValue("registrar", "host", None),
+            rport,
+            _localname)
+
+        # connection complete, call our notification function
+        logging.info("Connection completed for " + self._localname)
+        self.OnConnectionComplete()
+
+    def DisconnectFromQueryMaster(self):
+        if _qm != None and _remotename != None:
+            _qm.UnRegister(GetType(), _remotename)
+            logging.info("Disconnection completed for " + self._localname)
+
 def query_master_client_main_helper(
         clientObjectDict       # map of instances to names of objects to
                                # host as pyro objects
     ):
-    """Used to publish the client as a remote object, and complete the
-    connection with the query master"""
+    """
+    Used to publish the client as a remote object, and complete the
+    connection with the query master
+    """
 
     # Use QuiltConfig to read in configuration
     cfg = QuiltConfig()

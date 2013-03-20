@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ "$1" ] ; then sleepytime=$1; else sleepytime=5; fi
+$(dirname $0)/test_start
+sleep $sleepytime
+$(dirname $0)/test_stop

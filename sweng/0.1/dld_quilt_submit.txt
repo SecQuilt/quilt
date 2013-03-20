@@ -21,6 +21,7 @@ Classes:
             args    # see functional_specification of query_submit
         )
             # store args as member variable
+            # chain to super constructor
 
         bool ValidateQuery(
             string queryMetricMsg   # message to user about time and space

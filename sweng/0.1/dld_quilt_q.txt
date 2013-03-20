@@ -21,6 +21,7 @@ Classes:
             args    # see functional_specification of query_q
         )
             # store args as member variable
+            # chain to super constructor
 
          OnConnectionComplete()
             # print out statistics about the manager's Q
