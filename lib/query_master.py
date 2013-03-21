@@ -8,9 +8,6 @@ class QueryMaster:
     _clients = {}
     _lock = threading.Lock()
 
-    def __init__(self):
-        with self._lock:
-            Pyro.core.SynchronizedObjBase.__init__(self)
     def RegisterClient(
         self,
         nameServerHost,

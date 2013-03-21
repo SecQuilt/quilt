@@ -6,14 +6,14 @@ from daemon import runner
 import quilt_core
 import Pyro4
 import query_master
-import getpass
 import argparse
 
 class QuiltStatus(quilt_core.QueryMasterClient):
 
     def __init__(self, args):
         # chain to call super class constructor 
-        super(QuiltStatus, self).__init__(GetType())
+        # super(QuiltStatus, self).__init__(GetType())
+        quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
 
     def OnConnectionComplete(self):
@@ -27,6 +27,7 @@ class QuiltStatus(quilt_core.QueryMasterClient):
 
 def main(argv):
     
+    print "Status args: ", str(argv)
 
     # setup command line interface
     parser = argparse.ArgumentParser(description="""Display information 
@@ -46,9 +47,9 @@ def main(argv):
     # create the object and begin its life
     client = QuiltStatus(args)
     quilt_core.query_master_client_main_helper({
-        client._name : client})
+        client._localname : client})
         
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main(sys.argv[1:])
 

@@ -31,7 +31,7 @@ Classes:
         # Register a client with the query master
         string RegisterClient(   # return key name for the client
             string nameServerHost,      # ip address of nameserver
-            string nameServerPort,         # port for the nameserver
+            int nameServerPort,         # port for the nameserver
             string clientName           # name of the source manager on
                                         # the specified nameserver
             )

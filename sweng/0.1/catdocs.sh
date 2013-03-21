@@ -1,4 +1,4 @@
-for i in $(ls *.txt) 
+(for i in $(ls *.txt) 
 do 
 echo "
 
@@ -24,4 +24,4 @@ echo "
 
 "
 
-done 
+done) | cat -n 

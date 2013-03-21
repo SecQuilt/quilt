@@ -114,7 +114,7 @@ class QueryMasterClient:
         to generate a unique enough name for this machine
         """
         self._localname = '_'.join(
-            basename, getpass.getuser(), str(os.getpid()))
+            [basename, getpass.getuser(), str(os.getpid())])
 
     def OnConnectionComplete(self):
         pass
@@ -132,21 +132,21 @@ class QueryMasterClient:
         qmport = config.GetValue("query_master", "registrar_port", None)
 
         # access the Query Master's instance name, create a proxy to it
-        qmname = config.GetValue("query_master", "name", None)
+        qmname = config.GetValue("query_master", "name", "QueryMaster")
         ns = Pyro4.locateNS(qmhost, qmport)
         #TODO think about adding cleanup code to client to nicly disconnect
         # store a reference to the query master as a member variable
-        _qm = Pyro4.proxy(ns.lookup(qmname))
+        _qm = Pyro4.Proxy(ns.lookup(qmname))
         
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable
         rport = config.GetValue("registrar", "port", None)
         if rport != None:
             rport = int(rport)
-        _remotename = _qm.RegisterClient(
+        self._remotename = _qm.RegisterClient(
             config.GetValue("registrar", "host", None),
             rport,
-            _localname)
+            self._localname)
 
         # connection complete, call our notification function
         logging.info("Connection completed for " + self._localname)
@@ -177,7 +177,7 @@ def query_master_client_main_helper(
     daemon=Pyro4.Daemon()
     ns=Pyro4.locateNS(registrarHost, registrarPort)   
     # iterate the names and objects in clientObjectDict
-    for name,obj in clientObjectDict:
+    for name,obj in clientObjectDict.items():
         # register the clientObject with the local PyRo Daemon with
         uri=daemon.register(obj)
         # use the key name as the object name
