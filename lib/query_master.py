@@ -12,7 +12,8 @@ class QueryMaster:
         self,
         nameServerHost,
         nameServerPort,
-        clientName):
+        clientName,
+        clientType):
         """
         Register a client with the query master
         string RegisterClient(   # return key name for the client
@@ -26,8 +27,10 @@ class QueryMaster:
 
             # get the proxy handle to the remote object 
             ns = Pyro4.locateNS(nameServerHost, nameServerPort)
-            client = Pyro4.proxy(ns.lookup(clientName))
+            client = Pyro4.Proxy(ns.lookup(clientName))
+            logging.debug("Calling back to client for client type...")
             clientType = client.GetType()
+            logging.debug(clientName + " is a " + clientType)
             
             # determine unique name for client (hopefuly just using the
             # passed in name, but double check registered list.

@@ -30,8 +30,11 @@ Notes:
     server on the machine that hosts that object.  This is configurable
     and the interface will allow for using one nameserver for testing.
 
-Functions:
-    
+class Registrar : QuiltDaemon
+
+    def __init__():
+        chain to call parent init function
+        setup daemon pid/io stuff with QuiltDaemon.setup_process
     def Run():
         # Use QuiltConfig to read in configuration 
         # access the registrar's port number from config

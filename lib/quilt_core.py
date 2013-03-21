@@ -8,6 +8,8 @@ from os import listdir
 from os.path import isfile, join
 import threading
 import getpass
+import lockfile
+from daemon import runner
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -91,7 +93,11 @@ class QuiltConfig:
                     
 
 class QuiltDaemon(object):
-   
+  
+    def __init__(self): 
+        logging.basicConfig(level=logging.DEBUG)
+
+    name = ''
     def setup_process(self, name):
         if sys.stdin.isatty():
             outdev = '/dev/tty'
@@ -103,6 +109,18 @@ class QuiltDaemon(object):
         self.stderr_path = outdev
         self.pidfile_path =  '/tmp/' + name + '.pid'
         self.pidfile_timeout = 5
+
+    def main(self, argv):
+        try:
+            daemon_runner = runner.DaemonRunner(self)
+            daemon_runner.do_action()
+        except lockfile.LockTimeout as e:
+            logging.error(self. name + " Lockfile exists: " + str(e)) 
+        except runner.DaemonRunnerStopFailureError as e:
+            logging.error(self.name + " Failed to stop daemon: " + str(e))
+        except:
+            raise
+                
 
 class QueryMasterClient:
     
@@ -134,19 +152,24 @@ class QueryMasterClient:
         # access the Query Master's instance name, create a proxy to it
         qmname = config.GetValue("query_master", "name", "QueryMaster")
         ns = Pyro4.locateNS(qmhost, qmport)
+        uri = ns.lookup(qmname)
+
+        logging.debug(qmname + " is at uri: " + str(uri))
+
         #TODO think about adding cleanup code to client to nicly disconnect
         # store a reference to the query master as a member variable
-        _qm = Pyro4.Proxy(ns.lookup(qmname))
+        _qm = Pyro4.Proxy(uri)
         
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable
         rport = config.GetValue("registrar", "port", None)
         if rport != None:
             rport = int(rport)
+        rhost = config.GetValue("registrar", "host", None)
+        logging.debug("Registering " + self._localname + ", to: " + qmname + 
+            ", via registrar: " + str(rhost) + ":" + str(rport))
         self._remotename = _qm.RegisterClient(
-            config.GetValue("registrar", "host", None),
-            rport,
-            self._localname)
+            rhost, rport, self._localname)
 
         # connection complete, call our notification function
         logging.info("Connection completed for " + self._localname)

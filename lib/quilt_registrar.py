@@ -2,12 +2,12 @@
 import os
 import sys
 import logging
-from daemon import runner
 import quilt_core
 import Pyro4
 
 class Registrar(quilt_core.QuiltDaemon):
     def __init__(self):
+        quilt_core.QuiltDaemon.__init__(self)
         self.setup_process("registrar")
 
     def run(_self):
@@ -24,6 +24,4 @@ class Registrar(quilt_core.QuiltDaemon):
         Pyro4.naming.startNSloop(registrarHost,registrarPort)
 
 
-
-daemon_runner = runner.DaemonRunner(Registrar())
-daemon_runner.do_action()
+Registrar().main(sys.argv[1:])

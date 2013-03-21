@@ -2,7 +2,6 @@
 import os
 import sys
 import logging
-from daemon import runner
 import quilt_core
 import Pyro4
 import query_master
@@ -21,14 +20,14 @@ class QuiltStatus(quilt_core.QueryMasterClient):
         _qm.UnRegisterClient(_remotename)
         
     def GetType(self):
+        logging.debug("Returning QuiltStatus client type")
         return "QuiltStatus"
         
 
 
+
 def main(argv):
     
-    print "Status args: ", str(argv)
-
     # setup command line interface
     parser = argparse.ArgumentParser(description="""Display information 
         about the quilt system, including registered source managers""")

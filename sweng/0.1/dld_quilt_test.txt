@@ -21,16 +21,32 @@ Prototpe:
 Responsibilities:
     Provide an Integration Testing Framework.  
 
+Global:
 
-Functions:
+# set QUILT_CFG_DIR environment variable to expanded path equal to 
+# etc folder inside of test folder
+
+Classes:
+
+class Qtd : QuiltDaemon
+
+    def __init__
+        # setup daemon pid/io variables with defaults
+        NOTES:
+            testing seemed to reveal strange behavior when resetting these
+            before starting other quilt daemons, but they had to exist
+            or errors would occur
 
     def run
-        # set QUILT_CFG_DIR environment variable to expanded path equal to 
-        # etc folder inside of test folder
         
+        # register the at_exit function to kill the daemons when qtd is killed
+
         # start registrar
         # start qmd
         # start smd
+
+        # re-setup daemon pid/io variables, this time fully daemonized
+        # done qith QuiltDaemon.setup_process()
 
 
         # Repeat Forever
@@ -47,6 +63,7 @@ Functions:
             
 
         
+Functions:
 
     def at_exit
         # stop smd

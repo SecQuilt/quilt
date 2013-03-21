@@ -11,9 +11,12 @@ from daemon import runner
 import time
 import glob
 import unittest
+import lockfile
 
-# We want a debug log level for testing
-logging.basicConfig(level=logging.DEBUG)
+
+# set environment variable for testing configuration directory
+cfgdir = quilt_test_core.get_test_cfg_dir()
+os.environ[quilt_core.QuiltConfig.QUILT_CFG_DIR_VAR] = cfgdir 
 
 def at_exit():
 
@@ -47,20 +50,26 @@ def filename_to_modulename(scriptsHome,filename):
     return filename
 
 class Qtd(quilt_core.QuiltDaemon):
-    def __init__(self):
-        self.setup_process('quilt_test')
-
-    def run(_self):
         
-        # set environment variable for testing configuration directory
-        cfgdir = quilt_test_core.get_test_cfg_dir()
-        os.environ[quilt_core.QuiltConfig.QUILT_CFG_DIR_VAR] = cfgdir 
 
-        quilt_lib_dir = quilt_test_core.get_quilt_lib_dir()
+    def __init__(self):
+        outdev = '/dev/tty'
+        self.stdin_path = '/dev/null'
+        self.stdout_path = outdev
+        self.stderr_path = outdev
+        self.pidfile_path =  '/tmp/quilt_test.pid' # probably good to 
+                                                # keep this matching the call to
+                                                # setup_process in run()
+        self.pidfile_timeout = 5
+
+
+    def run(self):
+
         # assemble the filename for query master
+        quilt_lib_dir = quilt_test_core.get_quilt_lib_dir()
         quilt_reg_file = os.path.join(quilt_lib_dir,'quilt_registrar.py')
         quilt_qmd_file = os.path.join(quilt_lib_dir,'quilt_qmd.py')
-        
+
         # start the query master daemon
         atexit.register(at_exit)
         logging.debug('Integration test starting: ' + quilt_reg_file)
@@ -68,11 +77,20 @@ class Qtd(quilt_core.QuiltDaemon):
         logging.debug('Integration test starting: ' + quilt_qmd_file)
         subprocess.call([quilt_qmd_file, 'start'])
 
+        self.setup_process('quilt_test')
+
+
+
         # the directory containing test scripts        
         quilt_test_lib_dir = quilt_test_core.get_quilt_test_lib_dir()
 
         # Repeat Forever
         while True:
+            # sleep before beginning
+            logging.debug("sleeping before test iteration")
+            cfg = quilt_core.QuiltConfig()
+            time.sleep(int(cfg.GetValue("testing","sleep","1")))
+            # read sleep value again in case user changed
             cfg = quilt_core.QuiltConfig()
             logging.info("Begin Itegration Testing iteration")
             
@@ -108,20 +126,14 @@ class Qtd(quilt_core.QuiltDaemon):
                 tests.append(curtest)
                 testFiles[testFile] = "Loaded"
             
-            testSuite = unittest.TestSuite(tests)
-            
             # run the tests
-            runner = unittest.TextTestRunner().run(testSuite)
+#            testSuite = unittest.TestSuite(tests)
+#            runner = unittest.TextTestRunner().run(testSuite)
 
             logging.info("End Itegration Testing iteration")
 
-            # read sleep value again in case user changed
-            cfg = quilt_core.QuiltConfig()
-            # sleep before repeating
-            time.sleep(int(cfg.GetValue("testing","sleep","1")))
 
         
 
 
-daemon_runner = runner.DaemonRunner(Qtd())
-daemon_runner.do_action()
+Qtd().main(argv[1:])

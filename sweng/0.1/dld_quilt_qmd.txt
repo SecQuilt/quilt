@@ -34,20 +34,25 @@ Classes:
             int nameServerPort,         # port for the nameserver
             string clientName           # name of the source manager on
                                         # the specified nameserver
+            string clientType           # nae of the type of the client
             )
             # acquire lock
-            # get the proxy handle to the remote object 
             # determine unique name for source master (hopefuly just using the
             # passed in name, but double check registered list.
-            # Store in list of registered source masters
+            # Store in list of registered clients
             # use object's name and type to key it in the registerd list
-            # TODO, verify we can get type from proxy obj, otherwise
-            #   will have to pass it in.
             # return the determined name
 
             Notes:
                The returned name should be stored by client so that it knows how
                itself is known to the QMD
+
+                Previously was attempting to call back to client in here, this
+                wasnot a good idea.  First of all it doesn't work, possibly
+                because calling pyro daemon was not given enough sleep to get
+                into the listening state.  Even if that was resolved, our
+                current locking strategy is at the funciton level.  We do not
+                want to call out of the function with the lock on!
              
         # UnRegister a client with the query master
         void UnRegisterClient(
@@ -102,16 +107,20 @@ Classes:
             type                            #type id of object's class
             # acquire lock
             
+    class Qmd : QuiltDaemon
 
-Functions
+        def __init__
+            # chain call to init QuiltDaemon
+            # setup daemon specifit io/pid values
+            #   (QuiltDaemon.setup_process())
 
-    def run():
-        # Use QuiltConfig to read in configuration 
-        # access the registrar's host and port number from config
-        # Create the Query Master object
-        # access the query master's name from the config file
-        # register the Query Master with the PyRo Daemon
-        # start the Daemon's event loop
+        def run():
+            # Use QuiltConfig to read in configuration 
+            # access the registrar's host and port number from config
+            # Create the Query Master object
+            # access the query master's name from the config file
+            # register the Query Master with the PyRo Daemon
+            # start the Daemon's event loop
 
     
         
