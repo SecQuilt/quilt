@@ -3,6 +3,8 @@ import logging
 import Pyro4
 import threading
 
+
+    
 class QueryMaster:
 
     _clients = {}
@@ -21,34 +23,36 @@ class QueryMaster:
             int nameServerPort,         # port for the nameserver
             string clientName           # name of the source manager on
                                         # the specified nameserver
+            string clientType           # name of the type of the client
         """
         with self._lock:
-            logging.info("Connecting client: " + clientName + "...")
+            logging.info("registering client: " + clientName + "...")
 
             # get the proxy handle to the remote object 
-            ns = Pyro4.locateNS(nameServerHost, nameServerPort)
-            client = Pyro4.Proxy(ns.lookup(clientName))
-            logging.debug("Calling back to client for client type...")
-            clientType = client.GetType()
             logging.debug(clientName + " is a " + clientType)
             
             # determine unique name for client (hopefuly just using the
             # passed in name, but double check registered list.
             uniqueName = clientName
             index = 1;
-            if clientType not in clients:
-                clients[clientType] = {}
+            if clientType not in self._clients:
+                self._clients[clientType] = {}
 
-            while uniqueName in clients[clientType]:
+            while uniqueName in self._clients[clientType]:
                 uniqueName = '_'.join(clientName,str(index))
                 index = index + 1
                
-            # Store in list of registered source masters
+            # Store in list of registered clients
             # use object's name and type to key it in the registerd list
-            self._clients[clientType][uniqueName] = client
+            self._clients[clientType][uniqueName] = {
+                'registrarHost' : nameServerHost,
+                'registrarPort' : nameServerPort,
+                'clientName' : clientName }
+                
 
             # return the determined name
-            logging.info("Done Connecting client: " + clientName + ".")
+            logging.info("registered client: " + clientName + " as " +
+                uniqueName + ".")
             return uniqueName
 
     def UnRegisterClient(
@@ -60,19 +64,30 @@ class QueryMaster:
          string clientType - part of key
          string clientNameKey - key that the qmd knows to id a client
         """
+        clientDict = None
         with self._lock:
             # if not found in the list, do nothing
-            if clientType not in clients:
+            if clientType not in self._clients:
                 return
-            if clientNameKey not in clients[clientType]:
+            if clientNameKey not in self._clients[clientType]:
                 return
-            client = clients[clientType][clientNameKey]
+            logging.info("Unregistering client: " + clientNameKey + "...")
+            clientDict = self._clients[clientType][clientNameKey]
             # remove the specified sm from registered list
             del self._clients[clientType][clientNameKey]
-             
-            # call the remote object's shutdown method
-            #TODO if this blocks too long, may need to async
-            logging.info("Shutting down client: " + clientNameKey + "...")
-            client.shutdown()
-            logging.info("done Shutting down client: " + clientNameKey + ".")
+
+        # client not found exit silently
+        if clientDict == None:
+            return
+
+        # call the remote object's shutdown method
+#       ns = Pyro4.locateNS(
+#           clientDict['registrarHost'], clientDict['registrarPort'])
+#       with Pyro4.Proxy(ns.lookup(clientDict['clientName'])) as client:
+#           logging.info("Shutting down client: " + 
+#               clientNameKey + "...")
+#           client.shutdown()
+#           logging.info("Done Shutting down client: " + 
+#               clientNameKey + ".")
+
 

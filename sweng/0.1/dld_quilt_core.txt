@@ -21,6 +21,12 @@ Classes:
             # set stdin, stdout, stderr to TTY or to null if no TTY
             # set the pid file path and the pid timeout
 
+        main(self, argv)
+            # setup argument parser
+            # setup loggging 
+            # run the daemon
+            # capture common exceptions and provide helopful error msg
+
     # Responsible for access to quilt configuration
     class QuiltConfig():
         
@@ -61,6 +67,7 @@ Classes:
 
 
     class QueryMasterClient : Pyro.core.SynchronizedObjBase
+
         
         Note: To avoid having to deal with theading and locking, all
             methods are considered locked, we are using SynchronizedObjBase
@@ -70,19 +77,29 @@ Classes:
         self._lock = threading.lock()
 
         # Connect to the query master
-        void ConnectToQueryMaster():
-            # Access the QueryMaster's registrar's host and port from the config            
+        void RegisterWithQueryMaster():
+            # Access the QueryMaster's registrar's host and port from the config
             # access the Query Master's instance name, create a proxy to it
             # store a reference to the query master as a member variable
             # register the client with the query master
             # record the name the master assigned us as a member variable
-            # call OnConnectionComplete()
         
-
         # funciton called when registration of this client is complete.
-        # Inteded for overriding by the implementing client.
-        void OnConnectionComplete()
+        # Intended for optional overriding by the implementing client.
+        # called in main thread before event loop begins
+        # return false to prevent event loop from running
+        bool OnRegisterEnd()
+            # return true
 
+        # funciton called when client's owning daemon begins an event loop
+        # function called in event loop main thread
+        # return False to end participation in event loop
+        bool OnEventLoopBegin()
+            # return true
+
+        # Unregister from the query Master
+        void UnregisterFromQueryMaster()
+            # call query master's unregister function
 
         # Constructor
         void __init__( basename )
@@ -95,14 +112,25 @@ Classes:
         string GetRegisteredName()
             # return the name the query manager assigned to this client
 
-        # Disconnect from the query Master
-        void DisconnectFromQueryMaster()
-            # call query master's unregister function
 
 Functions:
 
+    # Quilt helper function for main, do common things
+    def quilt_main_helper(
+        description                 # prose description of functionality
+        argv                        # input arguments
+        )
+        # create a new argument parser 
+        # setup specificaiton for logging parameter
+        # attempt to read logging parameter from argv
+        # pass parsed logging info to quilt_core configure logging
+        # return the argument parser
+
     # Used to publish the client as a remote object, and complete the
     #   connection with the query master
+
+    Prototype: daemon_server.py
+
     static query_master_client_main_helper(
             clientObjectDic        # map of instances to names of objects to
                                    # host as pyro objects)
@@ -111,23 +139,57 @@ Functions:
         # iterate the names and objects in clientObjectDic
             # register the clientObject with the local PyRo Daemon with 
             # use the key name as the object name        
-            # call the ConnectToQueryMaster to complete registration
-        # start the Daemon's event loop
-    
+            # call the RegisterWithQueryMaster to complete registration
+
+        # iterate the names and objects in clientObjectDic
+            # call OnRegisterEnd(), keep track of objects that
+            #   desire to have the event loop (who return true)
+            #   replace clientObjectDic with participating objects
+
+        # do a daemon event loop, borrow heavily from example server prototype
+        #   code
+
+        # while clientObjectDic has elements in it
+            # initialized a removedClientDic
+            # iterate the names and objects in clientObjectDic
+                # call OnEventLoopBegin() if False is returned
+                    # remove object from clientObjectDic
+                    # place object in removedClientDic
+                    # UnRegisterClient from Query Master
+
+            # if all objects have been removed break out
+
+            # TODO: Maintain contract, do not process events
+            #   for object that declared they wanted to be
+            #   removed by returning false.  For now it does
+            #   not matter because we only ever have one object
+            #   in the list
+                   
+            # process events by stealing code from daemon_server.py
+
+        # close the daemon
+
         Notes:
-            We wouldn't necessarily have to register the client for two way
-            communicaiton if it was going to perform a non validating submit.
-            However, I feel that in the future we will care more about security of
-            the system, and forcing it to register will enable the two way calling
-            likely used for a secret handshake
-
-            Is there a potential timing issue here?  If the master makes a return
-            call after we submit the query before our daemon event loop gets
-            rolling?  Keep and eye on this.
-
+            We provide virtual functions and interpret their returns so
+            clients can customize how they want to behave.  Some objects may
+            not ever need callbacks from the query master and may not even
+            start an event loop.
+            
             TODO hardening:
             The clients are not hardened to unregister themselves when
             exceptions are thrown at this time. 
+
+    
+    def configure_logging(
+        loglevel            # string representing log level as per functional
+                            # specification desctription)
+    """Common site for logging configuration, always call as first function
+from main"""
+    #call logging basicConfig 
+
+    Notes:
+        This functionality will grow as needed, but have common site for
+        logging config here   
         
 Schema:
 

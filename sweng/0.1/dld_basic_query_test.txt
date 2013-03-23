@@ -66,4 +66,8 @@ Classes:
             # TODO parameterize this test if needed, could fail if anyone is
             # running simultaneiously
 
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
 

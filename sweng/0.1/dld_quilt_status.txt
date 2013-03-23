@@ -23,17 +23,19 @@ Classes:
             # store args as member variable
             # chain to call base constructor
 
-         OnConnectionComplete()
+         OnRegisterEnd()
             # print out statistics about the manager's sources
-            # GetSourceManagerStats() from query master
+            #   using remote call to query master
+            #   GetSourceManagerStats() 
             # print results
-            # DisconnectFromQueryMaster
+            # return false (prevent event loop from beginning)
 
 
 Functions:
 
     # main function of the script, which is passed command line variables
     def main(argc,argv)
+        # call the quilt core main helper
         # setup argument parser in accordance with funcitonal specification
         # parse the arguments, exit with error message if unparseable
         # create the quilt status object

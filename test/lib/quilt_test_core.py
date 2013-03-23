@@ -23,17 +23,17 @@ def get_test_cfg_dir():
     return d
     
 
-def unittest_main_helper(description=''):
+
+def unittest_main_helper(description='',argv=sys.argv):
     # setup the argument parser
     parser = argparse.ArgumentParser(description)
     parser.add_argument('-l','--log-level',nargs='?',
-            help='logging level (DEBUG,INFO,WARN,ERROR)')
-    args = parser.parse_args()
+            help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
+    args,unknown = parser.parse_known_args(argv)
 
     if (args.log_level is not None):
         # if log level was specified, set the log level
-        strlevel = 'logging.' + args.log_level
-        logging.basicConfig(level=eval(strlevel))
+        quilt_core.configure_logging(args.log_level)
 
         # now strip off the log arguments before we pass on to unit 
         # test main
@@ -42,6 +42,5 @@ def unittest_main_helper(description=''):
             slot = sys.argv.index('--log-level')
         sys.argv.pop(slot)
         sys.argv.pop(slot)
-    return args
 
 

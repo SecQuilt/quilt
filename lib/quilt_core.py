@@ -10,6 +10,7 @@ import threading
 import getpass
 import lockfile
 from daemon import runner
+import argparse
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -95,10 +96,11 @@ class QuiltConfig:
 class QuiltDaemon(object):
   
     def __init__(self): 
-        logging.basicConfig(level=logging.DEBUG)
+        pass
 
     name = ''
     def setup_process(self, name):
+        self.name = name
         if sys.stdin.isatty():
             outdev = '/dev/tty'
         else:
@@ -115,7 +117,7 @@ class QuiltDaemon(object):
             daemon_runner = runner.DaemonRunner(self)
             daemon_runner.do_action()
         except lockfile.LockTimeout as e:
-            logging.error(self. name + " Lockfile exists: " + str(e)) 
+            logging.error(self.name + " Lockfile exists: " + str(e)) 
         except runner.DaemonRunnerStopFailureError as e:
             logging.error(self.name + " Failed to stop daemon: " + str(e))
         except:
@@ -134,16 +136,14 @@ class QueryMasterClient:
         self._localname = '_'.join(
             [basename, getpass.getuser(), str(os.getpid())])
 
-    def OnConnectionComplete(self):
-        pass
-
     def GetType(self):
         raise Exception("""Abstract function is rquired to be implemented by
             subclass""")
 
-    def ConnectToQueryMaster(self):
+    def RegisterWithQueryMaster(self):
         """Connect to the query master, register this client"""
-        
+       
+ 
         # Access the QueryMaster's registrar's host and port from the config
         config = QuiltConfig()
         qmhost = config.GetValue("query_master", "registrar_host", None)
@@ -158,7 +158,7 @@ class QueryMasterClient:
 
         #TODO think about adding cleanup code to client to nicly disconnect
         # store a reference to the query master as a member variable
-        _qm = Pyro4.Proxy(uri)
+        self._qm = Pyro4.Proxy(uri)
         
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable
@@ -168,17 +168,36 @@ class QueryMasterClient:
         rhost = config.GetValue("registrar", "host", None)
         logging.debug("Registering " + self._localname + ", to: " + qmname + 
             ", via registrar: " + str(rhost) + ":" + str(rport))
-        self._remotename = _qm.RegisterClient(
-            rhost, rport, self._localname)
+        self._remotename = self._qm.RegisterClient(
+            rhost, rport, self._localname, self.GetType())
 
         # connection complete, call our notification function
         logging.info("Connection completed for " + self._localname)
-        self.OnConnectionComplete()
 
-    def DisconnectFromQueryMaster(self):
-        if _qm != None and _remotename != None:
-            _qm.UnRegister(GetType(), _remotename)
-            logging.info("Disconnection completed for " + self._localname)
+    def OnRegisterEnd():
+        """
+        virtual callback invoked when registration of this client is complete.
+        Intended for optional overriding by the implementing client.
+        called in main thread before event loop begins
+        return false to prevent event loop from running
+        """
+        return True
+
+    
+    def OnEventLoopBegin():
+        """
+        funciton called when client's owning daemon begins an event loop
+        function called in event loop main thread
+        return False to end participation in event loop
+        """
+        return True
+
+
+    def UnregisterFromQueryMaster(self):
+        if self._qm != None and self._remotename != None:
+            self._qm.UnRegisterClient(self.GetType(), self._remotename)
+            logging.info("Unregistration completed for " + self._localname)
+
 
 def query_master_client_main_helper(
         clientObjectDict       # map of instances to names of objects to
@@ -206,10 +225,79 @@ def query_master_client_main_helper(
         # use the key name as the object name
         ns.register(name,uri)
         # call the ConnectToQueryMaster to complete registration
-        obj.ConnectToQueryMaster()
-        
+        obj.RegisterWithQueryMaster()
+ 
+    
+    daemonObjs = {}
+    # iterate the names and objects in clientObjectDic
+    for name,obj in clientObjectDict.items():
+        # keep track of objects that
+        #   desire to have the event loop (who return true)
+        #   replace clientObjectDic with participating objects
+        if obj.OnRegisterEnd():
+            daemonObjs[name] = obj
+    
     # start the Daemon's event loop
-    daemon.requestLoop() 
 
+    # continue looping while there are daemon objects
+    while len(daemonObjs) > 0 :
 
+        delDaemonObjs = {}
+        # iterate the names and objects in clientObjectDic
+        # this funciton will return false if it wants to be
+        # removed
+        for name,obj in daemonObjs.items():
+            if not obj.OnEventLoopBegin():
+                delDaemonObjs[name] = obj
+
+        # remove objects from object list
+        # unregister clients from query master
+        for name,obj in delDaemonObjs.items():
+            del daemonObjs[name]
+            obj.UnregisterFromQueryMaster()
+            
+        # if all objects have been removed break out
+        if len(daemonObjs) == 0:
+            break
+
+        
+        # TODO: Maintain contract, do not process events
+        #   for object that declared they wanted to be
+        #   removed by returning false.  For now it does
+        #   not matter because we only ever have one object
+        #   in the list
+        socks=daemon.getServerSockets()
+        ins,outs,exs=select.select(socks,[],[],2)   # 'foreign' event loop
+        for s in socks:
+            if s in ins:
+                daemon.handleRequests()
+                break    # no need to continue with the for loop
+ 
+
+def configure_logging(strlevel):
+    # TODO eval security issue
+    strlevel = 'logging.' + strlevel
+    logging.basicConfig(level=eval(strlevel))
+    Pyro4.config.HMAC_KEY="Itsnotmuchofacheeshopisit"
+
+def main_helper( description, argv ):
+    """
+    Quilt helper function for main to do common things
+
+    description                 # prose description of functionality
+    argv                        # input arguments
+    """
+    argparser = argparse.ArgumentParser(description)
+
+    argparser.add_argument('-l','--log-level',nargs='?',
+        help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
+
+    args, unknownArgs = argparser.parse_known_args(argv)
+
+    # log level needs to be set if user desires
+    if (args.log_level != None):
+        # if log level was specified, set the log level
+        configure_logging(args.log_level)
+
+    return argparser
         

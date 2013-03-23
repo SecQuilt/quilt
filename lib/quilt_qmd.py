@@ -6,6 +6,8 @@ import quilt_core
 import Pyro4
 import query_master
 
+# logging.basicConfig(level=logging.DEBUG)
+
 class Qmd(quilt_core.QuiltDaemon):
     def __init__(self):
         quilt_core.QuiltDaemon.__init__(self)
@@ -41,5 +43,18 @@ class Qmd(quilt_core.QuiltDaemon):
         # start the Daemon's event loop
         daemon.requestLoop() 
 
-# start the daemon
-Qmd().main(sys.argv[1:])
+def main(argv):
+    
+    # setup command line interface
+    parser = quilt_core.main_helper("""Display information 
+        about the quilt system, including registered source managers""",
+        argv)
+
+    parser.add_argument('action', choices=['start', 'stop', 'restart'])
+    parser.parse_args()
+
+    # start the daemon
+    Qmd().main(argv)
+
+if __name__ == "__main__":        
+    main(sys.argv[1:])

@@ -1,0 +1,7 @@
+#!/bin/sh
+relativedir=$(dirname ${BASH_SOURCE[0]})
+testbin=$(cd $relativedir && pwd)
+quiltroot=$(dirname $(dirname $testbin))
+export PYTHONPATH=$quiltroot/lib:$quiltroot/test/lib
+
+

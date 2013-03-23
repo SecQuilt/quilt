@@ -24,4 +24,21 @@ class Registrar(quilt_core.QuiltDaemon):
         Pyro4.naming.startNSloop(registrarHost,registrarPort)
 
 
-Registrar().main(sys.argv[1:])
+
+
+def main(argv):
+    
+    # setup command line interface
+    parser =  quilt_core.main_helper("a meta server for quilt objects",
+        argv)
+
+    parser.add_argument('action', choices=['start', 'stop', 'restart'])
+    parser.parse_args()
+    args = parser.parse_args(argv)
+
+    # start the daemon
+    Registrar().main(argv)
+
+if __name__ == "__main__":        
+    main(sys.argv[1:])
+

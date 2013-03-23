@@ -1,5 +1,9 @@
 #!/bin/sh
-scriptPath=$(dirname $0)
-export PYTHONPATH=$scriptPath/../../lib:$scriptPath/../lib
-$scriptPath/../lib/quilt_test.py start
+testbin=$(cd $(dirname $0) && pwd)
+quiltroot=$(dirname $(dirname $testbin))
+export PYTHONPATH=$quiltroot/lib:$quiltroot/test/lib
+$quiltroot/lib/quilt_registrar.py   start -l DEBUG
+$quiltroot/lib/quilt_qmd.py         start -l DEBUG
+$quiltroot/test/lib/quilt_test.py   start -l DEBUG
+
 

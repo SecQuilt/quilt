@@ -31,8 +31,9 @@ Functions:
     def get_quilt_test_lib_dir():
         """grab the location of quilt test scritps"""
 
-    def main_helper
-        parse partial arguments for log level
-        set the log leverl accordingly
-        pup off used argument
-        return remainder of arguments
+    def main_helper(
+        description         # description of the program
+        argv                # arguments of the program
+
+        # chain call to quilte_core main helper
+        # return same object as quilt_cor emain helper

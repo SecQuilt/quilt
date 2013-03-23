@@ -20,21 +20,7 @@ os.environ[quilt_core.QuiltConfig.QUILT_CFG_DIR_VAR] = cfgdir
 
 def at_exit():
 
-    logging.info("Testing daemon is ending, stopping Query Master")
-    quilt_lib_dir = quilt_test_core.get_quilt_lib_dir()
-    # assemble the filename for query master
-    quilt_reg_file = os.path.join(quilt_lib_dir,'quilt_registrar.py')
-    quilt_qmd_file = os.path.join(quilt_lib_dir,'quilt_qmd.py')
-    # stop the query master
-    ret = subprocess.call([quilt_qmd_file, 'stop' ])
-    if (ret != 0):
-        logging.warning("Query master daemon exited with code: " + 
-            str(ret))
-
-    ret = subprocess.call([quilt_reg_file, 'stop' ])
-    if (ret != 0):
-        logging.warning("Query registrar daemon exited with code: " + 
-            str(ret))
+    logging.info("Thank you for testing with quilt_test")
 
 def filename_to_modulename(scriptsHome,filename):
     if filename.startswith(scriptsHome):
@@ -53,14 +39,8 @@ class Qtd(quilt_core.QuiltDaemon):
         
 
     def __init__(self):
-        outdev = '/dev/tty'
-        self.stdin_path = '/dev/null'
-        self.stdout_path = outdev
-        self.stderr_path = outdev
-        self.pidfile_path =  '/tmp/quilt_test.pid' # probably good to 
-                                                # keep this matching the call to
-                                                # setup_process in run()
-        self.pidfile_timeout = 5
+        quilt_core.QuiltDaemon.__init__(self)
+        self.setup_process('quilt_test')
 
 
     def run(self):
@@ -72,12 +52,6 @@ class Qtd(quilt_core.QuiltDaemon):
 
         # start the query master daemon
         atexit.register(at_exit)
-        logging.debug('Integration test starting: ' + quilt_reg_file)
-        subprocess.check_call([quilt_reg_file, 'start'])
-        logging.debug('Integration test starting: ' + quilt_qmd_file)
-        subprocess.call([quilt_qmd_file, 'start'])
-
-        self.setup_process('quilt_test')
 
 
 
@@ -127,13 +101,20 @@ class Qtd(quilt_core.QuiltDaemon):
                 testFiles[testFile] = "Loaded"
             
             # run the tests
-#            testSuite = unittest.TestSuite(tests)
-#            runner = unittest.TextTestRunner().run(testSuite)
+            testSuite = unittest.TestSuite(tests)
+            runner = unittest.TextTestRunner().run(testSuite)
 
             logging.info("End Itegration Testing iteration")
 
 
-        
+def main(argv):
+    
+    # setup command line interface
+    parser =  quilt_core.main_helper("""Provide an Integration
+        Testing Framework.""",argv)
+    parser.add_argument('action', choices=['start', 'stop', 'restart'])
+    parser.parse_args()
+    Qtd().main(argv)
 
-
-Qtd().main(argv[1:])
+if __name__ == "__main__":        
+    main(sys.argv[1:])

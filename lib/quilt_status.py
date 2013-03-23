@@ -15,10 +15,13 @@ class QuiltStatus(quilt_core.QueryMasterClient):
         quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
 
-    def OnConnectionComplete(self):
-        print _qm.GetSourceManagerStats()
-        _qm.UnRegisterClient(_remotename)
+    def OnRegisterEnd(self):
+        print 'TODO call _qm.GetSourceManagerStats()'
         
+        # return false (prevent event loop from beginning)
+        return False
+        
+
     def GetType(self):
         logging.debug("Returning QuiltStatus client type")
         return "QuiltStatus"
@@ -29,22 +32,16 @@ class QuiltStatus(quilt_core.QueryMasterClient):
 def main(argv):
     
     # setup command line interface
-    parser = argparse.ArgumentParser(description="""Display information 
-        about the quilt system, including registered source managers""")
-    parser.add_argument('-l','--log-level',nargs='?',
-        help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
+    parser =  quilt_core.main_helper("""Display information 
+        about the quilt system, including registered source managers""",
+        argv)
 
     args = parser.parse_args(argv)
 
-    # log level needs to be set if user desires
-    if (args.log_level is not None):
-        # if log level was specified, set the log level
-        # TODO eval security issue
-        strlevel = 'logging.' + args.log_level
-        logging.basicConfig(level=eval(strlevel))
-
     # create the object and begin its life
     client = QuiltStatus(args)
+
+    # start the client
     quilt_core.query_master_client_main_helper({
         client._localname : client})
         

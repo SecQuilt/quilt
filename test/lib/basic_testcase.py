@@ -17,3 +17,6 @@ class BasicTestcase(unittest.TestCase):
         output = subprocess.check_call([quilt_status_file,'-l','DEBUG'])
         print 'TODO Finish, output is', str(output)
 
+if __name__ == "__main__":
+    quilt_test_core.unittest_main_helper("Run the most basic of test cases",sys.argv)
+    unittest.main()
