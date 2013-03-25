@@ -111,4 +111,4 @@ class QueryMaster:
         for smgrName,smgrRec in smgrs.items():
             s + smgrRec["clientName"] + ", "
 
-        return s:
+        return s
