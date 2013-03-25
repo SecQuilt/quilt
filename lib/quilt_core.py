@@ -117,9 +117,9 @@ class QuiltDaemon(object):
             daemon_runner = runner.DaemonRunner(self)
             daemon_runner.do_action()
         except lockfile.LockTimeout as e:
-            logging.error(self.name + " Lockfile exists: " + str(e)) 
+            logging.warning(self.name + " Lockfile exists: " + str(e)) 
         except runner.DaemonRunnerStopFailureError as e:
-            logging.error(self.name + " Failed to stop daemon: " + str(e))
+            logging.warning(self.name + " Failed to stop daemon: " + str(e))
         except:
             raise
                 

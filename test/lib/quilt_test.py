@@ -100,6 +100,7 @@ class Qtd(quilt_core.QuiltDaemon):
             testSuite = unittest.TestSuite(tests)
             runner = unittest.TextTestRunner().run(testSuite)
 
+            
             logging.info("End Itegration Testing iteration")
 
             # sleep before beginning
