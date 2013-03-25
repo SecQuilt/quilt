@@ -27,10 +27,15 @@ Classes:
         
         def GetLastQuery()  # returns the last query string
     
+        def GetType(self):
+            return "SourceManager"
     
 Functions:
 
-    def run():
+    def main():
+        # call the quilt core main helper
+        # setup argument parser in accordance with funcitonal specification
+        # parse the arguments, exit with error message if unparseable
         # Create Instance of QuiltConfig
         # call GetSourceManagers and iterate through them
         #   Create the Source Manager objects

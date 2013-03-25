@@ -74,7 +74,7 @@ class QuiltConfig:
             os.path.join(self.GetCfgDir(), 'smd.d'))
 
         smdcfgdir = os.path.expandvars(smdcfgdir)        
-        if not path.exists(smdcfgdir):
+        if not os.path.exists(smdcfgdir):
             logging.warning(
                 "Source Manager config file directory does not exist" +
                 smdcfgdir)
@@ -174,7 +174,7 @@ class QueryMasterClient:
         # connection complete, call our notification function
         logging.info("Connection completed for " + self._localname)
 
-    def OnRegisterEnd():
+    def OnRegisterEnd(self):
         """
         virtual callback invoked when registration of this client is complete.
         Intended for optional overriding by the implementing client.
@@ -184,7 +184,7 @@ class QueryMasterClient:
         return True
 
     
-    def OnEventLoopBegin():
+    def OnEventLoopBegin(self):
         """
         funciton called when client's owning daemon begins an event loop
         function called in event loop main thread
@@ -266,7 +266,7 @@ def query_master_client_main_helper(
         #   removed by returning false.  For now it does
         #   not matter because we only ever have one object
         #   in the list
-        socks=daemon.getServerSockets()
+        socks=daemon.sockets()
         ins,outs,exs=select.select(socks,[],[],2)   # 'foreign' event loop
         for s in socks:
             if s in ins:
@@ -274,13 +274,22 @@ def query_master_client_main_helper(
                 break    # no need to continue with the for loop
  
 
-def configure_logging(strlevel):
+def common_init(name,strlevel):
+    """
+    Common site for logging configuration, always call as first function
+    from main and other initializeation
+    """
     # TODO eval security issue
+    if strlevel == None:
+        strlevel = 'WARN'
     strlevel = 'logging.' + strlevel
-    logging.basicConfig(level=eval(strlevel))
+    logging.basicConfig(level=eval(strlevel),
+        format='%(asctime)s:'+name+'%(process)d:%(levelname)s:%(message)s')
+
+    # common init stuff together
     Pyro4.config.HMAC_KEY="Itsnotmuchofacheeshopisit"
 
-def main_helper( description, argv ):
+def main_helper( name, description, argv ):
     """
     Quilt helper function for main to do common things
 
@@ -297,7 +306,7 @@ def main_helper( description, argv ):
     # log level needs to be set if user desires
     if (args.log_level != None):
         # if log level was specified, set the log level
-        configure_logging(args.log_level)
+        common_init(name, args.log_level)
 
     return argparser
         

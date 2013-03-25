@@ -1,9 +1,8 @@
 #!/bin/sh
-testbin=$(cd $(dirname $0) && pwd)
-quiltroot=$(dirname $(dirname $testbin))
-export PYTHONPATH=$quiltroot/lib:$quiltroot/test/lib
-$quiltroot/lib/quilt_registrar.py   start -l DEBUG
-$quiltroot/lib/quilt_qmd.py         start -l DEBUG
-$quiltroot/test/lib/quilt_test.py   start -l DEBUG
+source $(dirname ${BASH_SOURCE[0]})/testenv.rc
+$QUILT_HOME/lib/quilt_registrar.py   start -l DEBUG
+$QUILT_HOME/lib/quilt_qmd.py         start -l DEBUG
+$QUILT_HOME/lib/quilt_smd.py         start -l DEBUG
+$QUILT_HOME/test/lib/quilt_test.py   start -l DEBUG
 
 

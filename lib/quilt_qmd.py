@@ -46,9 +46,7 @@ class Qmd(quilt_core.QuiltDaemon):
 def main(argv):
     
     # setup command line interface
-    parser = quilt_core.main_helper("""Display information 
-        about the quilt system, including registered source managers""",
-        argv)
+    parser = quilt_core.main_helper("qmd","Query master daemon", argv)
 
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
     parser.parse_args()

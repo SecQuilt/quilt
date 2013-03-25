@@ -1,0 +1,105 @@
+quilt 0.1 Query Master design
+-----------------------------
+
+Module: query_master
+
+Type: library
+
+Internal Dependencies:
+    quilt_core
+    
+External Dependenies:
+    python-pyro(4)
+    python-daemon
+    threading
+
+Responsibilities:
+    provide QueryMaster remote api 
+
+Classes:
+
+    class QueryMaster 
+
+        # create a lock for this class, coarse grained but
+        # proably good enough.
+        self._lock = threading.lock()
+
+        # Register a client with the query master
+        string RegisterClient(   # return key name for the client
+            string nameServerHost,      # ip address of nameserver
+            int nameServerPort,         # port for the nameserver
+            string clientName           # name of the source manager on
+                                        # the specified nameserver
+            string clientType           # nae of the type of the client
+            )
+            # acquire lock
+            # determine unique name for source master (hopefuly just using the
+            # passed in name, but double check registered list.
+            # Store in list of registered clients
+            # use object's name and type to key it in the registerd list
+            # return the determined name
+
+            Notes:
+               The returned name should be stored by client so that it knows how
+               itself is known to the QMD
+
+                Previously was attempting to call back to client in here, this
+                wasnot a good idea.  First of all it doesn't work, possibly
+                because calling pyro daemon was not given enough sleep to get
+                into the listening state.  Even if that was resolved, our
+                current locking strategy is at the funciton level.  We do not
+                want to call out of the function with the lock on!
+             
+        # UnRegister a client with the query master
+        void UnRegisterClient(
+            string clientType               # client type
+            string clientNameKey            # key that the qwmd knows ro
+                                            #   recognize a client
+        )
+            # acquire lock
+            # remove the specified sm from registered list
+            # if not found in the list, do nothing
+            # call the remote object's shutdown method
+
+        string Query(                       # return the ID of the query
+            string submitterNameKey         # key that the submitter recieved
+                                            #   when it was registered with this
+                                            #   master
+            string query                    # the content of the query
+            string notificatoinAddress      # the email addresses for
+                                            #   notification
+        )
+            # acquire lock
+            # create proxy to the submitter
+            # generate a query id
+            # call submitter's validate function
+            # if submitter refuses to validate, return early
+            # store queryid  notificationAddress in a member list
+            # terminate the submitter's daemon
+
+
+            # Process query, 
+            # iterate the source master's that are registered.  Send them
+            # the query
+
+        # format a string with information about all the Query's in the q
+        string GetQueryQueueStats()
+            # acquire lock
+
+        # format a string with information abour the specified query
+        string GetQueryStats(
+            string queryID          # the query we are interested in
+        )
+            # acquire lock
+
+        # format a string with information about all source managers
+        string GetSourceManagerStats(
+            # describe all of the source managers, and return as string 
+        )
+            # acquire lock
+
+        # return the list of reistered object names
+        string[] getRegistedObjects(        #return list of names
+            type                            #type id of object's class
+            # acquire lock
+            

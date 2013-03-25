@@ -2,7 +2,7 @@ import os
 import logging
 import Pyro4
 import threading
-
+import quilt_smd
 
     
 class QueryMaster:
@@ -90,4 +90,25 @@ class QueryMaster:
 #           logging.info("Done Shutting down client: " + 
 #               clientNameKey + ".")
 
+#REVIEW
+    def GetSourceManagerStats(self):
+        """
+        format a string with information about all source managers
+        describe all of the source managers, and return as string 
+        """
+        # acquire lock
+        smgrs = None
+        with self._lock:
+            if "SourceManager" in self._clients:
+                smgrs = self._clients["SourceManager"].copy()
+            
+        if smgrs == None:
+            return "0 source managers"
 
+        # oterate source managers, gather nfo
+        s = str(len(smgrs)) + " source manager(s):\n"
+
+        for smgrName,smgrRec in smgrs.items():
+            s + smgrRec["clientName"] + ", "
+
+        return s:

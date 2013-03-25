@@ -65,9 +65,9 @@ quilt.conf
 [query_master]
 name : 'test'
 
-smd.d/test_smd.conf
-[test_smd]
-asd : asdasd
+smd.d/source1.conf
+[source1]
+foo : bar
 
 
 Scripts:
@@ -82,6 +82,7 @@ Scripts:
             # set config dir to test config
             # start registrar
             # start qmd
+            # start smd
             # start qtd
 
         test_stop

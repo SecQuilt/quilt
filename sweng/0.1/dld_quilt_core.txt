@@ -180,7 +180,8 @@ Functions:
             exceptions are thrown at this time. 
 
     
-    def configure_logging(
+    def common_init(
+        name                # name of program
         loglevel            # string representing log level as per functional
                             # specification desctription)
     """Common site for logging configuration, always call as first function
@@ -225,8 +226,9 @@ Schema:
                                          # scripts (no pathing
                                 #     needed assumed to be in test lib dir)
                                 #     like ['*TestSuite1*', *TestSuite2* ] 
-    sleep       :   1     # minutes to sleep between test (float supported)
-
+    sleep       :   0     # seconds to sleep before repeating test
+                          # 0 or less means do not repeat tests
+                        
     Soure Manager Config File
     -------------------------
 

@@ -60,10 +60,6 @@ class Qtd(quilt_core.QuiltDaemon):
 
         # Repeat Forever
         while True:
-            # sleep before beginning
-            logging.debug("sleeping before test iteration")
-            cfg = quilt_core.QuiltConfig()
-            time.sleep(int(cfg.GetValue("testing","sleep","1")))
             # read sleep value again in case user changed
             cfg = quilt_core.QuiltConfig()
             logging.info("Begin Itegration Testing iteration")
@@ -106,12 +102,19 @@ class Qtd(quilt_core.QuiltDaemon):
 
             logging.info("End Itegration Testing iteration")
 
+            # sleep before beginning
+            cfg = quilt_core.QuiltConfig()
+            sleepSecs = int(cfg.GetValue("testing","sleep","0"))
+            if sleepSecs <= 0:
+                break
+            logging.debug("sleeping before next iteration")
+            time.sleep(sleepSecs)
 
 def main(argv):
     
     # setup command line interface
-    parser =  quilt_core.main_helper("""Provide an Integration
-        Testing Framework.""",argv)
+    parser =  quilt_core.main_helper('quilt_test',"""Provide an 
+        Integration Testing Framework.""",argv)
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
     parser.parse_args()
     Qtd().main(argv)
