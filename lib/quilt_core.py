@@ -239,40 +239,40 @@ def query_master_client_main_helper(
     
     # start the Daemon's event loop
 
-    # continue looping while there are daemon objects
-    while len(daemonObjs) > 0 :
+#   # continue looping while there are daemon objects
+#   while len(daemonObjs) > 0 :
 
-        delDaemonObjs = {}
-        # iterate the names and objects in clientObjectDic
-        # this funciton will return false if it wants to be
-        # removed
-        for name,obj in daemonObjs.items():
-            if not obj.OnEventLoopBegin():
-                delDaemonObjs[name] = obj
+#       delDaemonObjs = {}
+#       # iterate the names and objects in clientObjectDic
+#       # this funciton will return false if it wants to be
+#       # removed
+#       for name,obj in daemonObjs.items():
+#           if not obj.OnEventLoopBegin():
+#               delDaemonObjs[name] = obj
 
-        # remove objects from object list
-        # unregister clients from query master
-        for name,obj in delDaemonObjs.items():
-            del daemonObjs[name]
-            obj.UnregisterFromQueryMaster()
-            
-        # if all objects have been removed break out
-        if len(daemonObjs) == 0:
-            break
+#       # remove objects from object list
+#       # unregister clients from query master
+#       for name,obj in delDaemonObjs.items():
+#           del daemonObjs[name]
+#           obj.UnregisterFromQueryMaster()
+#           
+#       # if all objects have been removed break out
+#       if len(daemonObjs) == 0:
+#           break
 
-        
-        # TODO: Maintain contract, do not process events
-        #   for object that declared they wanted to be
-        #   removed by returning false.  For now it does
-        #   not matter because we only ever have one object
-        #   in the list
-        socks=daemon.sockets()
-        ins,outs,exs=select.select(socks,[],[],2)   # 'foreign' event loop
-        for s in socks:
-            if s in ins:
-                daemon.handleRequests()
-                break    # no need to continue with the for loop
- 
+#       
+#       # TODO: Maintain contract, do not process events
+#       #   for object that declared they wanted to be
+#       #   removed by returning false.  For now it does
+#       #   not matter because we only ever have one object
+#       #   in the list
+#       socks=daemon.sockets()
+#       ins,outs,exs=select.select(socks,[],[],2)   # 'foreign' event loop
+#       for s in socks:
+#           if s in ins:
+#               daemon.handleRequests()
+#               break    # no need to continue with the for loop
+#
 
 def common_init(name,strlevel):
     """
