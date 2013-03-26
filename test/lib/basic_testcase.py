@@ -31,6 +31,7 @@ class BasicTestcase(unittest.TestCase):
         # unregistered when process exits
         with quilt_core.GetQueryMasterProxy(cfg) as qm:
             qs = qm.GetClients("QuiltStatus")
+            print str(qs)
             self.assertTrue( len(qs) == 0 )
 
         

@@ -226,6 +226,9 @@ def query_master_client_main_helper(
     
     daemon=Pyro4.Daemon()
     ns=Pyro4.locateNS(registrarHost, registrarPort)   
+
+    #TODO Hardening, make sure when exceptions are thrown that clients are removed
+
     # iterate the names and objects in clientObjectDict
     for name,obj in clientObjectDict.items():
         # register the clientObject with the local PyRo Daemon with
@@ -244,6 +247,9 @@ def query_master_client_main_helper(
         #   replace clientObjectDic with participating objects
         if obj.OnRegisterEnd():
             daemonObjs[name] = obj
+        else:
+            obj.UnregisterFromQueryMaster()
+            
     
     # start the Daemon's event loop
 

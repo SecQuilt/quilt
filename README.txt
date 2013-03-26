@@ -11,6 +11,6 @@ To run:
 $ test/bin/test_start
 
 
-Then after you are satisfied:
+This will leave some daemons running.  You can run this to stop them
 
 $ test/bin/test_stop
