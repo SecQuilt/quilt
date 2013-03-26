@@ -28,6 +28,26 @@ class SourceManager(quilt_core.QueryMasterClient):
         return "SourceManager"
         
 
+class Smd(quilt_core.QuiltDaemon):
+    def __init__(self, args):
+        quilt_core.QuiltDaemon.__init__(self)
+        self.setup_process("smd")
+        self._args = args
+
+    def run(self):
+
+        cfg = quilt_core.QuiltConfig()
+        smnames = cfg.GetSourceManagers()
+
+        objs = {}
+        # iterate through source manager configurations
+        for smname in smnames:
+            logging.debug(smname + " specified from configuration")
+            # create each source manager object
+            objs[smname] = SourceManager(self._args, smname)
+            
+        # start the client with all the source managers
+        quilt_core.query_master_client_main_helper(objs)
 
 def main(argv):
     
@@ -37,22 +57,13 @@ def main(argv):
         argv)
 
     # setup argument parser in accordance with funcitonal specification
-
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
-    cfg = quilt_core.QuiltConfig()
-    smnames = cfg.GetSourceManagers()
+    # start the daemon
+    Smd(args).main(argv)
 
-    objs = {}
-    # iterate through source manager configurations
-    for smname in smnames:
-        logging.debug(smname + " specified from configuration")
-        # create each source manager object
-        objs[smname] = SourceManager(args, smname)
-        
-    # start the client with all the source managers
-    quilt_core.query_master_client_main_helper(objs)
+
         
 if __name__ == "__main__":
     main(sys.argv[1:])

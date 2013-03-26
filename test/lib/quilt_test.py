@@ -114,7 +114,7 @@ class Qtd(quilt_core.QuiltDaemon):
 def main(argv):
     
     # setup command line interface
-    parser =  quilt_core.main_helper('quilt_test',"""Provide an 
+    parser =  quilt_core.main_helper('qtd',"""Provide an 
         Integration Testing Framework.""",argv)
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
     parser.parse_args()

@@ -29,17 +29,33 @@ Classes:
     
         def GetType(self):
             return "SourceManager"
-    
-Functions:
 
-    def main():
-        # call the quilt core main helper
-        # setup argument parser in accordance with funcitonal specification
+    class Smd : QuiltDaemon
+    
+    def __init__(args)
+        # call base class'es init
+        # call setup_process
+        # store prased args as member variable
+
+    def run:
+    
         # parse the arguments, exit with error message if unparseable
         # Create Instance of QuiltConfig
         # call GetSourceManagers and iterate through them
         #   Create the Source Manager objects
         #   store them in a dictionary
         # call util function query_master_client_main_helper
+
+        NOTE:
+            We can add the actual daemon (Smd) to the remote object list
+            This will allow query master to do things at the source
+            manager collection level.  We don't have the use case yet
+            when we do, redesign a bit
+
+Functions:
+
+    def main():
+        # call the quilt core main helper
+        # setup argument parser in accordance with funcitonal specification
 
            

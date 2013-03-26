@@ -146,8 +146,7 @@ Functions:
             #   desire to have the event loop (who return true)
             #   replace clientObjectDic with participating objects
 
-        # do a daemon event loop, borrow heavily from example server prototype
-        #   code
+        # do a daemon event loop, 
 
         # while clientObjectDic has elements in it
             # initialized a removedClientDic
@@ -164,8 +163,12 @@ Functions:
             #   removed by returning false.  For now it does
             #   not matter because we only ever have one object
             #   in the list
-                   
-            # process events by stealing code from daemon_server.py
+          
+            # select daemon sockets
+            # if there are daemon sockets
+                # run the events for those sockets
+            # otherwise
+                # sleep for fraction of a second
 
         # close the daemon
 
@@ -185,7 +188,7 @@ Functions:
         loglevel            # string representing log level as per functional
                             # specification desctription)
     """Common site for logging configuration, always call as first function
-from main"""
+from main and other initializeation"""
     #call logging basicConfig 
 
     Notes:

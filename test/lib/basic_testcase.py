@@ -15,7 +15,6 @@ class BasicTestcase(unittest.TestCase):
 
         logging.debug("Running: " + quilt_status_file)
         output = subprocess.check_call([quilt_status_file,'-l','DEBUG'])
-        raise "ouch"
         print 'TODO Finish, output is', str(output)
 
 if __name__ == "__main__":
