@@ -174,7 +174,7 @@ class QueryMasterClient:
         if rport != None:
             rport = int(rport)
         rhost = config.GetValue("registrar", "host", None)
-        logging.debug("Registering " + self._localname + ", to: " + qmname + 
+        logging.debug("Registering " + self._localname + ", to query master" + 
             ", via registrar: " + str(rhost) + ":" + str(rport))
         self._remotename = self._qm.RegisterClient(
             rhost, rport, self._localname, self.GetType())
@@ -215,7 +215,6 @@ def query_master_client_main_helper(
     Used to publish the client as a remote object, and complete the
     connection with the query master
     """
-    logging.debug("Client main helper for objs: " + str(clientObjectDict))
 
     # Use QuiltConfig to read in configuration
     cfg = QuiltConfig()

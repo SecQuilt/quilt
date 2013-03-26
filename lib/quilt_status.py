@@ -17,13 +17,12 @@ class QuiltStatus(quilt_core.QueryMasterClient):
 
     def OnRegisterEnd(self):
         
-        print self._qm.GetSourceManagerStats()
+        print 'Status Report:', self._qm.GetSourceManagerStats()
         # return false (prevent event loop from beginning)
         return False
         
 
     def GetType(self):
-        logging.debug("Returning QuiltStatus client type")
         return "QuiltStatus"
         
 
@@ -32,7 +31,7 @@ class QuiltStatus(quilt_core.QueryMasterClient):
 def main(argv):
     
     # setup command line interface
-    parser =  quilt_core.main_helper('quilt_status',"""Display information 
+    parser =  quilt_core.main_helper('qstat',"""Display information 
         about the quilt system, including registered source managers""",
         argv)
 

@@ -97,8 +97,8 @@ class QuiltTest(object):
             logging.info("End Itegration Testing iteration")
 
             # raise exception if tests failed
-            if (len(runner.errors) > 0):
-                exit(len(runner.errors))
+            if (not runner.wasSuccessful()):
+                exit(1)
             
 
             # sleep before beginning

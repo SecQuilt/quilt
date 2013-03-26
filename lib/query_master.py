@@ -3,7 +3,7 @@ import logging
 import Pyro4
 import threading
 import quilt_smd
-
+import pprint
     
 class QueryMaster:
 
@@ -96,10 +96,7 @@ class QueryMaster:
             return "0 source managers"
 
         # oterate source managers, gather nfo
-        s = str(len(smgrs)) + " source manager(s):\n"
-
-        for smgrName,smgrRec in smgrs.items():
-            s + smgrRec["clientName"] + ", "
+        s = str(len(smgrs)) + " source manager(s): \n" + pprint.pformat(smgrs)
 
         return s
 

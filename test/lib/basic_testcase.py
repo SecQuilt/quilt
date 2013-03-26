@@ -17,7 +17,7 @@ class BasicTestcase(unittest.TestCase):
 
         # call quilt_status (check return code, capture output)
         out = sei_core.run_process([quilt_status_file,'-l','DEBUG'],
-            whichReturn=sei_core.STDOUT)
+            whichReturn=sei_core.STDOUT, logToPython=False)
         
         # assure that name of the test source manager appears in the
         # output, test source name specified in testing 
@@ -29,7 +29,7 @@ class BasicTestcase(unittest.TestCase):
         
         # check qmd to be sure that all quilt_status's have 
         # unregistered when process exits
-        with sei_core.GetQueryMasterProxy(cfg) as qm:
+        with quilt_core.GetQueryMasterProxy(cfg) as qm:
             qs = qm.GetClients("QuiltStatus")
             self.assertTrue( len(qs) == 0 )
 
