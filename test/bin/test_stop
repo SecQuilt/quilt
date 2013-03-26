@@ -1,9 +1,14 @@
 #!/bin/sh
-testbin=$(cd $(dirname $0) && pwd)
-quiltroot=$(dirname $(dirname $testbin))
-export PYTHONPATH=$quiltroot/lib:$quiltroot/test/lib
-$quiltroot/test/lib/quilt_test.py   stop -l DEBUG
-$quiltroot/lib/quilt_qmd.py         stop -l DEBUG
-$quiltroot/lib/quilt_registrar.py   stop -l DEBUG
+
+# set python path for modules under test and test modules
+# set config dir to test config
+source $(dirname ${BASH_SOURCE[0]})/testenv.rc
+
+
+# stop quilt daemons
+$QUILT_HOME/lib/quilt_smd.py         stop -l DEBUG
+$QUILT_HOME/lib/quilt_qmd.py         stop -l DEBUG
+$QUILT_HOME/lib/quilt_registrar.py   stop -l DEBUG
+
 
 

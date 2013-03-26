@@ -3,15 +3,15 @@ quilt 0.1 test design
 
 Module: quilt_test
 
-Type: Executable Script / daemon process
-
+Type: Executable Script 
 
 Internal Dependencies:
     quilt_core
+    quilt_test_core
 
 External Dependenies:
     python-pyro(4)
-    python-daemon
+    python=argparse
 
 Prototpe:
     testd
@@ -25,20 +25,10 @@ Global:
 
 Classes:
 
-class Qtd : QuiltDaemon
+class QuiltTest 
 
-    def __init__
-        # setup daemon pid/io variables with defaults
-        NOTES:
-            previous iteration of design attempted to have the test daemon
-            start and stop the query daemons.  The attempt was to have an
-            all in one test thing, but in reality the complexity with starting
-            a daemon from a daemon was rough, and it didn't buy that much
-            since then the this test daemon would only work well for testing
-            on one machine.  It is now a stand alone daemon and
-            startup/shutdown scripts will coordinate daemons
 
-    def run
+    def Main(args)
         
         # Repeat Forever
             # Read quilt config (should be quilt test config)
@@ -47,11 +37,10 @@ class Qtd : QuiltDaemon
                 # skip file if it does not match includes
                 # load unit tests from those files
             # run the tests
+            # if any test fails throw exception
             # read sleep value between tests
+            # if sleep value is less than or equal zero exit script
             # sleep before repeating
-            
-            
-
         
 Functions:
 
@@ -80,10 +69,18 @@ Scripts:
         test_start
             # set python path for modules under test and test modules
             # set config dir to test config
+            # call test stop, capture all the output
             # start registrar
             # start qmd
             # start smd
-            # start qtd
+            # run quilt_Test
+            # return same error code as quilt_test
 
         test_stop
+            # kill quilt_test process
             # stop daemons in opposite order as start
+
+        timed_test
+            # TODO to automate testing need to make sure test does not run
+            # forever, so wrap it in some way that will cause the test to 
+            # fail if it is taking too long

@@ -12,7 +12,7 @@ import time
 import glob
 import unittest
 import lockfile
-
+import pprint
 
 # set environment variable for testing configuration directory
 cfgdir = quilt_test_core.get_test_cfg_dir()
@@ -35,15 +35,9 @@ def filename_to_modulename(scriptsHome,filename):
     filename = filename[:-3]
     return filename
 
-class Qtd(quilt_core.QuiltDaemon):
+class QuiltTest(object):
         
-
-    def __init__(self):
-        quilt_core.QuiltDaemon.__init__(self)
-        self.setup_process('quilt_test')
-
-
-    def run(self):
+    def main(self, args):
 
         # assemble the filename for query master
         quilt_lib_dir = quilt_test_core.get_quilt_lib_dir()
@@ -58,7 +52,7 @@ class Qtd(quilt_core.QuiltDaemon):
         # the directory containing test scripts        
         quilt_test_lib_dir = quilt_test_core.get_quilt_test_lib_dir()
 
-        # Repeat Forever
+        # Repeat Forever if necessarry
         while True:
             # read sleep value again in case user changed
             cfg = quilt_core.QuiltConfig()
@@ -100,8 +94,12 @@ class Qtd(quilt_core.QuiltDaemon):
             testSuite = unittest.TestSuite(tests)
             runner = unittest.TextTestRunner().run(testSuite)
 
-            
             logging.info("End Itegration Testing iteration")
+
+            # raise exception if tests failed
+            if (len(runner.errors) > 0):
+                exit(len(runner.errors))
+            
 
             # sleep before beginning
             cfg = quilt_core.QuiltConfig()
@@ -114,11 +112,9 @@ class Qtd(quilt_core.QuiltDaemon):
 def main(argv):
     
     # setup command line interface
-    parser =  quilt_core.main_helper('qtd',"""Provide an 
-        Integration Testing Framework.""",argv)
-    parser.add_argument('action', choices=['start', 'stop', 'restart'])
-    parser.parse_args()
-    Qtd().main(argv)
+    parser =  quilt_core.main_helper('qtst',"""Provide an 
+        Integration Testing Platform.""",argv)
+    QuiltTest().main(parser.parse_args())
 
 if __name__ == "__main__":        
     main(sys.argv[1:])
