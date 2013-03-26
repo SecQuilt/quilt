@@ -80,17 +80,7 @@ class QueryMaster:
         if clientDict == None:
             return
 
-        # call the remote object's shutdown method
-#       ns = Pyro4.locateNS(
-#           clientDict['registrarHost'], clientDict['registrarPort'])
-#       with Pyro4.Proxy(ns.lookup(clientDict['clientName'])) as client:
-#           logging.info("Shutting down client: " + 
-#               clientNameKey + "...")
-#           client.shutdown()
-#           logging.info("Done Shutting down client: " + 
-#               clientNameKey + ".")
 
-#REVIEW
     def GetSourceManagerStats(self):
         """
         format a string with information about all source managers
@@ -112,3 +102,16 @@ class QueryMaster:
             s + smgrRec["clientName"] + ", "
 
         return s
+
+    def GetClients(self,objType):
+        """return the list of registered clients matching the specified
+        type"""
+        
+        clients = []
+        with self._lock:
+            if objType in self._clients:
+                clients = self._clients[objType].copy()
+
+        return clients
+
+        

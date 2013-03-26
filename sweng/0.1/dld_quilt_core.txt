@@ -115,6 +115,14 @@ Classes:
 
 Functions:
 
+    def GetQueryMasterProxy(config=None)
+        """Access configuration to find query master, 
+        return proxy to it
+        """
+        # if config is none, intitalize config
+        # look up name, and name server info for query master
+        # return pyro proxy
+
     # Quilt helper function for main, do common things
     def quilt_main_helper(
         description                 # prose description of functionality

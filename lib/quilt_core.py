@@ -94,6 +94,21 @@ class QuiltConfig:
                 smdnames.append(s)
         return smdnames
                     
+def GetQueryMasterProxy(config=None):
+    """Access configuration to find query master, return proxy to it"""
+    if config is None:
+        config = QuiltConfig()
+    qmhost = config.GetValue("query_master", "registrar_host", None)
+    qmport = config.GetValue("query_master", "registrar_port", None)
+
+    # access the Query Master's instance name, create a proxy to it
+    qmname = config.GetValue("query_master", "name", "QueryMaster")
+    ns = Pyro4.locateNS(qmhost, qmport)
+    uri = ns.lookup(qmname)
+
+    logging.debug(qmname + " is at uri: " + str(uri))
+
+    return Pyro4.Proxy(uri)
 
 class QuiltDaemon(object):
   
@@ -148,19 +163,10 @@ class QueryMasterClient:
  
         # Access the QueryMaster's registrar's host and port from the config
         config = QuiltConfig()
-        qmhost = config.GetValue("query_master", "registrar_host", None)
-        qmport = config.GetValue("query_master", "registrar_port", None)
-
-        # access the Query Master's instance name, create a proxy to it
-        qmname = config.GetValue("query_master", "name", "QueryMaster")
-        ns = Pyro4.locateNS(qmhost, qmport)
-        uri = ns.lookup(qmname)
-
-        logging.debug(qmname + " is at uri: " + str(uri))
-
-        #TODO think about adding cleanup code to client to nicly disconnect
+        # TODO think about adding cleanup code to client to 
+        #   nicely disconnect
         # store a reference to the query master as a member variable
-        self._qm = Pyro4.Proxy(uri)
+        self._qm = GetQueryMasterProxy(config)
         
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable

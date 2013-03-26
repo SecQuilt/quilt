@@ -59,7 +59,6 @@ Classes:
             # acquire lock
             # remove the specified sm from registered list
             # if not found in the list, do nothing
-            # call the remote object's shutdown method
 
         string Query(                       # return the ID of the query
             string submitterNameKey         # key that the submitter recieved
@@ -99,7 +98,7 @@ Classes:
             # acquire lock
 
         # return the list of reistered object names
-        string[] getRegistedObjects(        #return list of names
+        string[] GetClients(        #return list of names
             type                            #type id of object's class
             # acquire lock
             
