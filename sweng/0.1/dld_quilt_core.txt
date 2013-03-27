@@ -152,6 +152,7 @@ Functions:
         # iterate the names and objects in clientObjectDic
             # call OnRegisterEnd(), keep track of objects that
             #   desire to have the event loop (who return true)
+            #   Unregister objects that are opting out
             #   replace clientObjectDic with participating objects
 
         # do a daemon event loop, 

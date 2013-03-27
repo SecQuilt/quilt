@@ -20,7 +20,7 @@ Classes:
 
     class SourceManager : QueryMasterClient
 
-        def Query(string query)
+        def Query(string queryId, string query)
             # print out the source manager's name and the query string
             # Store query in member variable
 

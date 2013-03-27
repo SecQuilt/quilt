@@ -13,6 +13,9 @@ External Dependenies:
     python-daemon
     threading
 
+Prototypes:
+    nested.py
+
 Responsibilities:
     provide QueryMaster remote api 
 
@@ -20,6 +23,8 @@ Classes:
 
     class QueryMaster 
 
+        
+        
         # create a lock for this class, coarse grained but
         # proably good enough.
         self._lock = threading.lock()
@@ -74,8 +79,6 @@ Classes:
             # call submitter's validate function
             # if submitter refuses to validate, return early
             # store queryid  notificationAddress in a member list
-            # terminate the submitter's daemon
-
 
             # Process query, 
             # iterate the source master's that are registered.  Send them
@@ -102,3 +105,24 @@ Classes:
             type                            #type id of object's class
             # acquire lock
             
+
+
+Functions:
+
+    Querymaster helper functions for server side only.  These will not
+    be called by clients, only by the query master object"
+
+    def get_client_proxy( clientRec)
+        """
+        return a pyro proxy object to the specified client
+
+        clientRec       the dictionary of record 
+                        for a client
+        """
+
+        # use pyro nameserver specified in record
+        # use objects 'local name' clientName to get 
+        # reference to proxy, return it
+
+    def get_client_proxy_from_type_and_name(qm, clientType, name)
+        # overload for get_client_proxy

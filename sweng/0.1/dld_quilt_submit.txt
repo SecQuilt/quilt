@@ -26,7 +26,7 @@ Classes:
         bool ValidateQuery(
             string queryMetricMsg   # message to user about time and space
                                     # requirements for the generated query
-            string queryID          # the ID that the query master assigned to
+            string queryId          # the ID that the query master assigned to
                                     #   the query
         )
             # print out query ID
@@ -37,9 +37,9 @@ Classes:
                 # if n return false to stop the query
             # return true to continue the query
 
-        void OnConnectionComplete()
+        void OnRegisterEnd()
             # submit args.query to the query master
-            # DisconnectFromQueryMaster
+            # return False to DisconnectFromQueryMaster
 
 Functions:
 

@@ -25,7 +25,7 @@ Query Master
         support returning the results to the user.  It does the coordination
 
     quilt_submit
-        -q QUERY    # A query to run on the system
+        QUERY    # A query to run on the system
         [-e EMAIL]  # comma seperated list of emails to supply notifications
         [-y]        # whether to automatically confirm the query
         [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
