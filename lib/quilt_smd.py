@@ -14,16 +14,16 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._args = args
         self._sourceName = sourceName
 
-#REVIEW
     def Query(self, queryId, query):
         with self._lock:
             self._lastQuery = query
+        # _sourceName should not change, set at init, so ok to read
+        # without lock
         logging.info("Source Manager: " + self._sourceName + 
             " recieved query: " + queryId + " as: " + query)
 
-#REVIEW
     def GetLastQuery(self):
-        with self._lock
+        with self._lock:
             return self._lastQuery
         
 

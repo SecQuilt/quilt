@@ -21,9 +21,10 @@ Responsibilities:
 
 Classes:
 
-    class BasicTests()
-        def BasicQueryTest()
-            # call quilt_submit "find me again" (check return code)
+    class BasicTestcase()
+        def test_basic_query()
+            # call quilt_submit "find me again [uniqueval] " 
+            #   (check return code)
             # sleep 2 seconds
             # Use QuiltConfig, Call GetSourceManagers, for each one
                 # use pyro, create proxy for the smd
@@ -32,12 +33,12 @@ Classes:
             # check qmd to be sure that all quilt_submit's have unregistered
             # do this by accessing Config, finding qmd name,
             # create pyro proxy for qmd, call
-            # getRegistedObjects(type(QuiltSubmit))
+            # getClients(type(QuiltSubmit))
             # make sure list is empty
             # TODO parameterize this test if needed, could fail if anyone is
             # running simultaneiously
 
-        def BasicQueueTest()
+        def test_basic_queue()
             # call quilt_submit "find me again [uniqueval]" (check return 
             #       code, capture query id output)
             # sleep 2 seconds
@@ -61,7 +62,7 @@ Classes:
             # check qmd to be sure that all quilt_status's have unregistered
             # do this by accessing Config, finding qmd name,
             # create pyro proxy for qmd, call
-            # getRegistedObjects(type(QuiltStatus))
+            # getClients(type(QuiltStatus))
             # make sure list is empty
             # TODO parameterize this test if needed, could fail if anyone is
             # running simultaneiously

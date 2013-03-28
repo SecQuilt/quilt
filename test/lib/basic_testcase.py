@@ -7,8 +7,42 @@ import subprocess
 import quilt_test_core
 import sei_core
 import quilt_core
+import time
+import query_master
+import random
 
 class BasicTestcase(unittest.TestCase):
+
+    def test_basic_query(self):
+        qstr = 'find me again ' + random.random()
+        # call quilt_submit "find me again" (check return code)
+        o = quilt_test_core.call_quilt_script('quilt_submit.py',
+            [ qstr ])
+        # sleep 2 seconds
+        time.sleep(2)
+        # Use QuiltConfig, Call GetSourceManagers, for each one
+            # use pyro, create proxy for the smd
+            # call GetLastQuery()
+            # assure it is equal to "find me again [uniqueval]"
+        cfg = quilt_core.QuiltConfig()
+        with quilt_core.GetQueryMasterProxy(cfg) as qm:
+            smgrs = qm.GetClients("SourceManager")
+            for smgr in smgrs:
+                with query_master.get_client_proxy(
+                        qm, "SourceManager", smgr) as smgrClient:
+                    lastQuery = smgrClient.GetLastQuery()
+                    assertTrue(lastQuery == qstr )
+
+        
+            # check qmd to be sure that all quilt_submit's have unregistered
+            # do this by accessing Config, finding qmd name,
+            qs = qm.GetClients("QuiltSubmit")
+            # make sure list is empty
+            self.assertTrue( len(qs) == 0 )
+
+        
+        
+        
     def test_basic_status(self):
 
         quilt_lib_dir = quilt_test_core.get_quilt_lib_dir()
@@ -31,9 +65,9 @@ class BasicTestcase(unittest.TestCase):
         # unregistered when process exits
         with quilt_core.GetQueryMasterProxy(cfg) as qm:
             qs = qm.GetClients("QuiltStatus")
-            print str(qs)
             self.assertTrue( len(qs) == 0 )
 
+    
         
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper("Run the most basic of test cases",sys.argv)

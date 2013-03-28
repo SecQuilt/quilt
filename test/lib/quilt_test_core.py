@@ -4,6 +4,8 @@ import os
 import argparse
 import logging
 import quilt_core
+import subprocess
+import sei_core
 
 def get_quilt_test_lib_dir():
     """grab the location of quilt test scritps"""
@@ -43,4 +45,22 @@ def unittest_main_helper(description='',argv=sys.argv):
         sys.argv.pop(slot)
         sys.argv.pop(slot)
 
+def call_quilt_script( scriptName, args = []):
+    """
+    returns the stdoutput of the script, checks for bad error code and
+    throws exception
+        scriptName          # base filename of the script in the quilt lib
+                            #   directory
+        args                # arguments to pass to the script):
+    """
+    
+    quilt_lib_dir = get_quilt_lib_dir()
+    # assemble the filename for query master
+    script_file = os.path.join(quilt_lib_dir,scriptName)
 
+    # call quilt_status (check return code, capture output)
+    args = [script_file, '-l', 'DEBUG'] + args
+    out = sei_core.run_process(args,
+        whichReturn=sei_core.STDOUT, logToPython=False)
+
+    return out

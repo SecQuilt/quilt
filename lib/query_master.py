@@ -111,13 +111,12 @@ class QueryMaster:
         return clients
 
 
-#REVIEW
     def Query(self, submitterNameKey, query, notificationAddress):
         """
         string Query(                       # return the ID of the query
             string submitterNameKey         # key that the submitter recieved
-                                            #   when it was registered with this
-                                            #   master
+                                            # when it was registered with this
+                                            # master
             string query                    # the content of the query
             string notificatoinAddress      # the email addresses for
                                             #   notification
@@ -125,21 +124,18 @@ class QueryMaster:
         """
 
         queryRec = {}
-        # GetClient is threadsafe, returns with the lock off
-        with get_client_proxy_from_type_and_name(
-            self, "QuiltSubmit", submitterNameKey) as submitter:
 
-            # assign unique query id and insert a query record
-            # lock the query master because we need exclusive acccess to 
-            #   the query list
-            baseqid = submitterNameKey
-            i = 0
-            qid = baseqid + "_query_" + str(i)
-            with self._lock:
-                while qid in self._queries:
-                    i = i + 1
-                    qid = baseqid + "_query_" + str(i)
-                self._queries[qid] = queryRec
+        # assign unique query id and insert a query record
+        # lock the query master because we need exclusive acccess to 
+        #   the query list
+        baseqid = submitterNameKey
+        i = 0
+        qid = baseqid + "_query_" + str(i)
+        with self._lock:
+            while qid in self._queries:
+                i = i + 1
+                qid = baseqid + "_query_" + str(i)
+            self._queries[qid] = queryRec
                     
         # GetClients is threadsafe, but when it returns the lock is off
         smgrs = self.GetClients("SourceManager")
@@ -148,19 +144,21 @@ class QueryMaster:
         for name,obj in smgrs.items():
             validStr += obj["clientName"] + ", "
 
-        validStr += "\n\tWould you like to continue?"
+        # get_client function is threadsafe, returns with the lock off
+        with get_client_proxy_from_type_and_name(
+            self, "QuiltSubmit", submitterNameKey) as submitter:
             
-        # call back to the submitter to get validation
-        if not submitter.ValidateQuery( validStr, qid):
-            logging.info("Submitter: " + submitterNameKey + """did not
-                validate the query: """ + qid)
-            # delete the query record, it was determined invalid
-            with self._lock:
-                del self._queries[qid]
-            return
-        else:
-            logging.info("Submitter: " + submitterNameKey + """did 
-                validate the query: """ + qid)
+            # call back to the submitter to get validation
+            if not submitter.ValidateQuery( validStr, qid):
+                logging.info("Submitter: " + submitterNameKey + """ did not
+                    validate the query: """ + qid)
+                # delete the query record, it was determined invalid
+                with self._lock:
+                    del self._queries[qid]
+                return
+            else:
+                logging.info("Submitter: " + submitterNameKey + """ did 
+                    validate the query: """ + qid)
             
         # iterate the source managers
         # send them the query
@@ -168,22 +166,26 @@ class QueryMaster:
             with get_client_proxy(obj) as smgr:
                 logging.debug("Submitting query: " + qid + " to: " + 
                     obj["clientName"])
-                smgr.Query(query)
+                smgr.Query(qid, query)
 
-#REVIEW
     def GetQueryQueueStats(self):
         """
         format a string with information about all the Query's in the q   
         """
         with self._lock:
-            cnt = len(self._queries)
-            pprint.pformat(self.
-#REVIEW
+            return pprint.pformat(self._queries.keys())
+
+    def GetQueryStats(self, queryId):
+        """
+        format a string with information about the specified query
+        """
+        with self._lock:
+            return pprint.pformat(self._queries[queryId])
+
 def get_client_proxy( clientRec):
     """
     return a pyro proxy object to the specified by the client record
     """
-    rec = clients[clientKey]
     pyroname = clientRec["clientName"]
     nshost = clientRec["nameServerHost"]
     nsport = clientRec["nameServerPort"]
@@ -193,8 +195,7 @@ def get_client_proxy( clientRec):
 
     return Pyro4.Proxy(uri)
 
-#REVIEW    
-def get_client_proxy_from_type_and_name( qm, clientType, clientName)
+def get_client_proxy_from_type_and_name( qm, clientType, clientName):
     # lock access to the clients of the query masteter
     with qm._lock:
         rec = qm._clients[clientType][clientName].copy()

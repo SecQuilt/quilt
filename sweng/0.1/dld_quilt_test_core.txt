@@ -37,3 +37,16 @@ Functions:
 
         # chain call to quilte_core main helper
         # return same object as quilt_cor emain helper
+
+    def call_quilt_script(  # returns the stdoutput of the script
+        scriptName          # base filename of the script in the quilt lib
+                            #   directory
+        args                # arguments to pass to the script):
+        
+        # get the quilt lib directory
+        # create file path to the script
+        # assemble command
+        # set log level to DEBUG
+        # invoke the command, exception thrown on bad error code
+        # return stdout from the command
+        
