@@ -48,7 +48,8 @@ class Smd(quilt_core.QuiltDaemon):
         for smname in smnames:
             logging.debug(smname + " specified from configuration")
             # create each source manager object
-            objs[smname] = SourceManager(self._args, smname)
+            sm = SourceManager(self._args, smname)
+            objs[sm._localname] = sm
             
         # start the client with all the source managers
         quilt_core.query_master_client_main_helper(objs)

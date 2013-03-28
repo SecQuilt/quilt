@@ -29,7 +29,7 @@ class Registrar(quilt_core.QuiltDaemon):
 def main(argv):
     
     # setup command line interface
-    parser =  quilt_core.main_helper("quilt_registrar",
+    parser =  quilt_core.main_helper("qreg",
         "a meta server for quilt objects",
         argv)
 

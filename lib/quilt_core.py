@@ -103,6 +103,8 @@ def GetQueryMasterProxy(config=None):
 
     # access the Query Master's instance name, create a proxy to it
     qmname = config.GetValue("query_master", "name", "QueryMaster")
+    logging.debug("Locating name server for query master: " + str(qmhost) + 
+        ", " + str(qmport))
     ns = Pyro4.locateNS(qmhost, qmport)
     uri = ns.lookup(qmname)
 
@@ -195,17 +197,28 @@ class QueryMasterClient:
     def OnEventLoopBegin(self):
         """
         funciton called when client's owning daemon begins an event loop
-        function called in event loop main thread
+        iteration, function called in event loop main thread
         return False to end participation in event loop
         """
         return True
 
+
+    def OnEventLoopEnd(self):
+        """
+        funciton called when client's owning daemon ends an event loop
+        iteration, function called in event loop main thread
+        return False to end participation in event loop
+        """
+        return True
 
     def UnregisterFromQueryMaster(self):
         if self._qm != None and self._remotename != None:
             self._qm.UnRegisterClient(self.GetType(), self._remotename)
             logging.info("Unregistration completed for " + self._localname)
 
+    def Heartbeat(self):
+        logging.debug("Heartbeat happened")
+        pass
 
 def query_master_client_main_helper(
         clientObjectDict       # map of instances to names of objects to
@@ -280,16 +293,31 @@ def query_master_client_main_helper(
         #   removed by returning false.  For now it does
         #   not matter because we only ever have one object
         #   in the list
-        logging.debug("Selecting from sockets")
-        s,_,_ = select.select(daemon.sockets,[],[])
-        logging.debug("Selected " + str(len(s)) + " sockets")
+        s,_,_ = select.select(daemon.sockets,[],[],0.05)
         
         if s:
-            logging.debug("recieved " + str(len(s)) + " events")
+            logging.debug("executing " + str(len(s)) + " events in main loop")
             daemon.events(s)
         else:
             time.sleep(0.05)
  
+        delDaemonObjs = {}
+        # iterate the names and objects in clientObjectDic
+        # this funciton will return false if it wants to be
+        # removed
+        for name,obj in daemonObjs.items():
+            if not obj.OnEventLoopEnd():
+                delDaemonObjs[name] = obj
+
+        # remove objects from object list
+        # unregister clients from query master
+        for name,obj in delDaemonObjs.items():
+            del daemonObjs[name]
+            obj.UnregisterFromQueryMaster()
+            
+        # if all objects have been removed break out
+        if len(daemonObjs) == 0:
+            break
 
 def common_init(name,strlevel):
     """

@@ -14,10 +14,10 @@ import random
 class BasicTestcase(unittest.TestCase):
 
     def test_basic_query(self):
-        qstr = 'find me again ' + random.random()
+        qstr = 'find me again ' + str(random.random())
         # call quilt_submit "find me again" (check return code)
         o = quilt_test_core.call_quilt_script('quilt_submit.py',
-            [ qstr ])
+            [ qstr, '-y' ])
         # sleep 2 seconds
         time.sleep(2)
         # Use QuiltConfig, Call GetSourceManagers, for each one
@@ -27,20 +27,19 @@ class BasicTestcase(unittest.TestCase):
         cfg = quilt_core.QuiltConfig()
         with quilt_core.GetQueryMasterProxy(cfg) as qm:
             smgrs = qm.GetClients("SourceManager")
-            for smgr in smgrs:
-                with query_master.get_client_proxy(
-                        qm, "SourceManager", smgr) as smgrClient:
-                    lastQuery = smgrClient.GetLastQuery()
-                    assertTrue(lastQuery == qstr )
 
-        
+            for smgr in smgrs:
+                clientRec =  qm.GetClientRec("SourceManager", smgr)
+                with query_master.get_client_proxy(clientRec) as smgrClient:
+                    lastQuery = smgrClient.GetLastQuery()
+                    self.assertTrue(lastQuery == qstr )
+
             # check qmd to be sure that all quilt_submit's have unregistered
             # do this by accessing Config, finding qmd name,
             qs = qm.GetClients("QuiltSubmit")
             # make sure list is empty
             self.assertTrue( len(qs) == 0 )
 
-        
         
         
     def test_basic_status(self):

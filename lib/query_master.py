@@ -110,6 +110,11 @@ class QueryMaster:
 
         return clients
 
+    def GetClientRec(self,objType,clientName):
+        """return the master's client record for the specified client"""
+        with self._lock:
+            return self._clients[objType][clientName].copy()
+
 
     def Query(self, submitterNameKey, query, notificationAddress):
         """
@@ -187,8 +192,8 @@ def get_client_proxy( clientRec):
     return a pyro proxy object to the specified by the client record
     """
     pyroname = clientRec["clientName"]
-    nshost = clientRec["nameServerHost"]
-    nsport = clientRec["nameServerPort"]
+    nshost = clientRec["registrarHost"]
+    nsport = clientRec["registrarPort"]
     
     ns = Pyro4.locateNS(nshost, nsport)
     uri = ns.lookup(pyroname)

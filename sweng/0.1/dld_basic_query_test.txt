@@ -34,6 +34,7 @@ Classes:
             # do this by accessing Config, finding qmd name,
             # create pyro proxy for qmd, call
             # getClients(type(QuiltSubmit))
+            # then GetclientRecs, and create proxys for each one
             # make sure list is empty
             # TODO parameterize this test if needed, could fail if anyone is
             # running simultaneiously

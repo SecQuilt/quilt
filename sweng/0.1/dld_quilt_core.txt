@@ -76,6 +76,7 @@ Classes:
         # proably good enough.
         self._lock = threading.lock()
 
+
         # Connect to the query master
         void RegisterWithQueryMaster():
             # Access the QueryMaster's registrar's host and port from the config
@@ -92,9 +93,15 @@ Classes:
             # return true
 
         # funciton called when client's owning daemon begins an event loop
-        # function called in event loop main thread
+        # iteration, function called in event loop main thread
         # return False to end participation in event loop
         bool OnEventLoopBegin()
+            # return true
+
+        # funciton called when client's owning daemon ends an event loop
+        # iteration, function called in event loop main thread
+        # return False to end participation in event loop
+        bool OnEventLoopEnd()
             # return true
 
         # Unregister from the query Master
@@ -173,12 +180,19 @@ Functions:
             #   not matter because we only ever have one object
             #   in the list
           
-            # select daemon sockets
+            # select daemon sockets, with a fraction of a second timeout
             # if there are daemon sockets
                 # run the events for those sockets
             # otherwise
                 # sleep for fraction of a second
 
+            # iterate the names and objects in clientObjectDic
+                # call OnEventLoopEnd() if False is returned
+                    # remove object from clientObjectDic
+                    # place object in removedClientDic
+                    # UnRegisterClient from Query Master
+
+            # if all objects have been removed break out
         # close the daemon
 
         Notes:

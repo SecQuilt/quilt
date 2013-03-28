@@ -104,6 +104,12 @@ Classes:
         string[] GetClients(        #return list of names
             type                            #type id of object's class
             # acquire lock
+
+        dict{} GetClientRec(        # return a client record
+            objType                     # the tupe id of the client
+            clientName                  # the client's name key
+        )
+            # acquire lock, return copy of record from _clients
             
 
 

@@ -17,6 +17,11 @@ Responsibilities:
 Classes:
     class QuiltSubmitter : QuiltMasterClient
 
+        # the event loop control variable, if false event loop will
+        # not run, or stop running.  This variable is shared between threads
+        # and should not be accessed without a lock
+        self._processEvents = True
+
         __init__(
             args    # see functional_specification of query_submit
         )
@@ -29,18 +34,36 @@ Classes:
             string queryId          # the ID that the query master assigned to
                                     #   the query
         )
+            # ALWAYS set process events flag to false end event loop, allowing
+            # submitter to exit
+
             # print out query ID
 
             # if args specify validation should occur
                 # display message to std output
                 # read y/n from std input
                 # if n return false to stop the query
+
+            
             # return true to continue the query
 
-        void OnRegisterEnd()
-            # submit args.query to the query master
-            # return False to DisconnectFromQueryMaster
 
+        void OnRegisterEnd()
+            # submit args.query to the query master as an asyncronous call
+            # return True so that the event loop starts running
+    
+
+        self.SetProcesssEvents( bool value)
+            # lock the class clock
+            # set _processEvents to the specified value
+
+        void OnEventLoopBegin()
+            # lock the class lock
+            # read and return value of _processEvents
+
+        void OnEventLoopEnd()
+            # lock the class lock
+            # read and return value of _processEvents
 Functions:
 
     # main function of the script, which is passed command line variables
