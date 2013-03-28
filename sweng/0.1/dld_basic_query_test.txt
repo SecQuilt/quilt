@@ -25,7 +25,7 @@ Classes:
         def test_basic_query()
             # call quilt_submit "find me again [uniqueval] " 
             #   (check return code)
-            # sleep 2 seconds
+            # sleep 1 seconds
             # Use QuiltConfig, Call GetSourceManagers, for each one
                 # use pyro, create proxy for the smd
                 # call GetLastQuery()
@@ -42,7 +42,7 @@ Classes:
         def test_basic_queue()
             # call quilt_submit "find me again [uniqueval]" (check return 
             #       code, capture query id output)
-            # sleep 2 seconds
+            # sleep 1 seconds
             # call quilt_q (check return code, capture output)
             # assure output contains same query id as before
             # call quilt_q -q query_id (check return code, capture output)

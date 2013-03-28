@@ -23,10 +23,10 @@ Classes:
             # store args as member variable
             # chain to super constructor
 
-         OnConnectionComplete()
+         OnRegisterEnd()
             # print out statistics about the manager's Q
             # if q id specified
-                # GetQueryStats from master
+                # TryGetQueryStats from master
             # else 
                 # GetQueryQueueStats from master
             # DisconnectFromQueryMaster

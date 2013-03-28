@@ -39,8 +39,9 @@ Query Master
         [-qid QUERY_ID]     # optional argument, which query to check
         [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
 
-        Quilt status will display information about queries in the queue.  If id
-        is specified, only that query's information will be displayed
+        Quilt queue will display information about queries in the queue.  If id
+        is specified, only that query's information will be displayed, if that 
+        id is not present nothing is displayed
 
     quilt_status
         [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN

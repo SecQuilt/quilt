@@ -18,8 +18,8 @@ class BasicTestcase(unittest.TestCase):
         # call quilt_submit "find me again" (check return code)
         o = quilt_test_core.call_quilt_script('quilt_submit.py',
             [ qstr, '-y' ])
-        # sleep 2 seconds
-        time.sleep(2)
+        # sleep 1 seconds
+        time.sleep(1)
         # Use QuiltConfig, Call GetSourceManagers, for each one
             # use pyro, create proxy for the smd
             # call GetLastQuery()
@@ -41,6 +41,50 @@ class BasicTestcase(unittest.TestCase):
             self.assertTrue( len(qs) == 0 )
 
         
+    def test_basic_queue(self):
+
+        qstr = 'find me again ' + str(random.random())
+        # call quilt_submit "find me again" (check return code)
+        o = quilt_test_core.call_quilt_script('quilt_submit.py',
+            [ qstr, '-y' ])
+        # sleep 1 seconds
+        time.sleep(1)
+
+        a = o.index("Query ID is:") + len(str("Query ID is:"))
+        qid = o[a:-1]
+
+        self.assertTrue(len(qid) > 0)
+
+        # call quilt_q (check return code, capture output)
+        o = quilt_test_core.call_quilt_script('quilt_q.py')
+        
+        # assure output contains same query id as before
+        self.assertTrue(qid in o)        
+
+        # call quilt_q -q query_id (check return code, capture output)
+        o = quilt_test_core.call_quilt_script('quilt_q.py',['-qid',qid])
+
+        # assure output contains same query id as before
+        self.assertTrue(qid in o)        
+
+        # call quilt_q -q FAKEid (check return code, capture output)
+        o = quilt_test_core.call_quilt_script('quilt_q.py',['-qid',
+            qid + 'FAKE'])
+
+        # assure no output
+        self.assertTrue(o == None or len(o)==0)
+
+        # check qmd to be sure that all quilt_q's have unregistered
+        # do this by accessing Config, finding qmd name,
+        # create pyro proxy for qmd, call getRegistedObjects(type(QuiltQ))
+        # make sure list is empty
+
+        with quilt_core.GetQueryMasterProxy(cfg) as qm:
+            # check qmd to be sure that all quilt_q's have unregistered
+            qs = qm.GetClients("QuiltQueue")
+            # make sure list is empty
+            self.assertTrue( len(qs) == 0 )
+
         
     def test_basic_status(self):
 

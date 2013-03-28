@@ -180,12 +180,17 @@ class QueryMaster:
         with self._lock:
             return pprint.pformat(self._queries.keys())
 
-    def GetQueryStats(self, queryId):
+    def TryGetQueryStats(self, queryId):
         """
         format a string with information about the specified query
+        return None if not found
         """
+        
         with self._lock:
-            return pprint.pformat(self._queries[queryId])
+            if queryId not in self._queries:
+                return None
+            else:
+                return pprint.pformat(self._queries[queryId])
 
 def get_client_proxy( clientRec):
     """

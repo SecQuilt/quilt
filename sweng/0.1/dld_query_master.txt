@@ -89,10 +89,12 @@ Classes:
             # acquire lock
 
         # format a string with information abour the specified query
-        string GetQueryStats(
+        string TryGetQueryStats(
             string queryID          # the query we are interested in
         )
             # acquire lock
+            # return None if query not foud, otherwise return the 
+            #   query's record
 
         # format a string with information about all source managers
         string GetSourceManagerStats(
