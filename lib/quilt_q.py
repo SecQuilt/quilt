@@ -18,9 +18,9 @@ class QuiltQueue(quilt_core.QueryMasterClient):
     def OnRegisterEnd(self):
         
         if self._args.query_id == None:
-            o = self._qm.TryGetQueryStats(self._args.query_id)
-        else:
             o = self._qm.GetQueryQueueStats()
+        else:
+            o = self._qm.TryGetQueryStats(self._args.query_id)
             
         if o != None:
             print o
