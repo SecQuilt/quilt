@@ -1,0 +1,481 @@
+#+TITLE:     Quilt Design and Psuedocode
+#+AUTHOR:    George Jones
+#+EMAIL:     gmj@cert.org
+#+DATE:      2013-03-20 Wed
+#+DESCRIPTION:
+
+This is a coding exercise to flesh out issues in Quilt design.  
+These examples ignore issues of scale and distribution.
+
+* Key terms defined below
+** Data Types
+  - [[*quiltPattern][quiltPattern]]
+  - [[*eventFieldSpec][eventFieldSpec]]
+  - [[*registeredQueryID][registeredQueryID]]
+  - [[*sourceQuery][sourceQuery]]
+  - [[sourceQueryID]]
+  - [[*sourceEvent][sourceEvent]]
+  - [[*eventIndexTable][eventIndexTable]]
+** Modules
+  - [[*sourceManager][sourceManager]]
+  - [[*queryMaster][queryMaster]]
+  - [[dataSource]]
+* For Discussion
+** TODO Discuss Data Types				 :George:Tim:Derrick:
+   These are fairly well thought out and complete.
+** TODO Discuss Modules					 :George:Tim:Derrick:
+   These are less well thought out.
+* Resolved Issues
+** DONE Resolve method of access to non-key data.
+   - Issue :: Once a pattern matches, it is likely that analysts will
+              want more  information. 
+   - Example :: If a query says "show me traffic from this source IP
+                to that destination IP" the next question might be
+                show the entire records that produced the match, even
+                the fields that were not part of the pattern".  This
+                makes the inidexing and storage complex.
+   - Resolution in the code below :: Each /sourceQuery/ will be
+        assigned a unique /sourceQueryID/ by the /queryMaster/.  This
+        /sourceQueryID/ will be passed from the /queryMaster/ to the
+        /sourceMaster/ when queries are issued/.  The /sourceMaster/
+        may then request further information about past queries from
+        the /sourceMaster/ by supplying the /sourceQueryID/ and a
+        possibly expanded) /eventFieldSpec/.  It is up to the
+        /sourceMaster/ how to satisfy such requests.  Possibilites in
+        include caching more complete results than those returned for
+        the original query or re-querying the data source. 
+
+   - Implementation options down the road :: Have the Source Master do
+        some sort of caching of query results, including fields not
+        used as part of the match to facilitate subsequent queries for
+        related information.
+** DONE Resolve where do pipelines happen?
+   - Issue :: Now, for example, pipelines can happen in SiLK on the
+              command line, via PySiLK, etc.  Will this ability be
+              preserved or will pipelining requried data to be moved
+              back to the /queryMaster/?
+   - Resolution :: Pipelines happen on the /sourceMaster/. The
+                   /sourceQuery/ may be a command containing
+                   pipelines. 
+
+* Open Issues
+** TODO Decide how the Query Master return lists of matches to the use ? :George:Tim:Derrick:
+   Say that a query, "show me scanners", returns a long list of
+   matches.  What goes back to the user?  One possiblity is a list of
+   matching query numbers ("match1", "match2") for which a
+   corresponding set of tables is created, e.g.
+
+#+BEGIN_EXAMPLE
+   cat > scanPattern <<EOF
+   # scan pattern goes here
+   EOF
+   $ queryMaster scanPattern
+     queryMaster: 2 matches found.
+     queryMaster: See match*.pattern.DATE.*
+   $ ls
+     match1.scanPattern.DATE.txt
+     match1.scanPattern.DATE.flow.sql
+     match1.scanPattern.DATE.dns.sql
+     match2.scanPattern.DATE.txt
+     match2.scanPattern.DATE.flow.sql
+     match2.scanPattern.DATE.dns.sql
+
+#+END_EXAMPLE
+
+** TODO Decide how the  return of one query be used to feed another :Geroge:Tim:Derrick:
+   For example, phishing might be detected by seeing email inbound (query1)
+   containing a url followed by outbound web traffic (query2) to the
+   same URL where query (needs the resuts of the first query).
+
+** TODO Decide if eventFieldSpecs need to indicate type	 :George:Derrick:Tim:
+** TODO Decide the right key for eventIndexTable? 	 :George:Tim:Derrick:
+    - time (as below) or
+    - event key (as commented below)
+
+** TODO Discuss use of sqllite etc as output format for eventIndexTables :George:Tim:Derrick:
+* Data Types
+** eventFieldSpec
+   - PURPOSE :: The /eventFieldSpec/ defines which combination of
+                output fields are returned from a [[*sourceQuery][sourceQuery]]
+		It is defined by a [[*sourceManager][sourceManager]] when it registers a
+                [[*registeredQueryID][registeredQueryID]] with the [[*queryMaster][queryMaster]].  In formulating
+                a [[*sourceQuery][sourceQuery]], the  [[*queryMaster][queryMaster]] selects a subset of
+                the fields defined.  This subset defines the fields of
+                the events returned in the [[*eventIndexTable][eventIndexTable]].
+*** eventFieldSpec Example
+    - see example in [[*sourceQuery Example][sourceQuery Example]]
+
+** registeredQueryID
+   - PURPOSE :: A /registeredQueryID/ defines methods that the
+                [[*queryMaster][queryMaster]] may use to retrieve information from a
+                [[*sourceManager][sourceManager]].  It specifies a name, input
+                parameters, and an [[*eventFieldSpec][eventFieldSpec]].  The input
+                parameters provide named lists of required and
+                optional input parameters.
+***  registeredQueryID example
+     - see example in [[*sourceQuery Example][sourceQuery Example]]
+
+** sourceQuery
+   - PURPOSE :: A /sourceQuery/ is a request from [[*queryMaster][queryMaster]] to a
+                [[*sourceManager][sourceManager]] for a list of events matching a
+                [[*registeredQury][registeredQuery]] for a given set of input parameters.
+                /sourceQuery/s are formulated from the list of
+                [[*registeredQury][registeredQuery]]s.  /sourceQuery/s return
+                [[*eventIndexTable][eventIndexTable]]s and are used to express subsets of
+                [[*quiltPattern][quiltPattern]]s 
+
+*** sourceQuery Example
+#+name: sourceQueryExample
+#+HEADER: :results output
+#+HEADER: :exports both    
+#+BEGIN_SRC python
+import pprint
+import time
+pp = pprint.PrettyPrinter(indent=4)
+now="%f" % (time.time())
+
+# registeredSourceQueries are passed up to the queryMaster from the sourceMasters.
+# This is defiend here for the sake of example.  In operation, all we would have
+# here is list of registeredQueries with this (and others) already defined.
+
+registeredQueryID={}
+registeredQueryID["queryName"]="allOutboundTraffic"
+registeredQueryID["queryRequiredParameters"]={'STARTDATE': None}
+registeredQueryID["queryOptionalParameters"]={}
+registeredQueryID["eventFieldSpec"]=["sIP","dIP","sPort","dPort","pro","packets","bytes","flags","sTime","dur","eTime","sen"]
+registeredQueryID["queryString"] = "rwfilter --type=out,outweb --proto=0- --start-date=STARTDATE --pass=stdout"
+registeredQueryID["registeredMaster"]="mySiLKRepo"
+print "registeredQueryID="
+pp.pprint(registeredQueryID)
+
+# this is where queryMaster code begins.
+
+registeredSourceQueries = {}
+registeredSourceQueries[registeredQueryID["queryName"]] = registeredQueryID  # callbacks from sourceMaster
+
+# choose a query to issue
+
+sourceQuery=registeredSourceQueries["allOutboundTraffic"].copy()
+
+# modify parameters, etc.
+
+sourceQuery["queryRequiredParameters"]["STARTDATE"]='2013/03/20:11'
+sourceQuery["eventFieldSpec"] = sourceQuery["eventFieldSpec"][0:4]
+sourceQuery["sourceQueryID"] = None
+
+# generate unique sourceQueryID
+
+sourceQueryID={}
+sourceQueryID["time"]=now
+sourceQueryID["queryName"]=sourceQuery["queryName"]
+sourceQueryID["queryRequiredParameters"]=sourceQuery["queryRequiredParameters"]
+sourceQueryID["queryOptionalParameters"]=sourceQuery["queryOptionalParameters"]
+print "sourceQueryID="
+pp.pprint(sourceQueryID)
+
+# Add ID to the query to allow sourceMaster to cache, re-query, etc.
+# Implementation-wise this may be redundant since all the info but
+# the timestamp is in the query, but is included here for clarity.
+
+
+sourceQuery["sourceQueryID"] = sourceQueryID.copy()
+print "sourceQuery="
+pp.pprint(sourceQuery)
+
+# Issue the query...
+
+# Get results...
+
+events = []
+events.append(['1363184654.264842', '1.1.1.1|2.2.2.2|80']);
+events.append(['1363184654.264842', '1.1.1.1|2.2.2.2|80']); # duplicate event
+events.append(['1363184664.000000', '1.1.1.1|2.2.2.2|80']); # repeate 10 seconds later
+events.append(['1363184674.000000', '3.3.3.3|2.2.2.2|80']); # new source, 10 seconds later
+events.append(['1363184674.000000', '3.3.3.3|2.2.2.2|53']); # different app, same time
+
+# Pack the results into an event index table
+eventIndexTable = {}
+eventIndexTable["sourceQueryID"] = sourceQueryID;
+eventIndexTable["table"] = events;
+
+print "eventIndexTable="
+pp.pprint(eventIndexTable)
+
+#+END_SRC   
+
+#+RESULTS: sourceQueryExample
+#+begin_example
+registeredQueryID=
+{   'eventFieldSpec': [   'sIP',
+                          'dIP',
+                          'sPort',
+                          'dPort',
+                          'pro',
+                          'packets',
+                          'bytes',
+                          'flags',
+                          'sTime',
+                          'dur',
+                          'eTime',
+                          'sen'],
+    'queryName': 'allOutboundTraffic',
+    'queryOptionalParameters': {   },
+    'queryRequiredParameters': {   'STARTDATE': None},
+    'queryString': 'rwfilter --type=out,outweb --proto=0- --start-date=STARTDATE --pass=stdout',
+    'registeredMaster': 'mySiLKRepo'}
+sourceQueryID=
+{   'queryName': 'allOutboundTraffic',
+    'queryOptionalParameters': {   },
+    'queryRequiredParameters': {   'STARTDATE': '2013/03/20:11'},
+    'time': '1364127771.391883'}
+sourceQuery=
+{   'eventFieldSpec': ['sIP', 'dIP', 'sPort', 'dPort'],
+    'queryName': 'allOutboundTraffic',
+    'queryOptionalParameters': {   },
+    'queryRequiredParameters': {   'STARTDATE': '2013/03/20:11'},
+    'queryString': 'rwfilter --type=out,outweb --proto=0- --start-date=STARTDATE --pass=stdout',
+    'registeredMaster': 'mySiLKRepo',
+    'sourceQueryID': {   'queryName': 'allOutboundTraffic',
+                         'queryOptionalParameters': {   },
+                         'queryRequiredParameters': {   'STARTDATE': '2013/03/20:11'},
+                         'time': '1364127771.391883'}}
+eventIndexTable=
+{   'sourceQueryID': {   'queryName': 'allOutboundTraffic',
+                         'queryOptionalParameters': {   },
+                         'queryRequiredParameters': {   'STARTDATE': '2013/03/20:11'},
+                         'time': '1364127771.391883'},
+    'table': [   ['1363184654.264842', '1.1.1.1|2.2.2.2|80'],
+                 ['1363184654.264842', '1.1.1.1|2.2.2.2|80'],
+                 ['1363184664.000000', '1.1.1.1|2.2.2.2|80'],
+                 ['1363184674.000000', '3.3.3.3|2.2.2.2|80'],
+                 ['1363184674.000000', '3.3.3.3|2.2.2.2|53']]}
+#+end_example
+
+** sourceQueryID
+   - PURPOSE :: A /sourceQueryID/ serves to uniquely identifiy each
+                instance of a [[*sourceQuery][sourceQuery]].  Each query is timestamped
+                when issued.  The combination of the timestamp, the
+                name of the [[*registeredQuery][registeredQuery]] and the input parameters
+                serve to uniquely define each query.  It is intended
+                that the [[*sourceMaster][sourceMaster]] can use the /sourceQueryID/ as a
+                reference to values returned by previous queries to
+                allow repeted retrieval or retrieval of additional
+                informatinon (via an expanded [[*eventFieldSpec][eventFieldSpec]]).  In
+                terms of imlementatnion, this may involve caching or
+                requerying the original [[*dataSource][dataSource]].
+
+*** sourceQueryID Example
+    - See [[*sourceQuery Example][sourceQuery Example]]
+
+** sourceEvent
+   - PURPOSE ::  A /sourceEvent/ represents an event or condition at
+                 a  [[*dataSource][dataSource]].  Each /sourceEvent/ is timestamped.
+                 The event is defined by the combnation of the
+                 timestamp and the fields specified in the
+                 [[*eventFieldSpec][eventFieldSpec]] of the [[*sourceQuery][sourceQuery]].  There may be
+                 multiple occurances of the same event.  Events may
+                 represent dynamic, recurring events such as log
+                 entries or netflow records, or static conditions
+                 such a the presence of a file, it's hash value or a
+                 a system configuration parameter.
+*** sourceEvent example
+
+This example was ment to generate a few events, which it does below.  It
+would up being a bunch of code to wrap rwfilter and rwcut. 
+
+#+name: eventExample
+#+HEADER: :results output
+#+HEADER: :exports both    
+#+BEGIN_SRC python
+import subprocess
+import StringIO
+
+# case of specs must match case of rw* headers.
+# this whole example wants to be PySiLK
+
+eventTimeSpec = "sTime"			# which ouput field will have time?
+eventFieldSpec = ["sIP","dIP"]		# which fields make up the event?
+eventQuerySpec = [eventTimeSpec] + eventFieldSpec
+
+# The use of subprocess and StringIO is a hack.
+# The point is that we run a silk command and can
+# parse lines later on to build up lists of events.
+#
+
+rwcutFields=",".join(eventQuerySpec)
+cmd = "rwfilter --type=out,outweb --proto=0- --start-date=2013/03/20 -daddr=8.8.8.8 --pass=stdout | rwcut --fields=" + rwcutFields
+cmdOut = subprocess.check_output(cmd, shell=True)
+buf = StringIO.StringIO(cmdOut)
+
+#
+# parse out standard SiLK style text output:
+#
+#            sIP|            dIP|sPort|dPort|pro|   packets|     bytes|   flags|                  sTime|      dur|                  eTime|sen|
+#   192.168.1.13|    224.0.0.251| 5353| 5353| 17|         2|       200|        |2013/03/13T17:14:34.251|    0.101|2013/03/13T17:14:34.352| S0|
+#   192.168.1.42|  67.18.187.111|  123|  123| 17|         1|        76|        |2013/03/13T17:15:52.916|    0.048|2013/03/13T17:15:52.964| S0|
+#   192.168.1.42|  134.121.64.62|  123|  123| 17|         1|        76|        |2013/03/13T17:16:52.916|    0.096|2013/03/13T17:16:53.012| S0|
+
+linenum = 1
+for line in buf.readlines():
+    line=line.strip()
+    line = line.rstrip("|")
+    words = line.split("|")
+
+    # assume first line is headers
+    record = {}
+
+    if linenum == 1:
+      headers = []
+      for word in words:
+         word = word.strip()
+         headers.append(word)
+    else:
+      for i in range(len(headers)):
+        record[headers[i]] = words[i].strip()
+
+      # Create an event with just the events from the fieldspec
+      # Timestamp goes first.
+      # Time should probably be normalized to epoch time.
+      # Here, I'm just using whatever timestamp rw* gives us.
+
+      eventTime = record[eventTimeSpec]
+      eventValue = ""
+      for fieldName in eventFieldSpec:
+        eventValue += record[fieldName] + "|"
+      event = [eventTime,eventValue]
+      print "event", event
+  
+    linenum += 1
+
+#+END_SRC   
+
+#+RESULTS: eventExample
+: event ['2013/03/20T08:42:11.957', '192.168.1.42|8.8.8.8|']
+: event ['2013/03/20T08:55:46.607', '192.168.1.42|8.8.8.8|']
+: event ['2013/03/20T08:55:46.633', '192.168.1.42|8.8.8.8|']
+: event ['2013/03/20T08:55:46.673', '192.168.1.42|8.8.8.8|']
+
+** eventIndexTable
+   - PURPOSE :: The /eventIndexTable/ is a list of [[*sourceEvent][sourceEvent]]s.  It
+                is returned by a [[*sourceManager][sourceManager]] in response to a [[*sourceQuery][sourceQuery]].
+*** eventIndexTable example
+     - see example in [[*sourceQuery Example][sourceQuery Example]]
+
+** quiltPattern
+*** TODO Work on this.  This is a swag.				 :Tim:George:
+*** TODO Define query epression grammar					:Tim:
+   - PURPOSE :: A /quiltPattern/ is an expression used to specify
+                patterns of events in the /Quilt/ grammar, to include
+                logical, relational, sequence, and temporal
+                relationships.  Each /quiltPattern/ is assigned a
+                unique name.  Each pattern specifies lists of
+                required and optional parameters.
+*** quiltPattern Example
+
+#+name: quiltPatternExample
+#+HEADER: :results output
+#+HEADER: :exports both    
+#+BEGIN_SRC python
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
+quiltPattern={}
+quiltPattern["name"]="returnTrafficToScanSources"
+quiltPattern["Expression"]="return silk.sip WHERE silk.sip talks to ${scanSources} AND silk.bytes > ${minBytes}"
+quiltPattern["requiredParameters"]=["scanSources","minBytes"]
+pp.pprint(quiltPattern)
+#+END_SRC   
+
+#+RESULTS: quiltPatternExample
+: {   'Expression': 'return silk.sip WHERE silk.sip talks to ${scanSources} AND silk.bytes > ${minBytes}',
+:     'name': 'returnTrafficToScanSources',
+:     'requiredParameters': ['scanSources', 'minBytes']}
+
+** quiltPatternQueryID
+*** TODO Refine this as QueryPattern, return values are worked out. :Tim:George:
+   - PURPOSE :: A /quiltPatternQueryID/ serves to uniquely identifiy each
+                use of a [[*quiltPattern][quiltPattern]]. The combination of the timestamp, the
+                name of the  [[*quiltPattern][quiltPattern]] and the input parameters
+                serve to uniquely define each pattern query.
+		
+		It is intended that /quiltPatternQueryID/s can be
+                used to refer to past queries, and as an index into
+                lists of matching events when a query produces one or
+                more matches.
+*** quiltPatternQueryID example
+
+#+name: patternQueryIDExample
+#+HEADER: :results output
+#+HEADER: :exports both    
+#+BEGIN_SRC python
+import pprint
+import time
+pp = pprint.PrettyPrinter(indent=4)
+import time
+
+now="%f" % (time.time())
+patternQueryID = {}
+patternQueryID["name"]="returnTrafficToScanSources"
+patternQueryID["time"]=now
+patternQueryID["parameters"]="scanSources=scanners.set,minBytes=1000000"
+pp.pprint(patternQueryID)
+#+END_SRC   
+
+#+RESULTS: patternQueryIDExample
+: {   'name': 'returnTrafficToScanSources',
+:     'parameters': 'scanSources=scanners.set,minBytes=1000000',
+:     'time': '1364033133.112163'}
+
+* Modules
+** queryMaster
+   - PURPOSE :: The /queryMaster/ implements the logic of
+                [[*quiltPattern][quiltPattern]]s.  It accepts patterns from the user,
+                reformulats them into a set of [[*sourceQuery][sourceQuery]]s, collects
+                the resulting [[*eventIndexTable][eventIndexTable]]s, applies the pattern
+                (logic, temporal and possibly abductive operations)
+                and returns the results to the user.  
+		
+		The results returned will be a list of matches, each
+                including the [[*quiltQueryID][quiltQueryID]], and a list of the events,
+                contained in [[*eventIndexTable][eventIndexTable]]s, that compised the match
+
+*** TODO Resolve what is input				 :George:Tim:Derrick:
+*** TODO Decide how to return the matching event list.	 :George:Tim:Derrick:
+    - Easy answer: just dump out the raw eventIndexTables for all subqueries.
+    - Better answer: dump out subsets of the eventIndexTables
+      containing only matching records.
+    - Even better answer: dump out subsets of the eventIndexTables
+      along with a list of match numbers per record so that, if a
+      given pattern matched 10 times, you can say "show me the
+      records for matches 3,5, and 7"
+
+*** TODO will there be confidence values with the matches ?
+   - INPUTS ::   [[*quiltPattern][quiltPattern]]s, possibly from command line syntax,
+                 parameters (addresses, domain names, ?past
+                 [[*quiltPattern][quiltPattern]]s,  [[*eventIndexTable][eventIndexTable]]s ?
+   - PROCESSING :: Break [[*quiltPattern][quiltPattern]]s down into one or more  [[*sourceQuery][sourceQuery]]s,
+                   send [[*sourceQuery][sourceQuery]]s to  [[*sourceManager][sourceManager]]s,
+                   collect results, apply logic to
+                   idenitfy matches, output list of matches and the
+                   corresponding tables.
+   - OUTPUTS ::  list of matches including  [[*quiltQueryID][quiltQueryID]] and  [[*eventIndexTable][eventIndexTable]]s.
+
+** sourceManager
+   - PURPOSE :: The /sourceManager/ is a middleware agent that resides with the
+   target [[*dataSource][dataSource]].  Knowledge of the interface to the [[*dataSource][dataSource]]
+   is encapsulated here.  Each /sourceManager/ registers itself with
+   the [[*queryMaster][queryMaster]].  It informs the [[*queryMaster][queryMaster]] which queries it is
+   able to execute by creating [[*registeredQueryID][registeredQueryID]] and registering them
+   with the [[*queryMaster][queryMaster]].   It accepts [[*sourceQuery][sourceQuery]]s and returns
+   [[*eventIndexTable][eventIndextable]]s.
+*** TODO implement two more types of sourceManagers to flesh out design issues/assumptions :George:
+*** sourceManager example: SiLK
+*** sourceManager example: DNS
+*** sourceManager example: Snort
+** dataSource
+  The existing system housing different data to be queried, e.g. a
+  system with SiLK, Snort, DNS Logs, syslog.  Could even be end user
+  systems which cuold be queried for the presence of a file with an
+  MD5 hash, a registry key, etc.
+   
+
