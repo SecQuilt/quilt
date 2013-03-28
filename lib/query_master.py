@@ -141,6 +141,11 @@ class QueryMaster:
                 i = i + 1
                 qid = baseqid + "_query_" + str(i)
             self._queries[qid] = queryRec
+
+        # record the actual query
+        queryRec[qid] = {
+            'query':query,
+            'notificationAddress':notificationAddress}
                     
         # GetClients is threadsafe, but when it returns the lock is off
         smgrs = self.GetClients("SourceManager")

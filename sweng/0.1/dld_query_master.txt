@@ -78,7 +78,8 @@ Classes:
             # generate a query id
             # call submitter's validate function
             # if submitter refuses to validate, return early
-            # store queryid  notificationAddress in a member list
+            # store query and notificationAddress in a member dict
+            #   keyed by query id
 
             # Process query, 
             # iterate the source master's that are registered.  Send them
