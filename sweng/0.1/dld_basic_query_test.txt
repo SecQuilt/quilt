@@ -45,9 +45,9 @@ Classes:
             # sleep 1 seconds
             # call quilt_q (check return code, capture output)
             # assure output contains same query id as before
-            # call quilt_q -q query_id (check return code, capture output)
+            # call quilt_q -qid query_id (check return code, capture output)
             # assure output contains same query id as before
-            # call quilt_q -q FAKEid (check return code, capture output)
+            # call quilt_q -qid FAKEid (check return code, capture output)
             # assure no output
             # check qmd to be sure that all quilt_q's have unregistered
             # do this by accessing Config, finding qmd name,
