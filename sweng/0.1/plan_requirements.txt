@@ -4,18 +4,27 @@ quilt 0.1 requirements
 Quilt 0.1 is a system which brings together multiple types of data and provides
 a distributed mechanism for querying the data.
 
+Queries:
 * Queries are submitted from an analyst system with no or partial local data
 * Queries reference multiple types of data and cross refer attributes of that
     data
+* Queries should support specification based on temporal order of events
+* Pattern matching of events supports temporal operators (BEFORE, CONCURRENT, 
+        UNTIL)
+
+Results:
+* results of query will be presented to the user as a collection of temporal
+    sequences of events.
+
+Data:
 * Differnt types of data can be housed at together, or at differnt locations,
     on an analyst's machine, or in the field
 * A Minnimum ammount of data should be brought back to a central system
 * data primarily remains in its "natural" location (determined by its
     individual collection system
-* Queries should support specification based on temporal order of events
-* Pattern matching of events supports temporal operators (BEFORE, CONCURRENT, 
-        UNTIL)
-* results of query will be presented to the user as a collection of temporal
-    sequences of events.
+* Intimate knowledge of a type of data's native query system need not be known
+    to the central system
 
-   
+Tasks:
+* Mine log files for events of interest
+    ** using regular expressions

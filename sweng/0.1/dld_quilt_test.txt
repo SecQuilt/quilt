@@ -54,9 +54,37 @@ quilt.conf
 [query_master]
 name : 'test'
 
-smd.d/source1.conf
-[source1]
-foo : bar
+smd.d/syslog.conf
+[syslog]
+
+# command will output event spec in json attributes
+# prototype: see tojson.sh, tojson.py, cfgproto.py
+grepOutputToJson : sed -e 's,",\\\",g' -e 's#\(^.*[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\)\( \)\(.*\)#"timestamp":"\1","content":"\3"#'
+sourceSpec : {
+    sourcePatterns : {
+        "grep"  :   {
+
+            # the template for the pattern     
+            'template' : "grep $OPTIONS | %(grepOutputToJson)s" ,
+            
+
+            'variables' : {
+                'OPTIONS' : 'grep command line options' } ,
+
+
+            # per-event data for results
+            'eventSpec' : {
+                'timestamp' : 'Month, day, and time of the log message',
+                'content' : 'Content of the log message'},
+
+            # data common to all result events
+            'eventMetadata' : {
+                'timeFormat' : "%b %m %H:%M:%S",
+                'timeOffset' : THIS_YEAR }
+
+     } } }
+
+
 
 
 Scripts:

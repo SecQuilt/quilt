@@ -12,6 +12,8 @@ External Dependencies:
 Responsibilities:
     utility functions common to all quilt modules
 
+Prototype: cfgproto.py
+
 Classes:
 
     # responsible for common daemon functionality
@@ -64,6 +66,23 @@ Classes:
         # these will be the files inside of $QUILT_CFG/smd.d
         def GetSourceManagers(  # [out] list of all defined source managers
             self)
+
+        def GetSourceManagerSpecs(  # [out] dict of source manager names mapped
+                                   #    to dictionary of source manager's
+                                   #    configuration data
+            #   create empty spec dict
+            #   iterate all smd files
+            #   load the config parsers
+            #   call the .items function for each section
+            #   convert the "sourceSpec" config field to a dict
+            #   store that dict with the section name in spec dict
+            #   return spec dict
+            
+        def GetSourcePatterns( self, sourceMgrName)
+            """
+            Get the source patterns defined for the specified source manager.
+            The return is a sourcePatternSpec dictionary
+            """
 
 
     class QueryMasterClient : Pyro.core.SynchronizedObjBase
@@ -262,4 +281,15 @@ Schema:
     -------------------------
 
     [NAME]      # the name of the source manager
-    key         :   value   # specific per source manager
+    sourceSpec         :   {    # source spec dict provides everything to know
+                                # about a source's interface
+        sourcePatterns : {      # sourcPatterns are templates for sourceQueries
+            "name" : {          # name of the pattern
+                "class" : 'x',  # type name of class defining the pattern
+                                # this sourcePatternSpec will be the input
+                                # data for the class
+    NOTE:
+        I do not want to detail this much further because it is rapidly
+        changing   
+    
+        } } }

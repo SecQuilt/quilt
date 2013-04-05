@@ -28,7 +28,7 @@ Classes:
             # store args as member variable
             # chain to super constructor
 
-        bool ValidateQuery(
+        bool OnValidateQuery(
             string queryMetricMsg   # message to user about time and space
                                     # requirements for the generated query
             string queryId          # the ID that the query master assigned to
@@ -49,7 +49,12 @@ Classes:
 
 
         void OnRegisterEnd()
-            # submit args.query to the query master as an asyncronous call
+            # create a query spec dictionary
+            #   set pattern name from args
+            #   set variables/values from args
+            #   set notification address in spec
+
+            # submit query spec to the query master as an asyncronous call
             # return True so that the event loop starts running
     
 
@@ -64,6 +69,17 @@ Classes:
         void OnEventLoopEnd()
             # lock the class lock
             # read and return value of _processEvents
+
+        void OnSubmitProblem(queryId, msg)
+            """Recieve a mesasge from the query master about a problem with
+            the query submission"""
+
+            # ALWAYS set process events flag to false end event loop, allowing
+            # submitter to exit
+
+            # print out the query id and the message
+            
+
 Functions:
 
     # main function of the script, which is passed command line variables

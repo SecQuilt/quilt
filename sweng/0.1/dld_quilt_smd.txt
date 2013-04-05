@@ -7,10 +7,16 @@ Type: Daemon process
         
 Internal Dependencies:
     quilt_core
+    quilt_source_query
+    sei_core
 
 External Dependenies:
     python-pyro(4)
     python-daemon
+    python-json 
+
+Prototype:
+    tojson.py, seiscripts: install_config.py
 
 Responsibilities:
     behave like a good Daemon process
@@ -20,15 +26,65 @@ Classes:
 
     class SourceManager : QueryMasterClient
 
-        def Query(string queryId, string query)
+        def __init__(string sourceName, dict sourceSpec)
+            # use name to init base class
+            # store sourceSpec as a member
+            
+        def Query(string queryId, dict sourceQuerySpec)
             # print out the source manager's name and the query string
             # Store query in member variable
 
+            # get the sourcePatternSpec from the pattern name in the
+            #   sourceQuerySpec
+
+            # create cmd line for grep
+            # use the template in the sourcePatternSpec, and use the values
+            #   provided for the variables
+            #   use string.Template as per install_config.py example
+
+            # use run_process to execute grep, give callback per line
+            #   processing function
+
+            # Set query result events list in query master using query id
         
+        def OnGrepLine(string line)
+
+
+            # assemble a jason string for an object representing an event
+            # based on eventSpec and eventSpec meta data
+            # convert that json object to a python event object
+            # append event to list of events member
+           
+             
+        
+
         def GetLastQuery()  # returns the last query string
     
         def GetType(self):
             return "SourceManager"
+
+        #   def OnRegisterEnd()
+        #       """After basic client registration completes, source manager
+        #       initiates the source pattern registration"""
+
+        def GetSourcePatterns()
+            """Returns a list of defined source patterns"""
+            # non need to lock because noone shuld be writing to a source spec
+            # after init
+
+            # iterate sourceSpec member's patterns
+            # append returning list with pattern names
+
+        def GetSourcePattern(patternName)
+            """return the specified patternSpec dict"""
+            
+
+            # non need to lock because noone shuld be writing to a source spec
+            # after init
+
+            # access the source pattern spec with the specified key in the
+            # sourceSpec, return a copy
+
 
     class Smd : QuiltDaemon
     
@@ -41,8 +97,8 @@ Classes:
     
         # parse the arguments, exit with error message if unparseable
         # Create Instance of QuiltConfig
-        # call GetSourceManagers and iterate through them
-        #   Create the Source Manager objects
+        # call GetSourceManagerSpecs and iterate through them
+        #   Create the Source Manager objects, pass them the spec
         #   store them in a dictionary
         # call util function query_master_client_main_helper
 

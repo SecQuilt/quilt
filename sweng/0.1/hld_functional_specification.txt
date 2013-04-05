@@ -25,29 +25,89 @@ Query Master
         support returning the results to the user.  It does the coordination
 
     quilt_submit
-        QUERY    # A query to run on the system
+        PATTERN     # name of the pattern to create the query from
         [-e EMAIL]  # comma seperated list of emails to supply notifications
         [-y]        # whether to automatically confirm the query
         [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
+        [-a VARIABLE VALUE] ...   # Arguments used to provide values to the
+                                  # variables in a pattern
 
         Quilt Submit will allow submission of a query.  It will communicate with
         the query master, recieve estimated time/space metrics of teh query,
         get user confirmation (if no -y), then deliver the query, to the master
         for processing, print the query id, and then exit.
 
+        A user may select a pattern and then replace the VARIABLEs 
+        defined in the pattern with the submitted values
+
     quilt_q
-        [-qid QUERY_ID]     # optional argument, which query to check
+        [QUERY_ID]     # optional argument, which query to check
         [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
 
-        Quilt queue will display information about queries in the queue.  If id
-        is specified, only that query's information will be displayed, if that 
-        id is not present nothing is displayed
+        Quilt queue will display information about queries in the queue.  If ID
+        is specified, only that query's information will be displayed.  the 
+        Query's information will describe the variables used in definition,
+        the state of the query, if that id is not present nothing is displayed
+
+    quilt_history
+        [QUERY_ID]     # optional argument, which query to check
+        [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
+
+        Quilt history will display information about completed queries.  If ID
+        is provided, the Query's information will describe the variables used 
+        it its definition, the state of the query, and any results that are
+        available.  If there are no completed queries or theres is no query
+        with the specified ID present, nothing is displayed.
+
 
     quilt_status
+
+        NOTE: As of 0.1 c2 (basicSrc) version the pattern and source flags
+            defined below are not supported, all information is displayed
+
+        [-p [PATTERN_NAME]]       # display the catalog of query master
+                                  # patterns, or if name is provided, display
+                                  # the details of a particular pattern
+        [-s [SOURCE_NAME]]        # display the catalog of data sources, or if
+                                  # name is provided display the details of
+                                  # a particular data souce
+                                            
         [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
         
         Display information about the quilt system, including registered
-        source managers
+        source managers, or defined patterns.  Detailed information about
+        how the object was defined is provided if a valid name is provided
+
+        If no flags are provided a summary of all objects is displayed
+
+        
+    quilt_define
+        TEMPLATE            # specification of the pattern.  This is a string
+                            # which can contain references to variables.
+                            # Variable referenses are like $this or like
+                            # ${this}
+        [-n NAME]           # suggested name of the pattern
+        [-v VARIABLE [DESCRIPTION [DEFAULT]]] ...    # the variable(s) that 
+                                          # are used in the TEMPLATE, 
+                                          # and a text description
+                                          # of the purpose of the variable
+                                          # and the default of the variable
+        [-m VARIABLE SOURCE_VARIABLE] ...   # provide mapping from a pattern
+                                            # variable to a source variable
+                                          
+        
+        Define a pattern to the query master.  A pattern is the template for a
+        query.  If specified the name of the pattern may be modified so as to
+        become unique.  The official name of the pattern will be displayed.
+
+        quilt_define will not return until pattern is defined or an error has
+        occured.  It will output the finalized (unique) name for the pattern
+
+        NOTE:
+            In a version coming to you soon, part of the pattern will have to
+            be a way to specify what sources to query, which source queries's
+            to use, which fields to get back, and mapping between source 
+            query variables and these variables.
         
 
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>

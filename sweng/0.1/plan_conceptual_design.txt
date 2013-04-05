@@ -1,27 +1,32 @@
 quilt 0.1 conceptual design
 ---------------------------
 
+Existing:
+Query Master :337
+  218 query_master.py
+   58 quilt_qmd.py
+   61 quilt_q.py
 
-Query Master
-    Parser          (Very Large)
-    Translater      (Large)
-    Dispatcher      (Large)
-    Collector       (Large)
-    Combiner        (Very Large)
-    Outputter       (Very Large)
-    Registrar       (Large)
 
-Source Master
-    Registration    (Large)
-    Accept          (Large)
-    Return          (Large)
-    Schema          (Very Large)
+Source Master :273
+  148 quilt_submit.py
+   75 quilt_smd.py
+   50 quilt_status.py
 
-Source1
-    Interpreter     (Large)
-    Executor        (Medium)
-    Adapter         (Very Large)
+System :280
+  115 basic_testcase.py=
+   45 quilt_registrar.py
+  120 quilt_test.py
 
-Support Scripts
-    startup         (Smallx3)
-    setup           (Mediumx3)
+Utility :539
+  354 quilt_core.py
+  119 sei_core.py
+   66 quilt_test_core.py
+
+New:
+M Data Adapter (adapt local data source)
+L Sample (reference implementation, config files)
+L Query Job (infrastrucutre to run on local machine)
+VL Data Director (data namespacing access)
+VL Results Collector (get results to the user)
+

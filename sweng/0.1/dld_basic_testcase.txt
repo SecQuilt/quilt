@@ -1,0 +1,75 @@
+quilt 0.1 basic tests
+---------------------
+
+Module: basic_tests
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test
+
+External Dependencies:
+    python-unittest
+    python-pyro
+
+Prototype:
+    see any unittest in seiscripts
+
+Responsibilities:
+    Perform a basic operations to conifirm basic funcitoning of components
+
+Classes:
+
+    class BasicTestcase()
+        def test_basic_query()
+            # call quilt_submit "find me again [uniqueval] " 
+            #   (check return code)
+            # sleep 1 seconds
+            # Use QuiltConfig, Call GetSourceManagers, for each one
+                # use pyro, create proxy for the smd
+                # call GetLastQuery()
+                # assure it is equal to "find me again [uniqueval]"
+            # check qmd to be sure that all quilt_submit's have unregistered
+            # do this by accessing Config, finding qmd name,
+            # create pyro proxy for qmd, call
+            # getClients(type(QuiltSubmit))
+            # then GetclientRecs, and create proxys for each one
+            # make sure list is empty
+            # TODO parameterize this test if needed, could fail if anyone is
+            # running simultaneiously
+
+        def test_basic_queue()
+            # call quilt_submit "find me again [uniqueval]" (check return 
+            #       code, capture query id output)
+            # sleep 1 seconds
+            # call quilt_q (check return code, capture output)
+            # assure output contains same query id as before
+            # call quilt_q query_id (check return code, capture output)
+            # assure output contains same query id as before
+            # call quilt_q FAKEid (check return code, capture output)
+            # assure no output
+            # check qmd to be sure that all quilt_q's have unregistered
+            # do this by accessing Config, finding qmd name,
+            # create pyro proxy for qmd, call getRegistedObjects(type(QuiltQ))
+            # make sure list is empty
+            # TODO parameterize this test if needed, could fail if anyone is
+            # running Q simultaneiously
+
+        def test_basic_status()
+            # call quilt_status (check return code, capture output)
+            # assure that name of the test source manager appears in the
+            # output, test source name specified int testing etc smd.d dir
+            # check qmd to be sure that all quilt_status's have unregistered
+            # do this by accessing Config, finding qmd name,
+            # create pyro proxy for qmd, call
+            # getClients(type(QuiltStatus))
+            # make sure list is empty
+            # TODO parameterize this test if needed, could fail if anyone is
+            # running simultaneiously
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

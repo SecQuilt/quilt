@@ -1,0 +1,44 @@
+quilt 0.1 source_query design
+-----------------------------
+
+TODO.... Not complete, not needed for 0.1.c2
+
+Module: source_query
+
+Type: Library
+
+External Dependencies:
+
+Internal Dependencies:
+    quilt_core
+
+Responsibilities:
+    Provide the base for an extension point for differnt kinds of source
+    queries.
+
+Classes:
+    class SourceQuery 
+
+    NOTE:   In the future, this class will allow us to submit the query to a
+        scheduler, and suport scalability.  For now we just run the query
+
+    void __init(
+        sourceManagerName, 
+        sourceManagerHost,
+        sourceManagerPort,
+        sourceQuerySpec)
+
+        # store these things as member variables
+
+    void Query()
+
+        # get the typename of the pattern class from the source spec
+        # TODO in the future, run dynamic import 
+        # create instance of specified class 
+    
+        
+
+
+
+
+

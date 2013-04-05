@@ -23,7 +23,9 @@ State           Condition                   Next State
 -----           ---------                   ----------
 init            no errors                   listen
 listen          query recieved              [listen,validate]
-validate        syntatic correct            confirmation
+listen          pattern recieved            [store,validate]
+store           store complete              end
+validate        syntatic correct            confirm
 validate        syntatic incorrect          report
 confirm         user acceptance             execute
 execute         results returned            report

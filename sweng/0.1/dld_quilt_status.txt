@@ -24,9 +24,14 @@ Classes:
             # chain to call base constructor
 
          OnRegisterEnd()
+
             # print out statistics about the manager's sources
             #   using remote call to query master
             #   GetSourceManagerStats() 
+            # print results
+            # print out statistics about the manager's patterns
+            #   using remote call to query master
+            #   GetPatternStats() 
             # print results
             # return false (prevent event loop from beginning)
 

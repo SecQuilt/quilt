@@ -17,39 +17,56 @@ c1.Infrastructure
         Run automated test suite
         
 
-c2.Communication
-    Provide 2-way communication between components
+c2.Basic Source
+    Provide 2-way communication between components, such that one
+    simple datasource an be queried and answers can be returned
     
     Design
-        Design integration with condor
-        Design data interchange formats
+        Design workload managment such that it can be extended to condor in
+            the future.
+        Design initial version of data interchange formats, do not focus on
+            the permenance of the descision, but focus on capability for this
+            basic source
         Design schema sharing system
+            The source will publish an event spec, and query spec to let the
+            master know what the capabilities are
         Design tests of the functionality
-	    Design prototype pattern input format
-            in-fix pattern specification language (e.g., some logical
-                expressions)
-            query-by example (e.g., collection of data samples with query
-                attributes/relations identified)
-            SQL-form query (e.g., closer to a programming language)
-            other (e.g., whatever bright ideas we have later)
 	
 
-    Implement
+    Develop
+        Stand up in order of the least scaffolding.
+        
+        data structures for schema sharing
+        
+        data source adapter for simple source
+
+        query agent for querying the source
+
+        workload managment wrapper
 
     Test
-        1. Single-source pattern (e.g., restatement to rwfilter)
+        1. Single-source pattern (e.g., restatement to source)
         2. Null pattern (e.g., TRUE (producing whole database) or FALSE 
             (producing no events)) on small database
-        3. Dual-source pattern without cross-reference (e.g. flow.sip=1.2.3.4 
-            and dns.resolution=1.2.3.4)
-        4. Dual-source pattern with cross-reference (e.g., flow.sip=1.2.3.4 and
-            dns.resolution=flow.dip)
-        5. Multiple source pattern without cross-reference
-        6. Multiple source pattern with cross reference
 
 c3.Adapation
-    Adopt a data source in the query master
+    Adopt a query language
 
+    Design prototype pattern input format
+        in-fix pattern specification language (e.g., some logical
+            expressions)
+        query-by example (e.g., collection of data samples with query
+            attributes/relations identified)
+        SQL-form query (e.g., closer to a programming language)
+        other (e.g., whatever bright ideas we have later)
+
+    Test
+        3. Dual-source pattern without cross-reference (e.g. flow.sip=1.2.3.4 
+            and dns.resolution=1.2.3.4)
+            dns.resolution=flow.dip)
+        4. Dual-source pattern with cross-reference (e.g., flow.sip=1.2.3.4 and
+        5. Multiple source pattern without cross-reference
+        6. Multiple source pattern with cross reference
 c4.Execution
     Execute query specified from Query Master on the Source Master
 

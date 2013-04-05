@@ -1,0 +1,45 @@
+quilt 0.1 quilt_define design
+-----------------------------
+
+Module: quilt_define
+
+Type: Executable Script
+
+External Dependencies:
+    python-argparse
+
+Internal Dependencies:
+    quilt_core
+
+Responsibilities:
+    Define patterns in query master
+
+Classes:
+    class QuiltDefine : QuiltMasterClient
+
+        void OnRegisterEnd()
+
+            # create a patternSpec dict from arguments (name, TEMPLATE,
+            #   VARIEABLEs)
+
+            # define patternSpec in the query master as an syncronous call
+            # return will be the pattern name
+
+            # print out pattern Name
+
+            # return False so that the event loop does not start
+    
+Functions:
+
+    # main function of the script, which is passed command line variables
+    def main(argc,argv)
+        # setup argument parser in accordance with funcitonal specification
+        # parse the arguments, exit with error message if unparseable
+        # create the quilt submitter object
+        # call query_master_client_main_helper
+
+
+
+
+
+

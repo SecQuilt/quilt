@@ -1,0 +1,96 @@
+quilt 0.1 basic tests
+---------------------
+
+Module: basic_source_testcase
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test
+
+External Dependencies:
+    python-unittest
+    python-pyro
+
+Prototype:
+    see any unittest in seiscripts
+
+Responsibilities:
+    Perform a simple query of a basic data source.  Excersize all states
+of the system.
+
+Classes:
+
+    class BasicSouceTestcase()
+
+        NOTE: seed log with some unique text to search for
+            "Occurs_1_time"
+            "Occurs_3_times"
+            "Occurs_3_times"
+            "Occurs_3_times"
+
+        def setUp():
+            """Setup the query master with some patterns used by the tests"""
+
+            # define a query pattern
+            # call quilt_define "Occurs_${NUMBER}_time${POSTFIX}" 
+            #   -n "test_pattern"
+            #   -v NUMBER 1 "The number of times"
+            #   -v POSTFIX 
+
+            TODO fix problems, don't know how to map patterns to sources?
+
+
+        def test_status():
+            # check for the query pattern
+            # call quilt_status 
+            # check errorcode and output contains "test_pattern"
+
+        def test_no_default_failure():
+            # issue an invalid query
+            # call quilt_submit test_pattern -y 
+            # capture query_id from stdout
+            # assure failure exit code, (because no default set for postfix)
+            
+            # check that the query is in the q and showing the error state
+            # call quilt_q query_id
+            # capture stdout
+            # assure success, and no output 
+
+        def test_valid_query_one_result():
+            # issue a valid query
+            # call quilt_submit test_pattern -y -a POSTFIX "''"
+            # capture query_id from std out 
+            # sleep 1 second
+            
+            # check that the query is in the history showing good state
+            # call quilt_history 
+            # asuure success, captrue stdout, 
+            # check it contains query_id
+            # check it shows good state (completed)
+
+            # call quilt_history query_id
+            # asure success, capture stdout, check it contains event
+            #   text "Occurs_1_time"
+            #   assure only one result
+
+        def test_valid_query_multi_result():
+            # issue a valid query
+            # call quilt_submit test_pattern -y -a POSTFIX s -a NUMBER 3
+            # assure success, capture query_id from stdout
+
+            # sleep 1 second
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            #   assure 3 results
+            #   assure contains text "Occurs_3_times"
+
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

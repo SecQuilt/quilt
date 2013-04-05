@@ -69,21 +69,65 @@ Classes:
             string submitterNameKey         # key that the submitter recieved
                                             #   when it was registered with this
                                             #   master
-            string query                    # the content of the query
-            string notificatoinAddress      # the email addresses for
-                                            #   notification
+            dict querySpec                  # the details of the query
         )
-            # acquire lock
-            # create proxy to the submitter
-            # generate a query id
-            # call submitter's validate function
-            # if submitter refuses to validate, return early
-            # store query and notificationAddress in a member dict
-            #   keyed by query id
+            # try the following 
 
-            # Process query, 
-            # iterate the source master's that are registered.  Send them
-            # the query
+            # acquire lock
+                # copy the patternSpec the query references
+                # generate a query id
+                # get copy of sources 
+
+            # expand the pattern using query variables            
+            
+            # create proxy to the submitter
+            # call submitter's validate function, pass num sources, and
+            #   expanded pattern
+            
+            # if submitter refuses to validate, return early
+
+            # acquire lock
+                # store query and notificationAddress in a member dict
+                #   as querySpec keyed by query id
+                #   store pattern name in querySpec
+                #   store state as Initial
+
+            # Process query...
+
+            # iterate the source master's that were identified. 
+                # Get the source patterns from source proxy
+                # Itterate the source patterns
+                    # create blank sourceQuerySpec
+                    #   set sourcePattern name
+
+                    # get the sourcePatternSpec from source proxy
+                    # get the variables from the sourcePatternSpec
+                    # Itterate source pattern variables
+                        # get the mapped pattern variable corresponding to the
+                        #   sourcePattern varible
+                        
+                        # perform subsitution, set the value of the variable
+                        #   from the query spec into the sourceQuery spec,
+                        #   using the name of the sourcePattern variable that
+                        #   maps to the name of the PAttern Variable
+
+                        # This part is confusing, but we are basically just
+                        # doing a double substitution and mapping some
+                        # variable names
+
+                    # send the completed sourceQuerySpec to the source using
+                    #   asyncronous call
+                        
+                     
+                
+
+        
+            #catch exception! 
+                # submit launched this call asyncronysly and must be made
+                # aware of the unexpected error
+                # call submit's OnSubmitProblem
+
+
 
         # format a string with information about all the Query's in the q
         string GetQueryQueueStats()
@@ -114,7 +158,36 @@ Classes:
         )
             # acquire lock, return copy of record from _clients
             
+        string DefinePattern(
+            dict    patternSpec)    # pattern specification dictionary
+            """Define the specified pattern in the query master, return
+            the finalized (unique) name of the pattern"""
 
+            # Acquire lock
+            # determine unique name for the pattern based off suggested name
+            #   in the spec
+
+            # store pattern spec in the member data
+
+            # return the unique name for the pattern
+
+        string GetPatternStats()
+            """Return a string describing the patterns defined in the query
+            master"""
+            
+            # Acquire lock
+            # return stats
+            
+        
+        void SetQueryResults(
+            string queryId,
+            eventList)
+            """Append the specified eventList to the specified queryId"""
+
+            # mark the query as completed in state
+            # set the results into the query spec
+            
+            
 
 Functions:
 

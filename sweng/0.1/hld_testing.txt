@@ -4,7 +4,20 @@ quilt 0.1 testing specification
 Complex logic will be Unit Tested
 
 This is a distributed system, and a lot of functionality will need integration
-testing
+testing.  Integration tests will be done using scripts to start daemons, and
+then using the unit test infrastructure to execute test code.
+
+test_start script will ensure that testing daemons have stoped, then start
+    the daemons, and then run the test driver, quilt_test
+
+quilt_test
+    the test driver, quilt_test will serially execute all tests defined in
+    by the patterns in the configuration
+
+test_stop
+    script will stop all daemons
+
+ 
 
 
            
