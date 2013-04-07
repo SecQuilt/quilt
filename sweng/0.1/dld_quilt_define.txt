@@ -17,12 +17,18 @@ Responsibilities:
 Classes:
     class QuiltDefine : QuiltMasterClient
 
+        def __init__(string sourceName)
+            # use name to init base class
+
+        def GetType(self):
+            return "QuiltDefine"
+
         void OnRegisterEnd()
 
-            # create a patternSpec dict from arguments (name, TEMPLATE,
-            #   VARIEABLEs)
+            # create a patternSpec dict from arguments (name, 
+            #   VARIEABLEs, and VARIABLE to SOURCE_VARIABLE mappings)
 
-            # define patternSpec in the query master as an syncronous call
+            # define patternSpec in the query master as a syncronous call
             # return will be the pattern name
 
             # print out pattern Name

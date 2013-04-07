@@ -34,33 +34,21 @@ Classes:
             """Setup the query master with some patterns used by the tests"""
 
             # define a query pattern
-            # call quilt_define "Occurs_${NUMBER}_time${POSTFIX}" 
+            # call quilt_define 
             #   -n "test_pattern"
-            #   -v NUMBER 1 "The number of times"
-            #   -v POSTFIX 
-
-            TODO fix problems, don't know how to map patterns to sources?
+            #   -v SEARCHSTRING 'The search string'
+            #   -m SEARCHSTRING syslog grep OPTIONS
 
 
         def test_status():
             # check for the query pattern
             # call quilt_status 
-            # check errorcode and output contains "test_pattern"
-
-        def test_no_default_failure():
-            # issue an invalid query
-            # call quilt_submit test_pattern -y 
-            # capture query_id from stdout
-            # assure failure exit code, (because no default set for postfix)
-            
-            # check that the query is in the q and showing the error state
-            # call quilt_q query_id
-            # capture stdout
-            # assure success, and no output 
+            # check errorcode and output contains 
+            #   "test_pattern" and "syslog"
 
         def test_valid_query_one_result():
             # issue a valid query
-            # call quilt_submit test_pattern -y -a POSTFIX "''"
+            # call quilt_submit test_pattern -y -a SEARCHSTRING Occurs_1_time
             # capture query_id from std out 
             # sleep 1 second
             
@@ -77,7 +65,7 @@ Classes:
 
         def test_valid_query_multi_result():
             # issue a valid query
-            # call quilt_submit test_pattern -y -a POSTFIX s -a NUMBER 3
+            # call quilt_submit test_pattern -y -a SEARCHSTRING Occurs_3_time
             # assure success, capture query_id from stdout
 
             # sleep 1 second

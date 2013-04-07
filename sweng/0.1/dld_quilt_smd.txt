@@ -31,8 +31,6 @@ Classes:
             # store sourceSpec as a member
             
         def Query(string queryId, dict sourceQuerySpec)
-            # print out the source manager's name and the query string
-            # Store query in member variable
 
             # get the sourcePatternSpec from the pattern name in the
             #   sourceQuerySpec

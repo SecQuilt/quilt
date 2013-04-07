@@ -82,18 +82,16 @@ Query Master
 
         
     quilt_define
-        TEMPLATE            # specification of the pattern.  This is a string
-                            # which can contain references to variables.
-                            # Variable referenses are like $this or like
-                            # ${this}
         [-n NAME]           # suggested name of the pattern
         [-v VARIABLE [DESCRIPTION [DEFAULT]]] ...    # the variable(s) that 
-                                          # are used in the TEMPLATE, 
+                                          # are part of the pattern, 
                                           # and a text description
                                           # of the purpose of the variable
                                           # and the default of the variable
-        [-m VARIABLE SOURCE_VARIABLE] ...   # provide mapping from a pattern
-                                            # variable to a source variable
+        [-m VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE] ...    
+                                                    # provide mapping from a 
+                                                    # pattern variable to a 
+                                                    # source variable
                                           
         
         Define a pattern to the query master.  A pattern is the template for a
@@ -104,10 +102,8 @@ Query Master
         occured.  It will output the finalized (unique) name for the pattern
 
         NOTE:
-            In a version coming to you soon, part of the pattern will have to
-            be a way to specify what sources to query, which source queries's
-            to use, which fields to get back, and mapping between source 
-            query variables and these variables.
+            In a version coming to you soon, the pattern will support a quilt
+            expression
         
 
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
