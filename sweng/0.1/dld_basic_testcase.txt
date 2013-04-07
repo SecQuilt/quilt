@@ -21,15 +21,27 @@ Responsibilities:
 
 Classes:
 
+
     class BasicTestcase()
+
+        def setUp():
+
+            """Setup the query master with some patterns used by the tests"""
+
+            # define a query pattern
+            # call quilt_define 
+            #   -n "test_pattern"
+            #   -v SEARCHSTRING 'The search string'
+            #   -m SEARCHSTRING syslog grep OPTIONS
+
         def test_basic_query()
-            # call quilt_submit "find me again [uniqueval] " 
-            #   (check return code)
+            # call quilt_submit test_pattern -v SEARCHSTRING "find me again [uniqueval]" 
+            #   (check return code capture query id)
             # sleep 1 seconds
             # Use QuiltConfig, Call GetSourceManagers, for each one
                 # use pyro, create proxy for the smd
                 # call GetLastQuery()
-                # assure it is equal to "find me again [uniqueval]"
+                # assure it is equal to "query id"
             # check qmd to be sure that all quilt_submit's have unregistered
             # do this by accessing Config, finding qmd name,
             # create pyro proxy for qmd, call
@@ -40,8 +52,8 @@ Classes:
             # running simultaneiously
 
         def test_basic_queue()
-            # call quilt_submit "find me again [uniqueval]" (check return 
-            #       code, capture query id output)
+            # call quilt_submit test_pattern -v SEARCHSTRING "find me again [uniqueval]" 
+            # check return code, capture query id output)
             # sleep 1 seconds
             # call quilt_q (check return code, capture output)
             # assure output contains same query id as before

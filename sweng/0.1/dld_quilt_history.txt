@@ -1,0 +1,45 @@
+quilt 0.1 quilt_history design
+------------------------
+
+Module: quilt_history
+
+Type: Executable Script
+
+External Dependencies:
+    python-argparse
+
+Internal Dependencies:
+    quilt_core
+
+Responsibilities:
+    Display information about queries in the completed queue
+
+Classes:
+    class QuiltHistory : QuiltMasterClient
+
+        __init__(
+            args    # see functional_specification of query_history
+        )
+            # store args as member variable
+            # chain to super constructor
+
+         OnRegisterEnd()
+            # print out statistics about the manager's History 
+            # GetQueryQueueStats from master, display them
+            # return False to DisconnectFromQueryMaster
+
+
+Functions:
+
+    # main function of the script, which is passed command line variables
+    def main(argc,argv)
+        # setup argument parser in accordance with funcitonal specification
+        # parse the arguments, exit with error message if unparseable
+        # create the quilt history object
+        # call query_master_client_main_helper
+
+
+
+
+
+

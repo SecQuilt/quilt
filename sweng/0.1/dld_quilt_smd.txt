@@ -31,6 +31,12 @@ Classes:
             # store sourceSpec as a member
             
         def Query(string queryId, dict sourceQuerySpec)
+    
+            # ALWAYS catch errors, report them to the query master
+            #   calling OnSourceQueryError()           
+ 
+            # lock self
+                # set last query member to queryId
 
             # get the sourcePatternSpec from the pattern name in the
             #   sourceQuerySpec

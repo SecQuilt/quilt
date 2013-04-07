@@ -48,7 +48,7 @@ Classes:
 
         def test_valid_query_one_result():
             # issue a valid query
-            # call quilt_submit test_pattern -y -a SEARCHSTRING Occurs_1_time
+            # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_1_time
             # capture query_id from std out 
             # sleep 1 second
             
@@ -65,7 +65,7 @@ Classes:
 
         def test_valid_query_multi_result():
             # issue a valid query
-            # call quilt_submit test_pattern -y -a SEARCHSTRING Occurs_3_time
+            # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_3_time
             # assure success, capture query_id from stdout
 
             # sleep 1 second

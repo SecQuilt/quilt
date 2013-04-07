@@ -78,6 +78,7 @@ Classes:
                 # copy the patternSpec the query references
                 # generate a query id
                 # get copy of sources
+                # store querySpec in Q to reserve query id
 
             # group variable mapping's by target source and source pattern
             #   store in local collection
@@ -105,12 +106,12 @@ Classes:
                     
             # use querySpec to create a validation  string                    
             # ask submitter to validate the source Queries
-            # if submitter refuses to validate, return early
+            # if submitter refuses to validate, 
+                # acuire lock remove query id from q
+                # return early
 
             # acquire lock
-                # store querySpec in a member dict
-                #   as querySpec keyed by query id
-                #   store state as INITIALIZED
+                #   store querySpec state as INITIALIZED
 
             # Process query...
             # iterate the sourceQuerySpec's in the querySpec by source
@@ -122,6 +123,7 @@ Classes:
                 # submit launched this call asyncronysly and must be made
                 # aware of the unexpected error
                 # call submit's OnSubmitProblem
+                # acquire lock, remove query id from pool
 
 
 
@@ -180,11 +182,28 @@ Classes:
             eventList)
             """Append the specified eventList to the specified queryId"""
 
+            # acquire lock
             # mark the query as completed in state
+            # move query spec from q to history member collection
             # set the results into the query spec
             
-            
+        void OnSourceQueryError(
+            Exception e)
+            """Called when an asyncronys source query produces an exeption"""
 
+            # log the execption 
+
+        # format a string with information about the specified query
+        # from the history
+        string GetQueryHistoryStats(
+            string queryID          # the query we are interested in
+        )
+            # acquire lock
+            # if queryID specified
+            #   throw error if query not found in history, otherwise return the 
+            #   query's record
+            # else
+            #   return complete history summary
 Functions:
 
     Querymaster helper functions for server side only.  These will not

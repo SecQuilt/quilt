@@ -29,15 +29,15 @@ Query Master
         [-e EMAIL]  # comma seperated list of emails to supply notifications
         [-y]        # whether to automatically confirm the query
         [-l LEVEL]  # log level (DEBUG,INFO,WARN,ERROR), default is WARN
-        [-a VARIABLE VALUE] ...   # Arguments used to provide values to the
+        [-v VARIABLE VALUE] ...   # Arguments used to provide values to the
                                   # variables in a pattern
 
         Quilt Submit will allow submission of a query.  It will communicate with
-        the query master, recieve estimated time/space metrics of teh query,
+        the query master, recieve estimated time/space metrics of the query,
         get user confirmation (if no -y), then deliver the query, to the master
         for processing, print the query id, and then exit.
 
-        A user may select a pattern and then replace the VARIABLEs 
+        A user may select a pattern and then substitute the VARIABLEs 
         defined in the pattern with the submitted values
 
     quilt_q
@@ -56,8 +56,8 @@ Query Master
         Quilt history will display information about completed queries.  If ID
         is provided, the Query's information will describe the variables used 
         it its definition, the state of the query, and any results that are
-        available.  If there are no completed queries or theres is no query
-        with the specified ID present, nothing is displayed.
+        available.  If there are no completed queries with the specified ID 
+        present, An error occurs.
 
 
     quilt_status
