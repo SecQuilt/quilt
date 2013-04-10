@@ -30,7 +30,6 @@ Classes:
 
             # define patternSpec in the query master as a syncronous call
             # return will be the pattern name
-
             # print out pattern Name
 
             # return False so that the event loop does not start
