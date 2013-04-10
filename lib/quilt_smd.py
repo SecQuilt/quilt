@@ -8,11 +8,13 @@ import argparse
 class SourceManager(quilt_core.QueryMasterClient):
 
 
-    def __init__(self, args, sourceName):
+    #REVIEW
+    def __init__(self, args, sourceName, sourceSpec):
         # chain to call super class constructor 
         quilt_core.QueryMasterClient.__init__(self,sourceName)
         self._args = args
         self._sourceName = sourceName
+        self._sourceSpec = sourceSpec
 
     def Query(self, queryId, query):
         with self._lock:
@@ -32,23 +34,48 @@ class SourceManager(quilt_core.QueryMasterClient):
         return "SourceManager"
         
 
+    #REVIEW
+    def GetSourcePatterns(self):
+        """Returns a list of defined source patterns"""
+        # non need to lock because noone shuld be writing to a source spec
+        # after init
+
+        # iterate sourceSpec member's patterns
+        # append returning list with pattern names
+        if 'sourcePatterns' in self._sourceSpec:
+            patterns = self._sourceSpec['sourcePatterns']
+            return patterns.keys
+        return []
+
+    #REVIEW
+    def GetSourcePattern(self, patternName):
+        """return the specified patternSpec dict"""
+        # non need to lock because noone shuld be writing to a source spec
+        # after init
+
+        # access the source pattern spec with the specified key in the
+        # sourceSpec, return a copy
+        return self._sourceSpec['patterns'][patternName]
+
+
 class Smd(quilt_core.QuiltDaemon):
     def __init__(self, args):
         quilt_core.QuiltDaemon.__init__(self)
         self.setup_process("smd")
         self._args = args
 
+    #REVIEW
     def run(self):
 
         cfg = quilt_core.QuiltConfig()
-        smnames = cfg.GetSourceManagers()
+        smspecs = cfg.GetSourceManagerSpecs()
 
         objs = {}
         # iterate through source manager configurations
-        for smname in smnames:
+        for smname,smspec in smspecs.items():
             logging.debug(smname + " specified from configuration")
             # create each source manager object
-            sm = SourceManager(self._args, smname)
+            sm = SourceManager(self._args, smname, smspec)
             objs[sm._localname] = sm
             
         # start the client with all the source managers

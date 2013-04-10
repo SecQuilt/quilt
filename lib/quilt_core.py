@@ -68,7 +68,8 @@ class QuiltConfig:
 
         return self._config.get(sectionName,valueName)
 
-    def GetSourceManagers(self):
+    #REVIEW
+    def GetSourceManagersUtil(self, which):
         """get list of all defined source managers"""
     
         # iterate through the source managers defined in the configuration
@@ -85,15 +86,35 @@ class QuiltConfig:
             if isfile(join(smdcfgdir,f)) ]
 
         # read all sections from all config file sin the smd directory
-        smdnames = []
+        names = which == names
+
+        if names:
+            smds = []
+        else:
+            smds = {}
+ 
         for f in smdcfgs:
             c = ConfigParser.ConfigParser()
             c.read(join(smdcfgdir, f))
             sections = c.sections()
             for s in sections:
-                smdnames.append(s)
-        return smdnames
-                    
+                if names:
+                    smds.append(s)
+                else
+                    # TODO assure security on access to
+                    # config files to assure safety of eval
+                    spec = eval(c.get(s,'sourceSpec')) 
+                    smds[s] = spec
+        return smds
+
+    #REVIEW
+    def GetSourceManagers(self):
+        return GetSourceManagersUtil("names")
+
+    #REVIEW               
+    def GetSourceManagerSpecs(self):
+        return GetSourceManagersUtil("specs")
+
 def GetQueryMasterProxy(config=None):
     """Access configuration to find query master, return proxy to it"""
     if config is None:

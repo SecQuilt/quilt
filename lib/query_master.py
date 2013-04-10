@@ -10,6 +10,7 @@ class QueryMaster:
 
     _clients = {}
     _queries = {}
+    _patterns = {}
     _lock = threading.Lock()
 
     def RegisterClient(
@@ -115,18 +116,199 @@ class QueryMaster:
         with self._lock:
             return self._clients[objType][clientName].copy()
 
+    #REVIEW
+    def DefinePattern(self, patternSpec):
+        """Define the specified pattern in the query master, return
+        the finalized (unique) name of the pattern"""
 
-    def Query(self, submitterNameKey, query, notificationAddress):
+        # determine unique name for the pattern based off suggested name
+        #   in the spec
+        if name in patternSpec:
+            rootName = patternSpec['name']
+        else:
+            rootName = "pattern"
+        patternName = rootName
+        i = 1;
+
+        with self._lock
+            while patternName in self._patterns:
+                patternName = rootName + str(i)
+                i = i + 1
+
+            # store pattern spec in the member data
+            self._patterns[patternName] = patternSpec
+            patternSpec[name] = patternName
+    
+        # return the unique name for the pattern
+        return patternName
+            
+            
+    #REVIEW
+    def Query(self, submitterNameKey, querySpec):
         """
         string Query(                       # return the ID of the query
             string submitterNameKey         # key that the submitter recieved
-                                            # when it was registered with this
-                                            # master
-            string query                    # the content of the query
-            string notificatoinAddress      # the email addresses for
-                                            #   notification
+                                            #   when it was registered with this
+                                            #   master
+            dict querySpec                  # the details of the query
+                                            #   necessary from the user
         )
         """
+
+        # try the following 
+        try:
+
+            # get copy of sources
+            # TODO better locking, we are locking in this func and then
+            #   locking again below
+            sources = self.GetClients("SourceManager")
+
+            # acquire lock
+            with self._lock:
+                # copy the patternSpec the query references
+                patternSpec = self._patterns[querySpec['patternName']].copy()
+                # generate a query id
+                baseqid = submitterNameKey
+                i = 0
+                qid = baseqid + "_query_" + str(i)
+                while qid in self._queries:
+                    i = i + 1
+                    qid = baseqid + "_query_" + str(i)
+                
+                # store querySpec in Q to reserve query id
+                self._queries[qid] = querySpec
+                
+
+            # group variable mapping's by target source and source pattern
+            #   store in local collection.  We later want to iterare the
+            #   source mangers efficiently, so we preprocess a srcPatDict here
+            #   which provides a direct mapping from srcVariables to 
+            #   queryVariables, grouped by sources and patterns
+            srcPatDict = {}
+            if 'variables' in patternSpec:
+                varSpecs = patternSpec['variables']
+                for varName, varSpec in varSpecs.items():
+                    if 'sourceMapping' in varSpec:
+                        mappings = varSpec['sourceMapping']
+                        for m in mappings:
+                            src = m['sourceName']
+                            pat = m['sourcePattern']
+                            var = m['sourceVariable']
+                            if src not in srcPatDict:
+                                patDict = {}
+                                srcPatDict[src] = patDict
+                            else:
+                                patDict = srcPatDict[src]
+                            if pat not in patDict:
+                                element = {}
+                                patDict[pat] = element
+                            else:
+                                element = patDict[pat]
+                            element[src] = varName
+
+            # iterate the collection of sources
+            for source in sources:
+                # use variable mapping's source name to get proxy to 
+                #   that source manager
+                with get_client_proxy_from_type_and_name(
+                    self, "SourceManager", source):
+
+                    # iterate the collection of sourcePatterns for current 
+                    #   source
+                    patterns = source.GetSourcePatterns()
+                    for patternName in patterns:
+                        srcPatSpec = source.GetSourcePattern(patternName)
+                        # get the sourcePatternSpec from the proxy as
+                        #   a new sourceQuerySpec
+                        #   logicaly we copy this into a sourceQuery and 
+                        #   begin to fill it with variables from the query.  
+                        #   But because we use pyro, we are already working 
+                        #   with the copy
+                        srcQuerySpec = srcPatSpec
+
+                        if 'variables' in srcQuerySpec:
+                            srcVars = srcQuerySpec['variables']
+                            # iterate the variables in the new 
+                            #   sourceQuerySpec
+                            for srcVarName, srcVarSpec in srcVars.items():
+                                fill_source_variable(
+                                    srcVarSpec, srcPatDict, source)
+
+                                # find that source variable in the pattern's 
+                                #   mappings
+                                # get the name of the query variable that maps to it
+                            # get the value of the query variable from the
+                            #   querySpec
+                            # assign the sourceVariable's value to that value
+
+                        # append completed sourceQuerySpec to querySpec
+
+                    
+            # use querySpec to create a validation  string                    
+            # ask submitter to validate the source Queries
+            # if submitter refuses to validate, 
+                # acuire lock remove query id from q
+                # return early
+
+            # acquire lock
+                #   store querySpec state as INITIALIZED
+
+            # Process query...
+            # iterate the sourceQuerySpec's in the querySpec by source
+                # get proxy to the source master
+                # query the source by sending it the source query spec as
+                #   asyncronous call
+
+            #catch exception! 
+                # submit launched this call asyncronysly and must be made
+                # aware of the unexpected error
+                # call submit's OnSubmitProblem
+                # acquire lock, remove query id from pool
+
+                        
+                
+        
+            # iterate the collection of sources
+                # use variable mapping's source name to get proxy to 
+                #   that source manager
+
+                # iterate the collection of sourcePatterns for current source
+                    # get the sourcePatternSpec from the proxy as
+                    #   a new sourceQuerySpec
+                    #   logicaly we copy this into a sourceQuery and begin to 
+                    #   fill it with variables from the query.  But because we
+                    #   use pyro, we are already working with the copy
+
+                    # iterate the variables in the new sourceQuerySpec
+                        # find that source variable in the pattern's mappings                        # get the name of the query variable that maps to it
+                        # get the value of the query variable from the
+                        #   querySpec
+                        # assign the sourceVariable's value to that value
+
+                    # append completed sourceQuerySpec to querySpec
+
+                    
+            # use querySpec to create a validation  string                    
+            # ask submitter to validate the source Queries
+            # if submitter refuses to validate, 
+                # acuire lock remove query id from q
+                # return early
+
+            # acquire lock
+                #   store querySpec state as INITIALIZED
+
+            # Process query...
+            # iterate the sourceQuerySpec's in the querySpec by source
+                # get proxy to the source master
+                # query the source by sending it the source query spec as
+                #   asyncronous call
+
+        #catch exception! 
+            # submit launched this call asyncronysly and must be made
+            # aware of the unexpected error
+            # call submit's OnSubmitProblem
+            # acquire lock, remove query id from pool
+
 
         queryRec = {}
 
@@ -196,6 +378,46 @@ class QueryMaster:
                 return None
             else:
                 return pprint.pformat(self._queries[queryId])
+
+    #REVIEW
+    def GetQueryHistoryStats(self, queryId = None):
+        """
+        format a string with information about the specified query
+        from the history, or provide stats for all if no queryId is 
+        specified
+        """
+        # acquire lock
+        with self._lock
+        # if queryID specified
+            if queryId != None:
+                # throw error if query not found in history, 
+                # otherwise return the query's record
+                if queryId not in self._history:
+                    raise Exception("query id: " + str(queryId) + 
+                        " is not present in history")
+                results = pprint.pformat(self._history[queryId])
+            else:
+                # return complete history summary
+                results = pprint.pformat(self._history)
+
+        return results
+    
+    #REVIEW
+    def GetPatternStats(self)
+        """Return a string describing the patterns defined in the query
+        master"""
+
+        with self._lock:
+            return pprint.pformat(self._patterns)
+
+def fill_source_variable(srcVarSpec, srcPatDict, source)
+    
+        # find that source variable in the pattern's 
+        #   mappings
+        # get the name of the query variable that maps to it
+    # get the value of the query variable from the
+    #   querySpec
+    # assign the sourceVariable's value to that value
 
 def get_client_proxy( clientRec):
     """

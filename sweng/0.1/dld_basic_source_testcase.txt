@@ -44,7 +44,7 @@ Classes:
             # check for the query pattern
             # call quilt_status 
             # check errorcode and output contains 
-            #   "test_pattern" and "syslog"
+            #   "test_pattern" 
 
         def test_valid_query_one_result():
             # issue a valid query
@@ -75,6 +75,33 @@ Classes:
             # capture stdout, assure good exitcode
             #   assure 3 results
             #   assure contains text "Occurs_3_times"
+
+        def test_valid_query_no_results():
+            # issue a valid query
+            # call quilt_submit test_pattern -y -v SEARCHSTRING Zappadappa_Occurs_3_time
+            # assure success, capture query_id from stdout
+
+            # sleep 1 second
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            #   assure 0 results
+
+        def test_valid_query_all_results():
+            
+            # issue a valid query
+            # call quilt_submit test_pattern -y -v SEARCHSTRING '.*' 
+            # assure success, capture query_id from stdout
+
+            # sleep 1 second
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            #   assure results > 4
+
+        
 
 
 def main:

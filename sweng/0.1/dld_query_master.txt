@@ -95,8 +95,7 @@ Classes:
                     #   use pyro, we are already working with the copy
 
                     # iterate the variables in the new sourceQuerySpec
-                        # find that source variable in the pattern's mappings
-                        # get the name of the query variable that maps to it
+                        # find that source variable in the pattern's mappings                        # get the name of the query variable that maps to it
                         # get the value of the query variable from the
                         #   querySpec
                         # assign the sourceVariable's value to that value
@@ -194,7 +193,8 @@ Classes:
             # log the execption 
 
         # format a string with information about the specified query
-        # from the history
+        # from the history, or provide stats for all if no queryID is 
+        # specified
         string GetQueryHistoryStats(
             string queryID          # the query we are interested in
         )

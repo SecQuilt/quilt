@@ -43,7 +43,7 @@ def main(argv):
         nothing is displayed""",
         argv)
 
-    parser.add_argument('-qid','--query-id',nargs='?',
+    parser.add_argument('query_id',nargs='?',
         help="a query ID for a query in the quilt queue")
 
     args = parser.parse_args(argv)

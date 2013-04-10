@@ -52,27 +52,42 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
                         if c == 'y' or c == 'Y':
                             break
 
-            logging.info("Done Recieved validation request for query: " + 
-                str(queryId))
             return True
         finally:
             # set process events flag to false end event loop, allowing
             # submitter to exit
             self.SetProcesssEvents(False)
             
+    #REVIEW
     def OnRegisterEnd(self):
         """After registration is complete we submit the query to the 
         query master"""
         
-        logging.info('Submiting query: ' + self._args.query)
+        # create a partial query spec dictionary
+        #   set pattern name from args
+        #   set notification address in spec
+        #   set state as UNINITIALIZED
+        querySpec = {
+            'state' : 'uninitialized',
+            'patternName' : self._args.pattern,
+            'notificationEmail' : self._args.notifcation_email }
         
-        # call remote method asyncronysly, this will return right away
-        Pyro4.async(self._qm).Query(
-            self._remotename,
-            self._args.query,
-            self._args.notifcation_email)
+        #   set variables/values from args
+        if len(self._args.variables) > 0:
+            varSpecs = {}
+            querySpec["variables"] = varSpecs
+            for v in self._args.variable:
+                vname = v[0]
+                vval = v[1]
+                varSpec = { 
+                    'name' : vname,
+                    'value' : vval } 
+                varSpecs[vname] = varSpec
+            
+        logging.info('Submiting query: ' + pprint.pformat(querySpec))
 
-        logging.info('Done Submiting query: ' + self._args.query)
+        # call remote method asyncronysly, this will return right away
+        Pyro4.async(self._qm).Query( self._remotename, querySpec)
             
         # Validate query will be remote called from query master
         
@@ -115,6 +130,23 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         with self._lock:
             return self._processEvents
 
+    #REVIEW
+    def OnSubmitProblem(self, queryId, msg):
+        """Recieve a message from the query master about a problem with
+        the query submission"""
+
+        try:
+            # print out the query id and the message
+            logging.error(msg)
+            print "Query submission error for:", queryId
+        finally:
+            # set process events flag to false end event loop, allowing
+            # submitter to exit
+            self.SetProcesssEvents(False)
+        
+
+
+#REVIEW
 def main(argv):
     
     # setup command line interface
@@ -123,15 +155,20 @@ def main(argv):
         Quilt Submit will allow submission of a query.  It will communicate 
         with the query master, recieve estimated time/space metrics of the
         query, get user confirmation (if no -y), then deliver the query, to 
-        the master for processing, print the query id, and then exit.""",
+        the master for processing, print the query id, and then exit.  
+        A user may select a pattern and then substitute the VARIABLEs 
+        defined in the pattern with the submitted values""",
         argv)
 
-    parser.add_argument('query',help="The query to run on the system")
+    parser.add_argument('pattern',
+        help="name of the pattern to create the query from")
     parser.add_argument('-e','--notifcation-email',nargs='?',
         help="comma seperated list of emails to supply with notifcations")
     parser.add_argument('-y','--confirm-query',action='store_true',
         default=False, help="whether to automatically confirm the query")
-    
+    parser.add_argument('-v','--variable', nargs=2, action='append',
+        help="Arguments used to provide values to the variables in a pattern")
+
     # parse command line
     args = parser.parse_args(argv)
 

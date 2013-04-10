@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#REVIEW
 import os
 import sys
 import logging
@@ -7,25 +8,25 @@ import Pyro4
 import query_master
 import argparse
 
-class QuiltStatus(quilt_core.QueryMasterClient):
+class QuiltHistory(quilt_core.QueryMasterClient):
 
     def __init__(self, args):
         # chain to call super class constructor 
-        # super(QuiltStatus, self).__init__(GetType())
         quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
 
-    #REVIEW
     def OnRegisterEnd(self):
         
-        print 'Sources', self._qm.GetSourceManagerStats()
-        print 'Patterns', self._qm.GetPatternStats()
+        o = self._qm.GetQueryHistoryStats()
+            
+        if o != None:
+            print o
+        
         # return false (prevent event loop from beginning)
         return False
-        
 
     def GetType(self):
-        return "QuiltStatus"
+        return "QuiltHistory"
         
 
 
@@ -33,14 +34,21 @@ class QuiltStatus(quilt_core.QueryMasterClient):
 def main(argv):
     
     # setup command line interface
-    parser =  quilt_core.main_helper('qstat',"""Display information 
-        about the quilt system, including registered source managers""",
+    parser =  quilt_core.main_helper('qhist',"""
+        Quilt history will display information about completed queries.  If ID
+        is provided, the Query's information will describe the variables used 
+        it its definition, the state of the query, and any results that are
+        available.  If there are no completed queries with the specified ID 
+        present, An error occurs.""",
         argv)
+
+    parser.add_argument('query_id',nargs='?',
+        help="a query ID for a query in the history")
 
     args = parser.parse_args(argv)
 
     # create the object and begin its life
-    client = QuiltStatus(args)
+    client = QuiltHistory(args)
 
     # start the client
     quilt_core.query_master_client_main_helper({
