@@ -230,9 +230,19 @@ class QueryMaster:
                             srcVars = srcQuerySpec['variables']
                             # iterate the variables in the new 
                             #   sourceQuerySpec
-                            for srcVarName, srcVarSpec in srcVars.items():
-                                fill_source_variable(
-                                    srcVarSpec, srcPatDict, source)
+                            for srcVar in srcVars.keys():
+                                var = srcPatDict[source][patternName][srcVar]
+                                varSpec = querySpec['variables'][var]
+                                val = varSpec['value']
+                                
+                                             
+
+                                
+                                querySpec['variables'][srcPatDict[source][patternName][srcVar]]
+                                srcVarSpec = create_source_variable(
+                                    srcVar, 
+                                    srcPatDict[source][patternName],
+                                    querySpec)
 
                                 # find that source variable in the pattern's 
                                 #   mappings
@@ -410,11 +420,14 @@ class QueryMaster:
         with self._lock:
             return pprint.pformat(self._patterns)
 
-def fill_source_variable(srcVarSpec, srcPatDict, source)
-    
-        # find that source variable in the pattern's 
-        #   mappings
-        # get the name of the query variable that maps to it
+def create_source_variable(srcVar, queryVarToSrcVarDict, source):
+    varSpec = { 'name' : srcVar,
+                'value' : 
+    # find that source variable in the pattern's 
+    #   mappings
+        
+
+    # get the name of the query variable that maps to it
     # get the value of the query variable from the
     #   querySpec
     # assign the sourceVariable's value to that value
@@ -425,7 +438,7 @@ def get_client_proxy( clientRec):
     """
     pyroname = clientRec["clientName"]
     nshost = clientRec["registrarHost"]
-    nsport = clientRec["registrarPort"]
+    nsport = clientRec["trarPort"]
     
     ns = Pyro4.locateNS(nshost, nsport)
     uri = ns.lookup(pyroname)
