@@ -6,6 +6,7 @@ import quilt_core
 import Pyro4
 import query_master
 import argparse
+import quilt_data
 
 class QuiltSubmit(quilt_core.QueryMasterClient):
     """
@@ -67,22 +68,21 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         #   set pattern name from args
         #   set notification address in spec
         #   set state as UNINITIALIZED
-        querySpec = {
-            'state' : 'uninitialized',
-            'patternName' : self._args.pattern,
-            'notificationEmail' : self._args.notifcation_email }
+        querySpec = quilt_data.query_spec_create(
+            name='uninitialized_' + self._args.pattern),
+            state = 'uninitialized',
+            patternName = self._args.pattern,
+            notificationEmail = self._args.notifcation_email )
         
         #   set variables/values from args
         if len(self._args.variables) > 0:
-            varSpecs = {}
-            querySpec["variables"] = varSpecs
+            variables = quilt_data.var_specs_create()
             for v in self._args.variable:
                 vname = v[0]
                 vval = v[1]
-                varSpec = { 
-                    'name' : vname,
-                    'value' : vval } 
-                varSpecs[vname] = varSpec
+                quilt_data.var_specs_append( variables,
+                    quilt_data.var_spec_create( name=vname, value=vval)
+            quilt_data.query_spec_set(variables=variables)
             
         logging.info('Submiting query: ' + pprint.pformat(querySpec))
 

@@ -9,6 +9,7 @@ import Pyro4
 import query_master
 import argparse
 import pprint
+import quilt_data
 
 class QuiltDefine(quilt_core.QueryMasterClient):
 
@@ -24,35 +25,31 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         this pattern with the query master"""
 
         # create the spec with it's name
-        patternSpec={ 'name' : self._args.name }
+        patternSpec=quilt_data.pat_spec_create(name=self._args.name)
 
         # create the specs for the variables
+        variables=None
         for v in self._args.variable:
             # create the variables section if it does not exist
-            if 'variables' not in patternSpec:
-                patternSpec['variables'] = {}
 
             # first position of the cmd line argument is name of variable
             varName = v[0]
-            
-            # create new entry for the variable, or use a previous one
-            # (no reason to do this really)
-            if varName in patternSpec['variables']:
-                vSpec = patternSpec['variables'][varName]
-            else:
-                vSpec = { 'name' : varName }
-                patternSpec['variables'][varName] = vSpec
+            varSpec = quilt_data.var_spec_create(name=varName)
 
             # if description was specified on cmd line, load it in the spec
             if len(v) > 1:
                 varDesc = v[1]
-                vSpec['description'] = varDesc
+                quilt_data.var_spec_set(varSpec, description=varDesc)
 
             # if default was specified on cmd line, load it in spec
             if len(v) > 2:
                 varDef = v[2]
-                vSpec['default'] = varDef
+                quilt_data.var_spec_set(varSpec, default=varDef)
+            variables = quilt_data.var_specs_append(variables, varSpec)
+
+        quilt_data.pat_spec_set(patternSpec,variables=variables)
         
+        mappings = None
         # create the specs for the variable mappings
         for m in self._args.mapping:
             varName = m[0]
@@ -60,24 +57,24 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             srcPat = m[2]
             srcVar = m[3]
 
-            vSpec = patternSpec['variables'][varName]
+            vSpec = quilt_data.var_specs_get(varName)
     
             # query variables are allowed to map to multiple
             # source variables.  Initalize a blank list if it isn't present
             # then append the new mapping information
-            if 'sourceMapping' in vSpec:
-                mappings = vSpec['sourceMapping']
-            else
-                mappings = []
-                vSpec['sourceMapping'] = mappings 
             
-            mappings.append( {
-                'sourceName' : src,
-                'sourcePattern' : srcPat,
-                'sourceVariable' : srcVar } )
-            
-            
+            srcVarMappingSpec = quilt_data.src_var_mapping_spec_create(
+                name=varName,
+                sourceName=src,
+                sourcePattern=srcPat,
+                sourceVariable=srcVar)
+        
+            quilt_data.src_var_mapping_specs_append(
+                mappings, srcVarMappingSpec)
 
+        if mappings != None:
+            pat_spec_set(patternSpec,mappings=mappings)
+            
         # define patternSpec in the query master as a syncronous call
         # return will be the pattern name
         string patName = self._qm.DefinePattern(patternSpec)

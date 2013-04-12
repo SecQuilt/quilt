@@ -13,6 +13,7 @@ from daemon import runner
 import argparse
 import select
 import time
+import quilt_data
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -91,7 +92,7 @@ class QuiltConfig:
         if names:
             smds = []
         else:
-            smds = {}
+            smds = quilt_data.src_specs_create()
  
         for f in smdcfgs:
             c = ConfigParser.ConfigParser()
@@ -101,10 +102,11 @@ class QuiltConfig:
                 if names:
                     smds.append(s)
                 else
-                    # TODO assure security on access to
-                    # config files to assure safety of eval
-                    spec = eval(c.get(s,'sourceSpec')) 
-                    smds[s] = spec
+                    specStr = c.get(s,'sourceSpec')
+                    quilt_data.src_specs_append( smds,
+                        quilt_data.src_spec_create(
+                            cfgStr=specStr, cfgSection=s))
+                    
         return smds
 
     #REVIEW

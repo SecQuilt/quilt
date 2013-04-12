@@ -5,12 +5,13 @@ import Pyro4
 import threading
 import quilt_smd
 import pprint
+import quilt_date
 
 class QueryMaster:
 
     _clients = {}
-    _queries = {}
-    _patterns = {}
+    _queries = quilt_data.query_specs_create()
+    _patterns = quilt_data.pat_specs_create()
     _lock = threading.Lock()
 
     def RegisterClient(
@@ -123,9 +124,8 @@ class QueryMaster:
 
         # determine unique name for the pattern based off suggested name
         #   in the spec
-        if name in patternSpec:
-            rootName = patternSpec['name']
-        else:
+        rootName = quilt_data.pat_spec_tryget(patternSpec, name=True)
+        if rootName == None:
             rootName = "pattern"
         patternName = rootName
         i = 1;
@@ -136,8 +136,8 @@ class QueryMaster:
                 i = i + 1
 
             # store pattern spec in the member data
-            self._patterns[patternName] = patternSpec
-            patternSpec[name] = patternName
+            quilt_data.pat_spec_set(patternSpec, name=patternName)
+            quilt_data.pat_specs_append(self._patterns, patternSpec)
     
         # return the unique name for the pattern
         return patternName
@@ -158,15 +158,13 @@ class QueryMaster:
         # try the following 
         try:
 
-            # get copy of sources
-            # TODO better locking, we are locking in this func and then
-            #   locking again below
-            sources = self.GetClients("SourceManager")
 
             # acquire lock
             with self._lock:
                 # copy the patternSpec the query references
-                patternSpec = self._patterns[querySpec['patternName']].copy()
+                patternName = quilt_data.query_spec_get(patternName=True)
+                patternSpec = quilt_data.pat_specs_get(
+                    self._patterns,patternName).copy()
                 # generate a query id
                 baseqid = submitterNameKey
                 i = 0
@@ -176,7 +174,8 @@ class QueryMaster:
                     qid = baseqid + "_query_" + str(i)
                 
                 # store querySpec in Q to reserve query id
-                self._queries[qid] = querySpec
+                quilt_data.query_spec_set(querySpec, name=qid)
+                quilt_data.query_specs_append(self._queries, querySpec)
                 
 
             # group variable mapping's by target source and source pattern
@@ -185,20 +184,31 @@ class QueryMaster:
             #   which provides a direct mapping from srcVariables to 
             #   queryVariables, grouped by sources and patterns
             srcPatDict = {}
-            if 'variables' in patternSpec:
-                varSpecs = patternSpec['variables']
-                for varName, varSpec in varSpecs.items():
-                    if 'sourceMapping' in varSpec:
-                        mappings = varSpec['sourceMapping']
+            patVarSpecs = quilt_data.pat_spec_tryget(patternSpec,variables=True)
+            if patVarSpecs != None:
+                for varName, varSpec in patVarSpecs.items():
+                    
+                    mappings = quilt_data.var_spec_tryget(
+                        varSpec,sourceMapping=True)
+                    if mappings:
                         for m in mappings:
-                            src = m['sourceName']
-                            pat = m['sourcePattern']
-                            var = m['sourceVariable']
+                            src = quilt_data.src_var_mapping_spec_get(
+                                m,sourceName=True)
+                            pat = quilt_data.src_var_mapping_spec_get(
+                                m,sourcePattern=True)
+                            var = quilt_data.src_var_mapping_spec_get(
+                                m,sourceVariable=True)
+
                             if src not in srcPatDict:
                                 patDict = {}
                                 srcPatDict[src] = patDict
                             else:
                                 patDict = srcPatDict[src]
+                            
+                            # need to reconcile what happens when there is a desire to
+                            # use the same srcPattern multiple times in one query
+
+                            patPresent = False
                             if pat not in patDict:
                                 element = {}
                                 patDict[pat] = element
@@ -206,8 +216,12 @@ class QueryMaster:
                                 element = patDict[pat]
                             element[src] = varName
 
-            # iterate the collection of sources
-            for source in sources:
+            varSpecs = quilt_data.query_spec_tryget(querySpec,variables=True)
+            srcQuerySpecs = None
+
+            # iterate the collection of sources, and build collection of 
+            # srcQuerySpecs
+            for source,patDict in srcPatDict.items():
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
                 with get_client_proxy_from_type_and_name(
@@ -224,34 +238,19 @@ class QueryMaster:
                         #   begin to fill it with variables from the query.  
                         #   But because we use pyro, we are already working 
                         #   with the copy
-                        srcQuerySpec = srcPatSpec
+                        srcQuerySpec = fill_src_query_spec(
+                            srcPatSpec, srcPatDict, varSpecs, patVarSpecs):
 
-                        if 'variables' in srcQuerySpec:
-                            srcVars = srcQuerySpec['variables']
-                            # iterate the variables in the new 
-                            #   sourceQuerySpec
-                            for srcVar in srcVars.keys():
-                                var = srcPatDict[source][patternName][srcVar]
-                                varSpec = querySpec['variables'][var]
-                                val = varSpec['value']
-                                
-                                             
-
-                                
-                                querySpec['variables'][srcPatDict[source][patternName][srcVar]]
-                                srcVarSpec = create_source_variable(
-                                    srcVar, 
-                                    srcPatDict[source][patternName],
-                                    querySpec)
-
-                                # find that source variable in the pattern's 
-                                #   mappings
-                                # get the name of the query variable that maps to it
-                            # get the value of the query variable from the
-                            #   querySpec
-                            # assign the sourceVariable's value to that value
+                        # name for source pattern is generated from qid, which
+                        # is already globally unique, then by taking on source
+                        # and pattern
+                        srcQueryName = '_'.join([qid,source,patternName])
+                        
+                        
 
                         # append completed sourceQuerySpec to querySpec
+                        srcQuerySpecs = quilt_data.src_query_specs_append(
+                            srcQuerySpecs, srcQuerySpec)
 
                     
             # use querySpec to create a validation  string                    
@@ -451,3 +450,49 @@ def get_client_proxy_from_type_and_name( qm, clientType, clientName):
         rec = qm._clients[clientType][clientName].copy()
     return get_client_proxy(rec)
     
+def fill_src_query_spec(srcQuerySpec, srcPatDict, varSpecs, patVarSpecs):
+    """Helper function for filling out a srcQuerySpec with variable values"""
+
+    srcVars = quilt_data.src_query_spec_get(
+        srcQuerySpec,variables=True)
+    if srcVars == None:
+        return
+
+    # iterate the variables in the "new" 
+    #   sourceQuerySpec
+    for srcVarName, srcVarSpec in srcVars.items():
+        
+        # find that source variable in the pattern's 
+        #   mappings
+        # get the name of the query variable that maps to it
+        varName = srcPatDict[source][patternName][srcVarName]
+
+        # get the value of the query variable from the
+        #   querySpec
+        varSpec = quilt_data.var_specs_get(varSpecs, varName)
+        varValue = quilt_data.var_spec_tryget(varSpec, value=True)
+
+        if varValue == None:
+            # user did not supply value for the variable in the
+            # query, use the default in the pattern
+            patVarSpec = quilt_data.var_specs_tryget(
+                patVarSpecs, varName)
+            varValue = quilt_data.var_spec_tryget(
+                patVarSpec,default=True)
+
+            if varValue == None:
+                # pattern definer did not supply a default, check
+                # to see if there is a default in the source pattern
+                varValue = quilt_data.var_spec_tryget(
+                    srcVarSpec, default=True)
+
+                if varValue == None:
+                    # could not determine a value for this variable
+                    # must throw error
+                    raise Exception("""No value set or default found
+                        for the query variable: """ + varName)
+        
+        # assign the sourceVariable's value to the determined value
+        quilt_data.var_spec_set(srcVarSpec, value=varValue)
+                            
+
