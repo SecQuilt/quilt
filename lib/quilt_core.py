@@ -103,7 +103,7 @@ class QuiltConfig:
                     smds.append(s)
                 else
                     specStr = c.get(s,'sourceSpec')
-                    quilt_data.src_specs_append( smds,
+                    quilt_data.src_specs_add( smds,
                         quilt_data.src_spec_create(
                             cfgStr=specStr, cfgSection=s))
                     

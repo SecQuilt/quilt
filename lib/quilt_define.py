@@ -45,7 +45,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             if len(v) > 2:
                 varDef = v[2]
                 quilt_data.var_spec_set(varSpec, default=varDef)
-            variables = quilt_data.var_specs_append(variables, varSpec)
+            variables = quilt_data.var_specs_add(variables, varSpec)
 
         quilt_data.pat_spec_set(patternSpec,variables=variables)
         
@@ -69,7 +69,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                 sourcePattern=srcPat,
                 sourceVariable=srcVar)
         
-            quilt_data.src_var_mapping_specs_append(
+            quilt_data.src_var_mapping_specs_add(
                 mappings, srcVarMappingSpec)
 
         if mappings != None:

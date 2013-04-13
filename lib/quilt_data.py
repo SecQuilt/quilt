@@ -94,7 +94,7 @@ def var_spec_name_get(spec):
 def var_specs_create():
     return {}
 
-def var_specs_append(specs, varspec):
+def var_specs_add(specs, varspec):
     if specs == None:
         specs = var_specs_create()
     specs[var_spec_name_get(varspec)] = varspec
@@ -151,7 +151,7 @@ def src_var_mapping_spec_get(
 def src_var_mapping_specs_create():
     return []
 
-def src_var_mapping_specs_append(mappingSpecs=None, mappingSpec):
+def src_var_mapping_specs_add(mappingSpecs=None, mappingSpec):
     if mappingSpecs = None:
         mappingSpecs = src_var_mapping_specs_create()
     mappingSpecs.append(mappingSpec)
@@ -192,7 +192,7 @@ def var_spec_name_get(spec):
 def pat_specs_create():
     return {}
 
-def pat_specs_append(patSpecs, patSpec):
+def pat_specs_add(patSpecs, patSpec):
     if patSpecs == None:
         patSpecs = pat_specs_create()
     patSpecs[pat_spec_name_get(patSpec)] = patSpec
@@ -288,7 +288,7 @@ query_spec_var_get = pat_spec_var_get
 def query_specs_create():
     return {}
 
-def query_specs_append(querySpecs, querySpec)
+def query_specs_add(querySpecs, querySpec)
     if querySpecs == None:
         querySpecs = query_specs_create()
     querySpecs[query_spec_get(querySpec,name=True)] = querySpec
@@ -354,13 +354,13 @@ src_query_spec_get = src_pat_spec_get
 src_query_spec_set = src_pat_spec_set
 src_query_spec_create = src_pat_spec_create
 src_query_specs_create = src_pat_specs_create
-src_query_specs_append = src_pat_specs_append
+src_query_specs_add = src_pat_specs_add
 
 
 def src_pat_specs_create():
     return {}
 
-def src_pat_specs_append(srcPatSpecs=None,srcPatSpec):
+def src_pat_specs_add(srcPatSpecs=None,srcPatSpec):
     if srcPatSpecs == None:
         srcPatSpecs = src_pat_specs_create()
     name = src_pat_spec_get(srcPatSpec,name=True)
@@ -418,14 +418,14 @@ def src_spec_create(cfgStr=None,cfgSection=None):
             # lazy user only specified description, convert to a variable spec
             if type(val)==str:
                 vspec = var_specs_create( name=name, description=val)
-                var_specs_append(cfgSrcPatVarSpecs, vspec)
+                var_specs_add(cfgSrcPatVarSpecs, vspec)
         return cfgSrcSpec
     return {}
 
 def src_specs_create():
     return {}
 
-def src_specs_append(srcSpecs=None,srcSpec):
+def src_specs_add(srcSpecs=None,srcSpec):
     if srcSpecs == None:
         srcSpecs = src_specs_create()
     

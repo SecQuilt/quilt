@@ -80,7 +80,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             for v in self._args.variable:
                 vname = v[0]
                 vval = v[1]
-                quilt_data.var_specs_append( variables,
+                quilt_data.var_specs_add( variables,
                     quilt_data.var_spec_create( name=vname, value=vval)
             quilt_data.query_spec_set(variables=variables)
             

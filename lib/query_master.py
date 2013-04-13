@@ -137,7 +137,7 @@ class QueryMaster:
 
             # store pattern spec in the member data
             quilt_data.pat_spec_set(patternSpec, name=patternName)
-            quilt_data.pat_specs_append(self._patterns, patternSpec)
+            quilt_data.pat_specs_add(self._patterns, patternSpec)
     
         # return the unique name for the pattern
         return patternName
@@ -177,7 +177,7 @@ class QueryMaster:
                 
                 # store querySpec in Q to reserve query id
                 quilt_data.query_spec_set(tmpQuerySpec, name=qid)
-                quilt_data.query_specs_append(self._queries, tmpQuerySpec)
+                quilt_data.query_specs_add(self._queries, tmpQuerySpec)
 
             # this the query spec we will be manipulating, give it the id
             # that we generate, we will eventually replace the placeholder
@@ -259,7 +259,7 @@ class QueryMaster:
                         
                         # append completed sourceQuerySpec to querySpec
                         srcQuerySpecsDict[source] = (
-                            quilt_data.src_query_specs_append(
+                            quilt_data.src_query_specs_add(
                                 srcQuerySpecsDict[source], srcQuerySpec))
                         
             # use querySpec and srcQuery list
@@ -300,7 +300,7 @@ class QueryMaster:
                     # validated contnts in member data
                     quilt_data.query_spec_set(querySpec,
                         state='initialized')
-                    quilt_data.query_specs_append(self._queries,
+                    quilt_data.query_specs_add(self._queries,
                         querySpec)
 
             # Process query...
@@ -337,7 +337,7 @@ class QueryMaster:
                 querySpec = quilt_data.query_specs_del(self._queries, qid)
                 # add it to the history with an error state
                 quilt_data.query_spec_set(querySpec, state="error")
-                quilt_data.query_specs_append(self._history, querySpec)
+                quilt_data.query_specs_add(self._history, querySpec)
             except:
                 logging.error("Failed to move errored query to history: " + 
                     str(sys.exc_info()[0]))
