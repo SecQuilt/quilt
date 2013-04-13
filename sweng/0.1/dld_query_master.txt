@@ -218,12 +218,8 @@ Functions:
     def get_client_proxy_from_type_and_name(qm, clientType, name)
         # overload for get_client_proxy
 
-    def fill_src_query_spec
-        # get the sourcePatternSpec from the proxy as
-        #   a new sourceQuerySpec
-        #   logicaly we copy this into a sourceQuery and begin to 
-        #   fill it with variables from the query.  But because we
-        #   use pyro, we are already working with the copy
+    def create_src_query_spec
+        # get new sourceQuery spec from the sourcePatternSpec 
 
         # iterate the variables in the new sourceQuerySpec
             # find that source variable in the pattern's mappings 
@@ -234,3 +230,5 @@ Functions:
             #   but if the query does not have a value, use a
             #   default provided by the pattern, but if that has
             #   no default, use default provided by source pattern
+        # return new src_query from name, patternName, and variables
+        #   described in src pattern

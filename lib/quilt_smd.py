@@ -16,14 +16,41 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._sourceName = sourceName
         self._sourceSpec = sourceSpec
 
-    def Query(self, queryId, query):
-        with self._lock:
-            self._lastQuery = query
-        # _sourceName should not change, set at init, so ok to read
-        # without lock
-        logging.info("Source Manager: " + self._sourceName + 
-            " recieved query: " + queryId + " as: " + query)
+    #REVIEW
+    def Query(self, queryId, sourceQuerySpec):
 
+        try:
+            with self._lock:
+                # set last query member to queryId
+                self._lastQuery = queryId
+
+            # _sourceName should not change, set at init, so ok to read
+            # without lock
+            logging.info("Source Manager: " + self._sourceName + 
+                " recieved query: " + queryId + " as: " + query)
+
+            # get the sourcePatternSpec from the pattern name in the
+            #   sourceQuerySpec
+
+            # create cmd line for grep
+            # use the template in the sourcePatternSpec, and use the values
+            #   provided for the variables
+            #   use string.Template as per install_config.py example
+
+            # use run_process to execute grep, give callback per line
+            #   processing function
+
+            # Set query result events list in query master using query id
+        
+        def OnGrepLine(string line)
+
+
+            # assemble a jason string for an object representing an event
+            # based on eventSpec and eventSpec meta data
+            # convert that json object to a python event object
+            # append event to list of events member
+           
+             
     def GetLastQuery(self):
         with self._lock:
             return self._lastQuery

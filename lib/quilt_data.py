@@ -346,26 +346,69 @@ def src_pat_spec_tryget(
     if variables and 'variables' in spec: return spec['variables']
     return None
 
-# source query's are really just a logical distinction from source
-# patterns, so we define variables for the query functions that point back
-# to the pattern functions
-src_query_spec_tryget = src_pat_spec_tryget
-src_query_spec_get = src_pat_spec_get
-src_query_spec_set = src_pat_spec_set
-src_query_spec_create = src_pat_spec_create
-src_query_specs_create = src_pat_specs_create
-src_query_specs_add = src_pat_specs_add
+# source query section
+
+def src_query_spec_create(
+    name=None,
+    srcPatternName=None,
+    variables=None
+    ):
+    return src_pat_spec_set(
+        None,
+        srcPatternName=srcPatternName
+        name=name,
+        variables=variables)
+
+def src_query_spec_set(
+    spec,
+    name=None,
+    srcPatternName=None,
+    variables=None
+    ):
+    if spec == None: spec = {}
+    if name != None: spec_name_set(name)
+    if srcPatternName != None: spec['srcPatternName']= srcPatternName
+    if variables != None: spec['variables']= variables
+    return spec
+
+def src_query_spec_get(
+    spec,
+    name=False,
+    srcPatternName=False,
+    variables=False
+    ):
+    """Accessor for information from the spec.  Only one parameter should
+    be set to true, otherwise first paramter that evaluates positively is 
+    returned"""
+    if name: return spec_name_get(name)
+    if variables: return spec['variables']
+    if srcPatternName: return spec['srcPatternName']
+    raise Exception("Accessor not properly used")
+
+def src_query_spec_tryget(
+    spec,
+    name=False,
+    srcPatternName=False,
+    variables=False
+    ):
+    """Accessor for information from the spec.  Only one parameter should
+    be set to true, otherwise first paramter that evaluates positively is 
+    returned.  If value is not present in spec, None is returned"""
+    if name: return spec_name_tryget(name)
+    if variables and 'variables' in spec: return spec['variables']
+    if srcPatternName and 'srcPatternName' in spec: return spec['srcPatternName']
+    return None
 
 
-def src_pat_specs_create():
+def src_query_specs_create():
     return {}
 
-def src_pat_specs_add(srcPatSpecs=None,srcPatSpec):
-    if srcPatSpecs == None:
-        srcPatSpecs = src_pat_specs_create()
-    name = src_pat_spec_get(srcPatSpec,name=True)
-    srcPatSpecs[name] = srcPatSpec
-    return srcPatSpec
+def src_query_specs_add(srcQuerySpecs=None, srcQuerySpec):
+    if srcQuerySpecs == None:
+        srcQuerySpecs = src_query_specs_create()
+    name = src_query_spec_get(srcQuerySpec,name=True)
+    srcQuerySpecs[name] = srcQuerySpec
+    return srcQuerySpec
 
 def src_spec_set(spec,
     name=None,
