@@ -35,7 +35,7 @@ Classes:
             int nameServerPort,         # port for the nameserver
             string clientName           # name of the source manager on
                                         # the specified nameserver
-            string clientType           # nae of the type of the client
+            string clientType           # name of the type of the client
             )
             # acquire lock
             # determine unique name for source master (hopefuly just using the
@@ -90,22 +90,23 @@ Classes:
                     # fill the a new src query spec from src pattern and
                     #   variable information from the query
                     #   by calling fill_src_query_spec
-                    # append completed sourceQuerySpec to querySpec
+                    # append completed sourceQuerySpec to list of srcQueries
                     #   name sourceQuerySpec uniquely by combining the query
                     #   name with the source pattern name
 
                     
-            # use querySpec to create a validation  string                    
+            # use querySpec and srcQueries to create a validation  string                    
             # ask submitter to validate the source Queries
             # if submitter refuses to validate, 
                 # acuire lock remove query id from q
                 # return early
 
             # acquire lock
-                #   store querySpec state as INITIALIZED
+                #   store querySpec state as INITIALIZED, and place 
+                    # validated contnts in member data
 
             # Process query...
-            # iterate the sourceQuerySpec's in the querySpec by source
+            # iterate the sourceQuerySpec's in srcQueries list by source
                 # get proxy to the source master
                 # query the source by sending it the source query spec as
                 #   asyncronous call
@@ -115,6 +116,7 @@ Classes:
                 # aware of the unexpected error
                 # call submit's OnSubmitProblem
                 # acquire lock, remove query id from pool
+                # add query to history with an error state
 
 
 
