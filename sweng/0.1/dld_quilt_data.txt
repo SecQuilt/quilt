@@ -1,0 +1,47 @@
+quilt 0.1 quilt_data design
+---------------------------
+
+Module: quilt_data
+
+Type: Library
+
+External Dependencies:
+
+Responsibilities:
+    Provide functions for manipulating quilt compliant dictionaries.  Python
+    lets us write whatever we want into dicts, we want to use dicts because
+    they are fast and built in, but we don't want to loose control of the
+    data, so provide an interface for working with standardized dicts, which
+    we call "Specs" or specifications
+
+Inheritance and variations:
+
+    query's are basicaly patterns    
+    But there are source and regular flavors
+    
+    TODO Decide if just alising query functions to pattern functions is
+        sufficeent
+    
+
+tions
+
+    def spec_create(name)
+        """create a spec with the name of the object set"""
+
+    # Query Variable Specification functions
+    def var_spec_name_[get/set]
+    def var_spec_value_[get/set]
+    def var_spec_description_[get/set]
+    def var_spec_default_[get/set]
+
+    def var_specs_append(specs, spec)
+
+    # source Variable specification functions
+    def src_var_spec_value_[get/set]
+    def src_var_spec_description_[get/set]
+    def src_var_spec_default_[get/set]
+
+    # Query Specification functions
+    
+    
+
