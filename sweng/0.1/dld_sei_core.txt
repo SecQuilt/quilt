@@ -22,12 +22,15 @@ Functions:
     whichReturn=EXITCODE, 
     checkCall=True,
     logToPython=True,
-    stdOutLineFunc=None):
+    outObj=None
+    outFunc=None
+    ):
     """
     run the specified process and wait for completion, throw exception if
     nonzero exit occurs and checkCall is specified, log output of process 
     as specified"""
 
-    # if stdOutLineFunc is defined, call it for each line output
+    # if outFunc is defined, call it for each line output
+    # pass outObj as first argument
     # if return stdout is specified, return stdout
  

@@ -401,6 +401,22 @@ class QueryMaster:
         with self._lock:
             return pprint.pformat(self._patterns)
 
+    #REVIEW
+    def SetQueryResults(self, queryId, eventList)
+        """Append the specified eventList to the specified queryId,
+        and mark it complete, and move it to history list"""
+
+        # acquire lock
+        with self._lock:
+            # mark the query as completed in state
+            querySpec = quilt_data.query_specs_del(self._queries, queryId)
+            quilt_data.query_spec_set(querySpec, state="COMPLETED")
+            # set the results into the query spec
+            quilt_data.query_spec_set(querySpec, results=eventList)
+            # move query spec from q to history member collection
+            quilt_data.query_specs_add(self._history, querySpec)
+
+            
 def create_source_variable(srcVar, queryVarToSrcVarDict, source):
     varSpec = { 'name' : srcVar,
                 'value' : 
@@ -483,6 +499,7 @@ def create_src_query_spec(srcPatSpec, srcPatDict, varSpecs, patVarSpecs, qid):
             srcQueryVarSpecs, srcQueryVarSpec)
     
     # create and return a src query spec
+    # TODO see Issue I001, this name may not be unique
     srcPatName = quilt_data.src_pat_spec_get(srcPatSpec,name=true)
     return quilt_data.src_query_spec_create(
         name=qid + "_" + srcPatName,

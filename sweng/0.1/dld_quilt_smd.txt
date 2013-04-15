@@ -13,10 +13,9 @@ Internal Dependencies:
 External Dependenies:
     python-pyro(4)
     python-daemon
-    python-json 
 
 Prototype:
-    tojson.py, seiscripts: install_config.py
+    seiscripts: install_config.py
 
 Responsibilities:
     behave like a good Daemon process
@@ -54,9 +53,9 @@ Classes:
         def OnGrepLine(string line)
 
 
-            # assemble a jason string for an object representing an event
+            # assemble a pytho dict string for an object representing an event
             # based on eventSpec and eventSpec meta data
-            # convert that json object to a python event object
+            # convert that string to a python event spec
             # append event to list of events member
            
              

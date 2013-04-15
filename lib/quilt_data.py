@@ -212,7 +212,7 @@ def query_spec_create(
     state=None,
     patternName=None,
     notificationEmail=None,
-    sourceQueries=None,
+    results=None,
     variables=None
     ):
     return query_spec_set(
@@ -221,7 +221,7 @@ def query_spec_create(
         state=state,
         patternName=patternName,
         notificationEmail=notificationEmail,
-        sourceQueries=sourceQueries,
+        results=results,
         variables=variables)
 
 def query_spec_set( 
@@ -230,7 +230,7 @@ def query_spec_set(
     state=None,
     patternName=None,
     notificationEmail=None,
-    sourceQueries=None,
+    results=None,
     variables=None
     ):
     if spec == None: spec = {}
@@ -238,7 +238,7 @@ def query_spec_set(
     if state != None: spec['state']= state
     if patternName != None: spec['patternName']= patternName
     if notificationEmail != None: spec['notificationEmail']= patternName
-    if sourceQueries != None: spec['sourceQueries']= sourceQueries
+    if results != None: spec['results']= results
     if variables != None: spec['variables']= variables
     return spec
     
@@ -248,7 +248,7 @@ def query_spec_get(
     state=False,
     patternName=False,
     notificationEmail=False,
-    sourceQueries=False,
+    results=False,
     variables=False
     ):
     """Accessor for information from the query spec.  Only one parameter should
@@ -258,7 +258,7 @@ def query_spec_get(
     if state: return spec['state']
     if patternName: return spec['patternName']
     if notificationEmail: return spec['notificationEmail']
-    if sourceQueries: return spec['sourceQueries']
+    if results: return spec['results']
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
     
@@ -268,7 +268,7 @@ def query_spec_tryget(
     state=False,
     patternName=False,
     notificationEmail=False,
-    sourceQueries=False,
+    results=False,
     variables=False
     ):
     """Accessor for information from the query spec.  Only one parameter should
@@ -278,9 +278,9 @@ def query_spec_tryget(
     if state and 'state' in spec: return spec['state']
     if patternName and 'patternName' in spec: return spec['patternName']
     if notificationEmail and 'notificationEmail' in spec: return spec['notificationEmail']
-    if sourceQueries and 'sourceQueries' in spec: return spec['sourceQueries']
+    if results and 'results' in spec: return spec['results']
     if variables and 'variables' in spec: return spec['variables']
-    raise Exception("Accessor not properly used")
+    return None
     
 
 query_spec_var_get = pat_spec_var_get
@@ -345,6 +345,12 @@ def src_pat_spec_tryget(
     if name: return spec_name_tryget(name)
     if variables and 'variables' in spec: return spec['variables']
     return None
+
+def src_pat_specs_create():
+    return {}
+
+def src_pat_specs_get(srcPatSpecs, patName):
+    return srcPatSpecs[patName]
 
 # source query section
 

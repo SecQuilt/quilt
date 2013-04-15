@@ -4,6 +4,8 @@ import sys
 import logging
 import quilt_core
 import argparse
+from string import Template
+import sei_core
 
 class SourceManager(quilt_core.QueryMasterClient):
 
@@ -15,6 +17,8 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._args = args
         self._sourceName = sourceName
         self._sourceSpec = sourceSpec
+        self._sourceResults = []
+        self._events = []
 
     #REVIEW
     def Query(self, queryId, sourceQuerySpec):
@@ -31,24 +35,45 @@ class SourceManager(quilt_core.QueryMasterClient):
 
             # get the sourcePatternSpec from the pattern name in the
             #   sourceQuerySpec
+            # pattern spec should be read only and safe to access without
+            #   a lock
+            srcPatSpecs = quilt_data.src_spec_get(sourcePatterns=True)
+            srcPatSpec = quilt_data.src_pat_specs_get(srcPatSpecs, 
+                quilt_data.src_query_spec_get(sourceQuerySpec, name=True))
+    
+            # get the variables in the query
+            srcQueryVars = quilt_data.src_query_spec_get(sourceQuerySpec, 
+                variables=True)
+            
+            # iterate src query variables map, create a somple var name to
+            #   var value map
+            varNameValueDict = {}
+            for srcVarName, srcVarSpec in srcQueryVars:
+                varNameValueDict[srcVarName] = quilt_data.var_spec_get(
+                    srcVarSpec, value=True)
 
             # create cmd line for grep
             # use the template in the sourcePatternSpec, and use the values
             #   provided for the variables
-            #   use string.Template as per install_config.py example
+            template = Template(srcPatSpec['template'])
+            cmdline = template.safe_substitute(varNameValueDict)
 
             # use run_process to execute grep, give callback per line
             #   processing function
+            sei_core.run_process(cmdline, shell=True,
+                whichReturn=sei_core.EXITCODE,outObj=self,outFunc=OnGrepLine)
 
             # Set query result events list in query master using query id
+            _qm.SetQueryResults(queryId, self._sourceResults)
         
-        def OnGrepLine(string line)
-
+        def OnGrepLine(self, line)
 
             # assemble a jason string for an object representing an event
             # based on eventSpec and eventSpec meta data
-            # convert that json object to a python event object
+            # convert that string to a python event object
             # append event to list of events member
+            #TODO fix security problem
+            self._events.append(eval(line))
            
              
     def GetLastQuery(self):

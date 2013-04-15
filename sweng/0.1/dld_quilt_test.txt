@@ -57,15 +57,15 @@ name : 'test'
 smd.d/syslog.conf
 [syslog]
 
-# command will output event spec in json attributes
+# command will output event spec in object parseable string format
 # prototype: see tojson.sh, tojson.py, cfgproto.py
-grepOutputToJson : sed -e 's,",\\\",g' -e 's#\(^.*[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\)\( \)\(.*\)#"timestamp":"\1","content":"\3"#'
+grepOutputToObjStr : sed -e 's,",\\\",g' -e 's#\(^.*[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\)\( \)\(.*\)#"timestamp":"\1","content":"\3"#' -e 's#.*#{\0}#g' 
 sourceSpec : {
     sourcePatterns : {
         "grep"  :   {
 
             # the template for the pattern     
-            'template' : "grep $OPTIONS | %(grepOutputToJson)s" ,
+            'template' : "grep $OPTIONS | %(grepOutputToObjStr)s" ,
             
 
             'variables' : {
