@@ -87,7 +87,7 @@ class QuiltConfig:
             if isfile(join(smdcfgdir,f)) ]
 
         # read all sections from all config file sin the smd directory
-        names = which == names
+        names = which == 'names'
 
         if names:
             smds = []

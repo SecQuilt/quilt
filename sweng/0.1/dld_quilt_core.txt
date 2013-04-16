@@ -78,11 +78,6 @@ Classes:
             #   store that dict with the section name in spec dict
             #   return spec dict
             
-        def GetSourcePatterns( self, sourceMgrName)
-            """
-            Get the source patterns defined for the specified source manager.
-            The return is a sourcePatternSpec dictionary
-            """
 
 
     class QueryMasterClient : Pyro.core.SynchronizedObjBase

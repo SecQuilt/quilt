@@ -19,29 +19,54 @@ Inheritance and variations:
     query's are basicaly patterns    
     But there are source and regular flavors
     
-    TODO Decide if just alising query functions to pattern functions is
-        sufficeent
+Collections:
+
+    all *_spec are objects, and all *_specs are collections
+
+Functions:
+
+    Object accessors:
+        ${object}_[get/set/create/tryget/del]
+
+    These functions (named by the abreviations) are available for the 
+    following objects:
+
+General Objects:
+    var_spec:   Variable Specification
+        Variable specifications are used to define parameters and arguments
+        to patterns and queries.  They are not "subtyped" for each use but
+        any object containing variables uses them 
+
+Top Level Objects:
+    pat_spec:   Pattern Specification
+        Patterns are top level templates for queries.  You can instantiate
+        a pattern a create a query that will gather results from multiple
+        sources
+
+    src_var_mapping_spec:    Source Variable Mapping Specification
+        pat_spec's have a collection of these.  They provide instruction to
+        the system as to which variables in the pattern specification map to
+        which source variables in a source pattern
+
+    query_spec: Query Specification
+        Queries are instantiated patterns.  They have values set from the 
+        usert that completely fill out a pattern, providing enough
+        information to then query multiple sources.
+
+Source Level Objects:
+    src_pat_spec:   Source Pattern Specification
+        Source patterns provide information to the source manager about a
+        set of data that can be retrieved from that source
+
+    src_query_spec: Source Query Specification
+        Source Queries are instantiated Source Patterns.  They will have all
+        variables needed by the source pattern, and those variables will have
+        values provided
     
-
-tions
-
-    def spec_create(name)
-        """create a spec with the name of the object set"""
-
-    # Query Variable Specification functions
-    def var_spec_name_[get/set]
-    def var_spec_value_[get/set]
-    def var_spec_description_[get/set]
-    def var_spec_default_[get/set]
-
-    def var_specs_append(specs, spec)
-
-    # source Variable specification functions
-    def src_var_spec_value_[get/set]
-    def src_var_spec_description_[get/set]
-    def src_var_spec_default_[get/set]
-
-    # Query Specification functions
+    src_spec:   Source Specification
+        Source Specification's define details about the source, such as
+        which patterns are available for the source
+    
     
     
 

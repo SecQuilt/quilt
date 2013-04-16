@@ -4,6 +4,10 @@ import os
 import logging
 import pprint
 
+STATE_COMPLETED="COMPLETED"
+STATE_INITIALIZED="INITIALIZED"
+STATE_UNINITIALIZED="UNINITIALIZED"
+STATE_ERROR="ERROR"
 
 # Generic spec functions
 def spec_set(spec, name=None):
@@ -12,9 +16,6 @@ def spec_set(spec, name=None):
     if name != None: spec['name'] = name
     return spec
  
-def spec_create( name=None ):
-    return spec_set(None,name=name)
-    
 def spec_name_tryget(spec):
     if 'name' in spec:
         return spec['name']
@@ -28,12 +29,12 @@ def spec_name_set(spec,name):
     return spec_set(spec,name=name)
 
 # Variable Spec functions
-    return spec_create(name)
 
 def var_spec_get( spec,
     name=False,
     value=False,
     sourceMapping=False,
+    description=False,
     default=False
     ):
     """Accessor for information from the variable spec.  Only one parameter 
@@ -42,6 +43,7 @@ def var_spec_get( spec,
     if name: return spec_name_get(name)
     if value: return spec['value']
     if sourceMapping: return spec['sourceMapping']
+    if description: return spec['description']
     if default: return spec['default']
     raise Exception("Accessor not properly used")
 
@@ -49,6 +51,7 @@ def var_spec_tryget( spec,
     name=False,
     value=False,
     sourceMapping=False,
+    description=False,
     default=False
     ):
     """Accessor for information from the variable spec.  Only one parameter 
@@ -57,6 +60,7 @@ def var_spec_tryget( spec,
     if name: return spec_name_tryget(name) 
     if value and 'value' in spec: return spec['value'] 
     if sourceMapping and 'sourceMapping' in spec: return spec['sourceMapping'] 
+    if description and 'description' in spec: return spec['description'] 
     if default and 'default' in spec: return spec['default']
     return None
 
@@ -64,6 +68,7 @@ def var_spec_set( spec,
     name=None,
     value=None,
     sourceMapping=None,
+    description=None,
     default=None
     ):
     if spec == None:
@@ -71,6 +76,7 @@ def var_spec_set( spec,
     if name != None: spec_name_set(name)
     if value != None: spec['value']= value
     if sourceMapping != None: spec['sourceMapping']= sourceMapping
+    if description != None: spec['description']= description
     if default != None: spec['default']= default
     return spec
 
@@ -78,6 +84,7 @@ def var_spec_create(name):
     name=None,
     value=None,
     sourceMapping=sourceMapping,
+    description=description,
     default=default
     ):
     return var_spec_set(
@@ -85,19 +92,17 @@ def var_spec_create(name):
         name=name,
         value=value,
         sourceMapping=sourceMapping,
+        description=description,
         default=default
         )
     
-def var_spec_name_get(spec):
-    return spec_name_get(spec)
-
 def var_specs_create():
     return {}
 
 def var_specs_add(specs, varspec):
     if specs == None:
         specs = var_specs_create()
-    specs[var_spec_name_get(varspec)] = varspec
+    specs[spec_name_get(varspec)] = varspec
     return specs
 
 def var_specs_get(specs, varName):
@@ -186,8 +191,6 @@ def pat_spec_var_get( spec, varName):
     return var_specs_get(pat_spec_vars_get(spec), varName)
 
     
-def var_spec_name_get(spec):
-    return spec_name_get(spec)
     
 def pat_specs_create():
     return {}
@@ -237,7 +240,6 @@ def query_spec_set(
     if name != None: spec_name_set(name)
     if state != None: spec['state']= state
     if patternName != None: spec['patternName']= patternName
-    if notificationEmail != None: spec['notificationEmail']= patternName
     if results != None: spec['results']= results
     if variables != None: spec['variables']= variables
     return spec
@@ -466,6 +468,7 @@ def src_spec_create(cfgStr=None,cfgSection=None):
         for name,val in cfgSrcPatVarSpecs:
             # lazy user only specified description, convert to a variable spec
             if type(val)==str:
+!!!!!!!!!!!!!!!!!!!!!!!
                 vspec = var_specs_create( name=name, description=val)
                 var_specs_add(cfgSrcPatVarSpecs, vspec)
         return cfgSrcSpec

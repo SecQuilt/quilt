@@ -307,7 +307,7 @@ class QueryMaster:
                 # store querySpec state as INITIALIZED, and place 
                 # validated contnts in member data
                 quilt_data.query_spec_set(querySpec,
-                    state='initialized')
+                    state=quilt_data.STATE_INITIALIZED)
                 quilt_data.query_specs_add(self._queries,
                     querySpec)
 
@@ -344,7 +344,8 @@ class QueryMaster:
                 # acquire lock, remove query id from pool
                 querySpec = quilt_data.query_specs_del(self._queries, qid)
                 # add it to the history with an error state
-                quilt_data.query_spec_set(querySpec, state="error")
+                quilt_data.query_spec_set(querySpec,
+                    state=quilt_data.STATE_ERROR)
                 quilt_data.query_specs_add(self._history, querySpec)
             except:
                 logging.error("Failed to move errored query to history: " + 
@@ -410,7 +411,8 @@ class QueryMaster:
         with self._lock:
             # mark the query as completed in state
             querySpec = quilt_data.query_specs_del(self._queries, queryId)
-            quilt_data.query_spec_set(querySpec, state="COMPLETED")
+            quilt_data.query_spec_set(querySpec,
+                state=quilt_data.STATE_COMPLETED)
             # set the results into the query spec
             quilt_data.query_spec_set(querySpec, results=eventList)
             # move query spec from q to history member collection

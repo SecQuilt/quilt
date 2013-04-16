@@ -59,9 +59,8 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             # submitter to exit
             self.SetProcesssEvents(False)
             
-    #REVIEW
     def OnRegisterEnd(self):
-        """After registration is complete we submit the query to the 
+        """After registration is complete submit the query to the 
         query master"""
         
         # create a partial query spec dictionary
@@ -69,8 +68,8 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         #   set notification address in spec
         #   set state as UNINITIALIZED
         querySpec = quilt_data.query_spec_create(
-            name='uninitialized_' + self._args.pattern),
-            state = 'uninitialized',
+            name='new ' + self._args.pattern,
+            state = quilt_data.STATE_UNINITIALIZED,
             patternName = self._args.pattern,
             notificationEmail = self._args.notifcation_email )
         
@@ -81,8 +80,8 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
                 vname = v[0]
                 vval = v[1]
                 quilt_data.var_specs_add( variables,
-                    quilt_data.var_spec_create( name=vname, value=vval)
-            quilt_data.query_spec_set(variables=variables)
+                    quilt_data.var_spec_create( name=vname, value=vval))
+            quilt_data.query_spec_set(querySpec, variables=variables)
             
         logging.info('Submiting query: ' + pprint.pformat(querySpec))
 
@@ -130,7 +129,6 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         with self._lock:
             return self._processEvents
 
-    #REVIEW
     def OnSubmitProblem(self, queryId, msg):
         """Recieve a message from the query master about a problem with
         the query submission"""
@@ -166,7 +164,7 @@ def main(argv):
         help="comma seperated list of emails to supply with notifcations")
     parser.add_argument('-y','--confirm-query',action='store_true',
         default=False, help="whether to automatically confirm the query")
-    parser.add_argument('-v','--variable', nargs=2, action='append',
+    parser.add_argument('-v','--variable', nargs='2', action='append',
         help="Arguments used to provide values to the variables in a pattern")
 
     # parse command line

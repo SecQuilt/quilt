@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#REVIEW
 import os
 import sys
 import logging
@@ -11,6 +10,7 @@ import quilt_core
 import time
 import query_master
 import random
+import quilt_data
 
 class BasicSourceTestcase(unittest.TestCase):
 
@@ -40,7 +40,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
         # check it shows good state (completed)
-        self.assertTrue("COMPLETE" in o)
+        self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
     def test_status(self):
         # check for the query pattern
@@ -61,7 +61,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
         # check it shows good state (completed)
-        self.assertTrue("COMPLETE" in o)
+        self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   text "Occurs_1_time"
         #   assure only one result
         occurences = 
@@ -81,7 +81,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
         # check it shows good state (completed)
-        self.assertTrue("COMPLETE" in o)
+        self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   text "Occurs_3_times"
         #   assure only three results
         occurences = 
@@ -100,7 +100,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
         # check it shows good state (completed)
-        self.assertTrue("COMPLETE" in o)
+        self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   text "Occurs_no_times"
         #   assure no results
         occurences = 
@@ -118,12 +118,13 @@ class BasicSourceTestcase(unittest.TestCase):
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
         # check it shows good state (completed)
-        self.assertTrue("COMPLETE" in o)
+        self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   assure there are many results
         occurences = 
             len([m.start() for m in re.finditer('\n', o)])
         self.assertTrue(occurences > 10)
 
 if __name__ == "__main__":
-    quilt_test_core.unittest_main_helper("Run the most basic of test cases",sys.argv)
+    quilt_test_core.unittest_main_helper(
+        "Run integration test for one basic source",sys.argv)
     unittest.main()
