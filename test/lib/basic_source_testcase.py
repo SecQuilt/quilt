@@ -18,7 +18,7 @@ class BasicSourceTestcase(unittest.TestCase):
         """Setup the query master with some patterns used by the tests"""
         o = quilt_test_core.call_quilt_script('quilt_define.py',[
             '-n', 'test_pattern',
-            '-v', 'SEARCHSTRING' 'the Search string'
+            '-v', 'SEARCHSTRING', 'the Search string',
             '-m', 'SEARCHSTRING', 'syslog', 'grep', 'OPTIONS'])
         logging.debug("Defined test_pattern")
 

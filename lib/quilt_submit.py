@@ -163,7 +163,7 @@ def main(argv):
         help="comma seperated list of emails to supply with notifcations")
     parser.add_argument('-y','--confirm-query',action='store_true',
         default=False, help="whether to automatically confirm the query")
-    parser.add_argument('-v','--variable', nargs='2', action='append',
+    parser.add_argument('-v','--variable', nargs=2, action='append',
         help="Arguments used to provide values to the variables in a pattern")
 
     # parse command line

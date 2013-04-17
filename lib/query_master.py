@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import logging
 import Pyro4
 import threading
@@ -121,25 +122,33 @@ class QueryMaster:
         """Define the specified pattern in the query master, return
         the finalized (unique) name of the pattern"""
 
-        # determine unique name for the pattern based off suggested name
-        #   in the spec
-        rootName = quilt_data.pat_spec_tryget(patternSpec, name=True)
-        if rootName == None:
-            rootName = "pattern"
-        patternName = rootName
-        i = 1;
+        try:
+            # determine unique name for the pattern based off suggested name
+            #   in the spec
+            rootName = quilt_data.pat_spec_tryget(patternSpec, name=True)
+            logging.info("%%%%%%%%%%%%%%%" + str(type(rootName)) + ":" + str(rootName))
+            if rootName == None:
+                rootName = "pattern"
+            patternName = rootName
+            i = 1;
 
-        with self._lock:
-            while patternName in self._patterns:
-                patternName = rootName + str(i)
-                i = i + 1
+            with self._lock:
+                while patternName in self._patterns.keys():
+                    patternName = '_'.join([rootName,str(i)])
+                    i = i + 1
 
-            # store pattern spec in the member data
-            quilt_data.pat_spec_set(patternSpec, name=patternName)
-            quilt_data.pat_specs_add(self._patterns, patternSpec)
-    
-        # return the unique name for the pattern
-        return patternName
+                # store pattern spec in the member data
+                logging.info("@@@@@@@@@@@@@@@@@" + str(type(patternName)))
+                quilt_data.pat_spec_set(patternSpec, name=patternName)
+                quilt_data.pat_specs_add(self._patterns, patternSpec)
+                
+        
+            # return the unique name for the pattern
+            return patternName
+
+        except Exception, e:
+            logging.exception(e)
+            raise
             
             
     def Query(self, submitterNameKey, querySpec):

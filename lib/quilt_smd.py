@@ -49,7 +49,7 @@ class SourceManager(quilt_core.QueryMasterClient):
             # iterate src query variables map, create a simple var name to
             #   var value map
             varNameValueDict = {}
-            for srcVarName, srcVarSpec in srcQueryVars:
+            for srcVarName, srcVarSpec in srcQueryVars.items():
                 varNameValueDict[srcVarName] = quilt_data.var_spec_get(
                     srcVarSpec, value=True)
 
@@ -57,7 +57,7 @@ class SourceManager(quilt_core.QueryMasterClient):
             # use the template in the sourcePatternSpec, and use the values
             #   provided for the variables, and environment variables
             replacments = os.environ.copy()
-            for k,v in varNameValueDict:
+            for k,v in varNameValueDict.items():
                 replacments[k] = v
             template = Template(replacments)
             cmdline = template.safe_substitute(varNameValueDict)

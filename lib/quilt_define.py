@@ -23,7 +23,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         this pattern with the query master"""
 
         # create the spec with it's name
-        patternSpec=quilt_data.pat_spec_create(name=self._args.name)
+        patternSpec=quilt_data.pat_spec_create(name=self._args.name[0])
 
         # create the specs for the variables
         variables=None
@@ -57,7 +57,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                 srcPat = m[2]
                 srcVar = m[3]
 
-                vSpec = quilt_data.var_specs_get(varName)
+                vSpec = quilt_data.var_specs_get(variables, varName)
         
                 # query variables are allowed to map to multiple
                 # source variables.  Initalize a blank list if it isn't present
@@ -104,7 +104,7 @@ def main(argv):
         """,
         argv)
 
-    parser.add_argument('-n','--name', nargs='1',
+    parser.add_argument('-n','--name', nargs=1,
         help="suggested name of the pattern")
 
     parser.add_argument('-v','--variable', nargs='+', action='append',
@@ -113,7 +113,7 @@ def main(argv):
             purpose of the variable, and the oprional default value of the 
             variable""")
 
-    parser.add_argument('-m','--mapping', nargs='4', action='append',
+    parser.add_argument('-m','--mapping', nargs=4, action='append',
         help="""VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE  Provide 
             mapping from a pattern variable to a source variable.
             pattern variables are described with the -v, --variable command.

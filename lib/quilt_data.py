@@ -39,7 +39,7 @@ def var_spec_get( spec,
     """Accessor for information from the variable spec.  Only one parameter 
     should be set to true, otherwise first paramter that evaluates positively 
     is returned"""
-    if name: return spec_name_get(name)
+    if name: return spec_name_get(spec)
     if value: return spec['value']
     if sourceMapping: return spec['sourceMapping']
     if description: return spec['description']
@@ -72,7 +72,7 @@ def var_spec_set( spec,
     ):
     if spec == None:
         spec = {}
-    if name != None: spec_name_set(name)
+    if name != None: spec_name_set(spec, name)
     if value != None: spec['value']= value
     if sourceMapping != None: spec['sourceMapping']= sourceMapping
     if description != None: spec['description']= description
@@ -105,7 +105,7 @@ def var_specs_add(specs, varspec):
     return specs
 
 def var_specs_get(specs, varName):
-    return vars[varName]
+    return specs[varName]
 
 
 # Pattern Spec functions
@@ -130,7 +130,7 @@ def src_var_mapping_spec_set(
     sourceVariable=None
     ):
     if spec == None: spec = {}
-    if name != None: spec_name_set(name)
+    if name != None: spec_name_set(spec, name)
     if sourceName != None: spec['sourceName'] = sourceName
     if sourcePattern != None: spec['sourcePattern'] = sourcePattern
     if sourceVariable != None: spec['sourceVariable'] = sourceVariable
@@ -162,16 +162,6 @@ def src_var_mapping_specs_add(mappingSpecs, mappingSpec):
     return mappingSpecs
     
 
-def pat_spec_create(
-    name=None,
-    mappings=None,
-    variables=None
-    ):
-    return src_pat_spec_set(
-        None,
-        name=name,
-        mappings=mappings,
-        variables=variables)
 
 def pat_spec_set(
     spec,
@@ -180,10 +170,21 @@ def pat_spec_set(
     variables=None
     ):
     if spec == None: spec = {}
-    if name != None: spec_name_set(name)
+    if name != None: spec_name_set(spec, name)
     if mappings != None: spec['mappings'] = mappings
     if variables != None: spec['variables']= variables
     return spec
+
+def pat_spec_create(
+    name=None,
+    mappings=None,
+    variables=None
+    ):
+    return pat_spec_set(
+        None,
+        name=name,
+        mappings=mappings,
+        variables=variables)
 
 def pat_spec_get(
     spec,
@@ -195,7 +196,7 @@ def pat_spec_get(
     Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned"""
-    if name: return spec_name_get(name)
+    if name: return spec_name_get(spec)
     if mappings: return spec['mappings'] 
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
@@ -210,7 +211,7 @@ def pat_spec_tryget(
     Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If no parameter evaluates to True, None is returned"""
-    if name: return spec_name_tryget(name)
+    if name: return spec_name_tryget(spec)
     if mappings and 'mappings' in spec: return spec['mappings'] 
     if variables and 'variables' in spec: return spec['variables']
     return None
@@ -225,6 +226,8 @@ def pat_specs_create():
 def pat_specs_add(patSpecs, patSpec):
     if patSpecs == None:
         patSpecs = pat_specs_create()
+    name = pat_spec_get(patSpec,name=True)
+    logging.info("!!!!!!!!!!!!!" + str(type(name)))
     patSpecs[pat_spec_get(patSpec,name=True)] = patSpec
     return patSpecs
     
@@ -247,7 +250,7 @@ def query_spec_set(
     variables=None
     ):
     if spec == None: spec = {}
-    if name != None: spec_name_set(name)
+    if name != None: spec_name_set(spec, name)
     if state != None: spec['state']= state
     if patternName != None: spec['patternName']= patternName
     if results != None: spec['results']= results
@@ -284,7 +287,7 @@ def query_spec_get(
     """Accessor for information from the query spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned"""
-    if name: return spec_name_get(name)
+    if name: return spec_name_get(spec)
     if state: return spec['state']
     if patternName: return spec['patternName']
     if notificationEmail: return spec['notificationEmail']
@@ -304,7 +307,7 @@ def query_spec_tryget(
     """Accessor for information from the query spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If value is not present in spec None is returned"""
-    if name: return spec_name_tryget(name)
+    if name: return spec_name_tryget(spec)
     if state and 'state' in spec: return spec['state']
     if patternName and 'patternName' in spec: return spec['patternName']
     if notificationEmail and 'notificationEmail' in spec: return spec['notificationEmail']
@@ -340,7 +343,7 @@ def src_pat_spec_set(
     variables=None
     ):
     if spec == None: spec = {}
-    if name != None: spec_name_set(name)
+    if name != None: spec_name_set(spec, name)
     if variables != None: spec['variables']= variables
     return spec
 
@@ -362,7 +365,7 @@ def src_pat_spec_get(
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned"""
-    if name: return spec_name_get(name)
+    if name: return spec_name_get(spec)
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
 
@@ -374,7 +377,7 @@ def src_pat_spec_tryget(
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If value is not present in spec, None is returned"""
-    if name: return spec_name_tryget(name)
+    if name: return spec_name_tryget(spec)
     if variables and 'variables' in spec: return spec['variables']
     return None
 
@@ -404,7 +407,7 @@ def src_query_spec_set(
     variables=None
     ):
     if spec == None: spec = {}
-    if name != None: spec_name_set(name)
+    if name != None: spec_name_set(spec, name)
     if srcPatternName != None: spec['srcPatternName']= srcPatternName
     if variables != None: spec['variables']= variables
     return spec
@@ -418,7 +421,7 @@ def src_query_spec_get(
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned"""
-    if name: return spec_name_get(name)
+    if name: return spec_name_get(spec)
     if variables: return spec['variables']
     if srcPatternName: return spec['srcPatternName']
     raise Exception("Accessor not properly used")
@@ -432,7 +435,7 @@ def src_query_spec_tryget(
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If value is not present in spec, None is returned"""
-    if name: return spec_name_tryget(name)
+    if name: return spec_name_tryget(spec)
     if srcPatternName and 'srcPatternName' in spec: return spec['srcPatternName']
     if variables and 'variables' in spec: return spec['variables']
     return None
@@ -493,13 +496,17 @@ def src_spec_create(cfgStr=None, cfgSection=None):
             # lazy user did not provide name, use the config section as name
             src_spec_set(cfgSrcSpec, name=cfgSection)
         
-        cfgSrcPatSpec = src_spec_get(cfgSrcSpec,sourcePatterns=True)
-        cfgSrcPatVarSpecs = src_pat_spec_get(cfgSrcPatSpec,variables=True)
-        for name,val in cfgSrcPatVarSpecs:
-            # lazy user only specified description, convert to a variable spec
-            if type(val)==str:
-                vspec = var_specs_create( name=name, description=val)
-                var_specs_add(cfgSrcPatVarSpecs, vspec)
+        cfgSrcPatSpecs = src_spec_get(cfgSrcSpec,sourcePatterns=True)
+        for srcPatName, srcPatSpec in cfgSrcPatSpecs.items():
+            cfgSrcPatVarSpecs = src_pat_spec_get(srcPatSpec,variables=True)
+            for name,val in cfgSrcPatVarSpecs.items():
+                # lazy user only specified description, convert to a variable spec
+                if type(val)==str:
+                    vspec = var_spec_create( name=name, description=val)
+            
+                    logging.info("Variable created: " + str(vspec))
+
+                    var_specs_add(cfgSrcPatVarSpecs, vspec)
         return cfgSrcSpec
     return {}
 
