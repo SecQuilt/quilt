@@ -144,7 +144,6 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         
 
 
-#REVIEW
 def main(argv):
     
     # setup command line interface

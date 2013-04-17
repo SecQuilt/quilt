@@ -70,21 +70,35 @@ class SourceManager(quilt_core.QueryMasterClient):
 
             # Set query result events list in query master using query id
             _qm.SetQueryResults(queryId, self._sourceResults)
-        
-        def OnGrepLine(self, line)
+     
+    # catch exception! 
+        except:
+            error = sys.exc_info()[0] 
+            try:
+                _qm.OnSourceQueryError(
+                    self._remotename, queryId, error)
+            except:
+                error2 = sys.exc_info()[0] 
+                logging.error("Unable to send source query error to " +
+                    "query master")
+                logging.error(str(error2))
+            finally:
+                logging.error("Failed to execute source query")
+                logging.error(str(error))
+                
 
-            # assemble a jason string for an object representing an event
-            # based on eventSpec and eventSpec meta data
-            # convert that string to a python event object
-            # append event to list of events member
-            #TODO fix security problem
-            self._sourceResults.append(eval(line))
-           
              
     def GetLastQuery(self):
         with self._lock:
             return self._lastQuery
         
+    def OnGrepLine(self, line):
+        # assemble a jason string for an object representing an event
+        # based on eventSpec and eventSpec meta data
+        # convert that string to a python event object
+        # append event to list of events member
+        #TODO fix security problem
+        self._sourceResults.append(eval(line))
 
     def GetType(self):
         logging.debug("Returning SourceManager client type")

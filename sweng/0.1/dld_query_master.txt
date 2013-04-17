@@ -181,10 +181,11 @@ Classes:
             # set the results into the query spec
             
         void OnSourceQueryError(
-            Exception e)
+            queryid, Exception)
             """Called when an asyncronys source query produces an exeption"""
 
             # log the execption 
+            # remove query from q and place in history with error state
 
         # format a string with information about the specified query
         # from the history, or provide stats for all if no queryID is 

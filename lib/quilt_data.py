@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#REVIEW
 import os
 import logging
 import pprint
@@ -80,12 +79,12 @@ def var_spec_set( spec,
     if default != None: spec['default']= default
     return spec
 
-def var_spec_create(name):
+def var_spec_create(
     name=None,
     value=None,
-    sourceMapping=sourceMapping,
-    description=description,
-    default=default
+    sourceMapping=None,
+    description=None,
+    default=None
     ):
     return var_spec_set(
         None,
@@ -102,7 +101,7 @@ def var_specs_create():
 def var_specs_add(specs, varspec):
     if specs == None:
         specs = var_specs_create()
-    specs[spec_name_get(varspec)] = varspec
+    specs[var_spec_get(varspec,name=True)] = varspec
     return specs
 
 def var_specs_get(specs, varName):
@@ -147,7 +146,7 @@ def src_var_mapping_spec_get(
     """Accessor for information from the query spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned"""
-    if sourceName: return spec_name_get(spec)
+    if name: return spec_name_get(spec)
     if sourceName: return spec['sourceName']
     if sourcePattern: return spec['sourcePattern']
     if sourceVariable: return spec['sourceVariable']
@@ -156,8 +155,8 @@ def src_var_mapping_spec_get(
 def src_var_mapping_specs_create():
     return []
 
-def src_var_mapping_specs_add(mappingSpecs=None, mappingSpec):
-    if mappingSpecs = None:
+def src_var_mapping_specs_add(mappingSpecs, mappingSpec):
+    if mappingSpecs == None:
         mappingSpecs = src_var_mapping_specs_create()
     mappingSpecs.append(mappingSpec)
     return mappingSpecs
@@ -186,11 +185,39 @@ def pat_spec_set(
     if variables != None: spec['variables']= variables
     return spec
 
+def pat_spec_get(
+    spec,
+    name=False,
+    mappings=False,
+    variables=False
+    ):
+    """Accessor for information from the pattern spec.  
+    Only one parameter should
+    be set to true, otherwise first paramter that evaluates positively is 
+    returned"""
+    if name: return spec_name_get(name)
+    if mappings: return spec['mappings'] 
+    if variables: return spec['variables']
+    raise Exception("Accessor not properly used")
 
+def pat_spec_tryget(
+    spec,
+    name=False,
+    mappings=False,
+    variables=False
+    ):
+    """Accessor for information from the pattern spec.  
+    Only one parameter should
+    be set to true, otherwise first paramter that evaluates positively is 
+    returned.  If no parameter evaluates to True, None is returned"""
+    if name: return spec_name_tryget(name)
+    if mappings and 'mappings' in spec: return spec['mappings'] 
+    if variables and 'variables' in spec: return spec['variables']
+    return None
+
+# shortcut function dereferences variables for you
 def pat_spec_var_get( spec, varName):
     return var_specs_get(pat_spec_vars_get(spec), varName)
-
-    
     
 def pat_specs_create():
     return {}
@@ -198,7 +225,7 @@ def pat_specs_create():
 def pat_specs_add(patSpecs, patSpec):
     if patSpecs == None:
         patSpecs = pat_specs_create()
-    patSpecs[pat_spec_name_get(patSpec)] = patSpec
+    patSpecs[pat_spec_get(patSpec,name=True)] = patSpec
     return patSpecs
     
 def pat_specs_get(patSpecs, patName):
@@ -209,6 +236,23 @@ def pat_specs_get(patSpecs, patName):
 # Query's are basically specialized patterns, but I am not trying to reinvent
 # inheritance here.  So all fields are just duplicated rather than trying to 
 # do some complicated chaining to pattern_spec funcitons.
+
+def query_spec_set( 
+    spec,
+    name=None,
+    state=None,
+    patternName=None,
+    notificationEmail=None,
+    results=None,
+    variables=None
+    ):
+    if spec == None: spec = {}
+    if name != None: spec_name_set(name)
+    if state != None: spec['state']= state
+    if patternName != None: spec['patternName']= patternName
+    if results != None: spec['results']= results
+    if variables != None: spec['variables']= variables
+    return spec
 
 def query_spec_create(
     name=None,
@@ -227,22 +271,6 @@ def query_spec_create(
         results=results,
         variables=variables)
 
-def query_spec_set( 
-    spec,
-    name=None,
-    state=None,
-    patternName=None,
-    notificationEmail=None,
-    results=None,
-    variables=None
-    ):
-    if spec == None: spec = {}
-    if name != None: spec_name_set(name)
-    if state != None: spec['state']= state
-    if patternName != None: spec['patternName']= patternName
-    if results != None: spec['results']= results
-    if variables != None: spec['variables']= variables
-    return spec
     
 def query_spec_get( 
     spec,
@@ -290,7 +318,7 @@ query_spec_var_get = pat_spec_var_get
 def query_specs_create():
     return {}
 
-def query_specs_add(querySpecs, querySpec)
+def query_specs_add(querySpecs, querySpec):
     if querySpecs == None:
         querySpecs = query_specs_create()
     querySpecs[query_spec_get(querySpec,name=True)] = querySpec
@@ -305,14 +333,6 @@ def query_specs_del(querySpecs, querySpecName):
     return spec
 
 # Source Pattern Spec functions
-def src_pat_spec_create(
-    name=None,
-    variables=None
-    ):
-    return src_pat_spec_set(
-        None,
-        name=name,
-        variables=variables)
 
 def src_pat_spec_set(
     spec,
@@ -323,6 +343,16 @@ def src_pat_spec_set(
     if name != None: spec_name_set(name)
     if variables != None: spec['variables']= variables
     return spec
+
+def src_pat_spec_create(
+    name=None,
+    variables=None
+    ):
+    return src_pat_spec_set(
+        None,
+        name=name,
+        variables=variables)
+
 
 def src_pat_spec_get(
     spec,
@@ -363,8 +393,8 @@ def src_query_spec_create(
     ):
     return src_pat_spec_set(
         None,
-        srcPatternName=srcPatternName
         name=name,
+        srcPatternName=srcPatternName,
         variables=variables)
 
 def src_query_spec_set(
@@ -403,15 +433,15 @@ def src_query_spec_tryget(
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If value is not present in spec, None is returned"""
     if name: return spec_name_tryget(name)
-    if variables and 'variables' in spec: return spec['variables']
     if srcPatternName and 'srcPatternName' in spec: return spec['srcPatternName']
+    if variables and 'variables' in spec: return spec['variables']
     return None
 
 
 def src_query_specs_create():
     return {}
 
-def src_query_specs_add(srcQuerySpecs=None, srcQuerySpec):
+def src_query_specs_add(srcQuerySpecs, srcQuerySpec):
     if srcQuerySpecs == None:
         srcQuerySpecs = src_query_specs_create()
     name = src_query_spec_get(srcQuerySpec,name=True)
@@ -451,24 +481,23 @@ def src_spec_tryget(spec,
     if sourcePatterns and 'sourcePatterns' in spec: return spec['sourcePatterns']
     return None
     
-def src_spec_create(cfgStr=None,cfgSection=None):
-    if cfgStr:
+def src_spec_create(cfgStr=None, cfgSection=None):
+    if cfgStr != None:
         # we allow the user certain shortcuts when defining a spec,
         # we now go through the spec they defined and translate the
         # user input to the official sourceSpec schema
         #TODO harden against eval
         cfgSrcSpec = eval(cfgStr)
 
-        if src_spec_tryget(name=True) == None:
+        if src_spec_tryget(cfgSrcSpec, name=True) == None:
             # lazy user did not provide name, use the config section as name
-            src_spec_set(name=cfgSection)
+            src_spec_set(cfgSrcSpec, name=cfgSection)
         
         cfgSrcPatSpec = src_spec_get(cfgSrcSpec,sourcePatterns=True)
         cfgSrcPatVarSpecs = src_pat_spec_get(cfgSrcPatSpec,variables=True)
         for name,val in cfgSrcPatVarSpecs:
             # lazy user only specified description, convert to a variable spec
             if type(val)==str:
-!!!!!!!!!!!!!!!!!!!!!!!
                 vspec = var_specs_create( name=name, description=val)
                 var_specs_add(cfgSrcPatVarSpecs, vspec)
         return cfgSrcSpec
@@ -477,7 +506,7 @@ def src_spec_create(cfgStr=None,cfgSection=None):
 def src_specs_create():
     return {}
 
-def src_specs_add(srcSpecs=None,srcSpec):
+def src_specs_add(srcSpecs,srcSpec):
     if srcSpecs == None:
         srcSpecs = src_specs_create()
     

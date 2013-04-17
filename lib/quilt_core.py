@@ -69,7 +69,6 @@ class QuiltConfig:
 
         return self._config.get(sectionName,valueName)
 
-    #REVIEW
     def GetSourceManagersUtil(self, which):
         """get list of all defined source managers"""
     
@@ -101,7 +100,7 @@ class QuiltConfig:
             for s in sections:
                 if names:
                     smds.append(s)
-                else
+                else:
                     specStr = c.get(s,'sourceSpec')
                     quilt_data.src_specs_add( smds,
                         quilt_data.src_spec_create(
@@ -109,13 +108,11 @@ class QuiltConfig:
                     
         return smds
 
-    #REVIEW
     def GetSourceManagers(self):
-        return GetSourceManagersUtil("names")
+        return self.GetSourceManagersUtil("names")
 
-    #REVIEW               
     def GetSourceManagerSpecs(self):
-        return GetSourceManagersUtil("specs")
+        return self.GetSourceManagersUtil("specs")
 
 def GetQueryMasterProxy(config=None):
     """Access configuration to find query master, return proxy to it"""

@@ -12,3 +12,5 @@ print c.get('section','complex')
 pprint.pprint (c.items('section'))
 pprint.pprint (c._sections['section'])
 
+d = eval(c.get('section','complex'))
+print d['xyz']

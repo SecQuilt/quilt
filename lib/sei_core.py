@@ -28,7 +28,6 @@ def log_stream(stream, prefix='', postfix='',seperator=' ',loglevel='logging.DEB
 STDOUT=1
 EXITCODE=2
 
-#REVIEW
 def log_process(
     process,prefix='', postfix='',seperator=' ',loglevel='logging.DEBUG',
     whichReturn=STDOUT,logToPython=True, outObj=None, outFunc=None):

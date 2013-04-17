@@ -64,8 +64,8 @@ class BasicSourceTestcase(unittest.TestCase):
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   text "Occurs_1_time"
         #   assure only one result
-        occurences = 
-            len([m.start() for m in re.finditer('Occurs_1_time', o)])
+        occurences = (
+            len([m.start() for m in re.finditer('Occurs_1_time', o)]))
         self.assertTrue(occurences == 1)
         
     def test_valid_query_multi_result(self):
@@ -84,8 +84,8 @@ class BasicSourceTestcase(unittest.TestCase):
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   text "Occurs_3_times"
         #   assure only three results
-        occurences = 
-            len([m.start() for m in re.finditer('Occurs_3_times', o)])
+        occurences = (
+            len([m.start() for m in re.finditer('Occurs_3_times', o)]))
         self.assertTrue(occurences == 3)
 
 
@@ -103,8 +103,8 @@ class BasicSourceTestcase(unittest.TestCase):
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   text "Occurs_no_times"
         #   assure no results
-        occurences = 
-            len([m.start() for m in re.finditer('Occurs_no_times', o)])
+        occurences = (
+            len([m.start() for m in re.finditer('Occurs_no_times', o)]))
         self.assertTrue(occurences == 0)
 
     def test_valid_query_all_results(self):
@@ -120,8 +120,8 @@ class BasicSourceTestcase(unittest.TestCase):
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
         #   assure there are many results
-        occurences = 
-            len([m.start() for m in re.finditer('\n', o)])
+        occurences = (
+            len([m.start() for m in re.finditer('\n', o)]))
         self.assertTrue(occurences > 10)
 
 if __name__ == "__main__":
