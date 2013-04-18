@@ -101,7 +101,6 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._sourceResults.append(eval(line))
 
     def GetType(self):
-        logging.debug("Returning SourceManager client type")
         return "SourceManager"
         
 
@@ -142,6 +141,8 @@ class Smd(quilt_core.QuiltDaemon):
         cfg = quilt_core.QuiltConfig()
         smspecs = cfg.GetSourceManagerSpecs()
 
+        #logging.debug("Source manager specs: " + str(smspecs))
+
         objs = {}
         # iterate through source manager configurations
         for smname,smspec in smspecs.items():
@@ -149,6 +150,8 @@ class Smd(quilt_core.QuiltDaemon):
             # create each source manager object
             sm = SourceManager(self._args, smname, smspec)
             objs[sm._localname] = sm
+        
+        #logging.info("Creating source managers: " + str(objs))
             
         # start the client with all the source managers
         quilt_core.query_master_client_main_helper(objs)

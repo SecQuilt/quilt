@@ -24,7 +24,7 @@ class BasicSourceTestcase(unittest.TestCase):
 
     def query(self,searchString):
         o = quilt_test_core.call_quilt_script('quilt_submit.py',[
-            '-y', '-v', 'SEARCHSTRING', searchString])
+            '-y', '-v', 'SEARCHSTRING', searchString, 'test_pattern'])
         # capture query_id from std out 
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]

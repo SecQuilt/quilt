@@ -227,7 +227,6 @@ def pat_specs_add(patSpecs, patSpec):
     if patSpecs == None:
         patSpecs = pat_specs_create()
     name = pat_spec_get(patSpec,name=True)
-    logging.info("!!!!!!!!!!!!!" + str(type(name)))
     patSpecs[pat_spec_get(patSpec,name=True)] = patSpec
     return patSpecs
     
@@ -516,5 +515,7 @@ def src_specs_create():
 def src_specs_add(srcSpecs,srcSpec):
     if srcSpecs == None:
         srcSpecs = src_specs_create()
+    srcSpecs[src_spec_get(srcSpec, name=True)] = srcSpec
+    return srcSpecs
     
     

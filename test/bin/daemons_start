@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# set python path for modules under test and test modules
+# set config dir to test config
+source $(dirname ${BASH_SOURCE[0]})/testenv.rc
+
+
+# start up quilt daemons
+$QUILT_HOME/lib/quilt_registrar.py   start -l DEBUG
+$QUILT_HOME/lib/quilt_qmd.py         start -l DEBUG
+$QUILT_HOME/lib/quilt_smd.py         start -l DEBUG
+
+
+

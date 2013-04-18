@@ -12,6 +12,7 @@ class QueryMaster:
 
     _clients = {}
     _queries = quilt_data.query_specs_create()
+    _history = quilt_data.query_specs_create()
     _patterns = quilt_data.pat_specs_create()
     _lock = threading.Lock()
 
@@ -31,10 +32,8 @@ class QueryMaster:
             string clientType           # name of the type of the client
         """
         with self._lock:
-            logging.info("registering client: " + clientName + "...")
 
             # get the proxy handle to the remote object 
-            logging.debug(clientName + " is a " + clientType)
             
             # determine unique name for client (hopefuly just using the
             # passed in name, but double check registered list.
@@ -56,8 +55,7 @@ class QueryMaster:
                 
 
             # return the determined name
-            logging.info("registered client: " + clientName + " as " +
-                uniqueName + ".")
+            logging.debug("Registered client: " + uniqueName)
             return uniqueName
 
     def UnRegisterClient(
@@ -76,7 +74,7 @@ class QueryMaster:
                 return
             if clientNameKey not in self._clients[clientType]:
                 return
-            logging.info("Unregistering client: " + clientNameKey + "...")
+            logging.debug("Unregistering client: " + clientNameKey + "...")
             clientDict = self._clients[clientType][clientNameKey]
             # remove the specified sm from registered list
             del self._clients[clientType][clientNameKey]
@@ -126,7 +124,6 @@ class QueryMaster:
             # determine unique name for the pattern based off suggested name
             #   in the spec
             rootName = quilt_data.pat_spec_tryget(patternSpec, name=True)
-            logging.info("%%%%%%%%%%%%%%%" + str(type(rootName)) + ":" + str(rootName))
             if rootName == None:
                 rootName = "pattern"
             patternName = rootName
@@ -138,7 +135,6 @@ class QueryMaster:
                     i = i + 1
 
                 # store pattern spec in the member data
-                logging.info("@@@@@@@@@@@@@@@@@" + str(type(patternName)))
                 quilt_data.pat_spec_set(patternSpec, name=patternName)
                 quilt_data.pat_specs_add(self._patterns, patternSpec)
                 
@@ -336,32 +332,39 @@ class QueryMaster:
                     Pyro4.async(smgr).Query(qid, srcQuerySpec)
 
         # catch exception! 
-        except:
-            error = sys.exc_info()[0]
+        except Exception, error:
+
+            logging.exception(error)
+
             try:
                 # submit launched this call asyncronysly and must be made
                 # aware of the unexpected error
                 # call submit's OnSubmitProblem
+                logging.info("Attempting to get proxy for errror report")
                 with get_client_proxy_from_type_and_name(
                     self, "QuiltSubmit", submitterNameKey) as submitter:
+                    logging.info("Attempting to send error to submitter")
                     submitter.OnSubmitProblem(qid,str(error))
-            except:
+                    # Pyro4.async(submitter).OnSubmitProblem(qid,str(error))
+
+            except Exception, error2:
                 # stuff is going horribly wrong, we couldn't notify submitter
                 logging.error("Unable to notify submitter: " + 
                     str(submitterNameKey) +
                     " of error when submiting query: " + str(qid))
-                logging.error(error)
+                logging.exception(error2)
 
             try:
+                logging.info("Cleaning up after query error")
                 # acquire lock, remove query id from pool
                 querySpec = quilt_data.query_specs_del(self._queries, qid)
                 # add it to the history with an error state
                 quilt_data.query_spec_set(querySpec,
                     state=quilt_data.STATE_ERROR)
                 quilt_data.query_specs_add(self._history, querySpec)
-            except:
-                logging.error("Failed to move errored query to history: " + 
-                    str(sys.exc_info()[0]))
+            except Exception, error2:
+                logging.error("Failed to move error'd query to history")
+                logging.exception(error2)
                 
 
     def GetQueryQueueStats(self):
@@ -389,22 +392,27 @@ class QueryMaster:
         from the history, or provide stats for all if no queryId is 
         specified
         """
-        # acquire lock
-        with self._lock:
-        # if queryID specified
-            if queryId != None:
-                # throw error if query not found in history, 
-                # otherwise return the query's record
-                if queryId not in self._history:
-                    raise Exception("query id: " + str(queryId) + 
-                        " is not present in history")
-                results = pprint.pformat(quilt_data.query_specs_get(
-                    self._history, queryId))
-            else:
-                # return complete history summary
-                results = pprint.pformat(self._history)
+        try:
+            # acquire lock
+            with self._lock:
+            # if queryID specified
+                if queryId != None:
+                    # throw error if query not found in history, 
+                    # otherwise return the query's record
+                    if queryId not in self._history:
+                        raise Exception("query id: " + str(queryId) + 
+                            " is not present in history")
+                    results = pprint.pformat(quilt_data.query_specs_get(
+                        self._history, queryId))
+                else:
+                    # return complete history summary
+                    results = pprint.pformat(self._history)
 
-        return results
+            return results
+
+        except Exception, e:
+            logging.exception(e)
+            raise
     
     def GetPatternStats(self):
         """Return a string describing the patterns defined in the query
@@ -439,10 +447,10 @@ class QueryMaster:
                     state=quilt_data.STATE_ERROR)
                 # move query spec from q to history member collection
                 quilt_data.query_specs_add(self._history, querySpec)
-        except:
+        except Exception, e:
             logging.error("Unable to properly process source error")
-            error2 = sys.exc_info()[0] 
-            logging.error(str(error2))
+            logging.exception(e)
+            raise
         
         finally:
             logging.error("Source: " + source + 
@@ -455,7 +463,7 @@ def get_client_proxy( clientRec):
     """
     pyroname = clientRec["clientName"]
     nshost = clientRec["registrarHost"]
-    nsport = clientRec["trarPort"]
+    nsport = clientRec["registrarPort"]
     
     ns = Pyro4.locateNS(nshost, nsport)
     uri = ns.lookup(pyroname)

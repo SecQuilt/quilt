@@ -7,6 +7,7 @@ import Pyro4
 import query_master
 import argparse
 import quilt_data
+import pprint
 
 class QuiltSubmit(quilt_core.QueryMasterClient):
     """
@@ -27,6 +28,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         # super(QuiltSubmit, self).__init__(GetType())
         quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
+        self.run = False
 
     def ValidateQuery(self, queryMetricMsg, queryId):
         """
@@ -59,9 +61,8 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             # submitter to exit
             self.SetProcesssEvents(False)
             
-    def OnRegisterEnd(self):
-        """After registration is complete submit the query to the 
-        query master"""
+    def Submit(self):
+        """submit the query to the query master"""
         
         # create a partial query spec dictionary
         #   set pattern name from args
@@ -74,7 +75,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             notificationEmail = self._args.notifcation_email )
         
         #   set variables/values from args
-        if len(self._args.variables) > 0:
+        if self._args.variable != None and len(self._args.variable) > 0:
             variables = quilt_data.var_specs_create()
             for v in self._args.variable:
                 vname = v[0]
@@ -94,6 +95,10 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         # should soon recieve a validation callback from query master
         return True
         
+    def OnRegisterEnd(self):
+        """After registration is complete submit the query to the 
+        query master"""
+        return True
 
     def GetType(self):
         return "QuiltSubmit"
@@ -117,6 +122,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             lock the class lock
             read and return value of _processEvents
         """
+
         with self._lock:
             return self._processEvents
 
@@ -126,6 +132,9 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             lock the class lock
             read and return value of _processEvents
         """
+        if not self.run:
+            self.run = True
+            self.Submit()
         with self._lock:
             return self._processEvents
 

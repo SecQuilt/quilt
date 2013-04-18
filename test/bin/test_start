@@ -11,10 +11,9 @@ $QUILT_HOME/test/bin/quilt_stop.py   &> /dev/null
 sleep 4
 ps aux | grep quilt
 
+
 # start up quilt daemons
-$QUILT_HOME/lib/quilt_registrar.py   start -l DEBUG
-$QUILT_HOME/lib/quilt_qmd.py         start -l DEBUG
-$QUILT_HOME/lib/quilt_smd.py         start -l DEBUG
+source $(dirname ${BASH_SOURCE[0]})/testenv.rc
 
 # run the quilt tests, exit with same failure code
 $QUILT_HOME/test/lib/quilt_test.py   -l DEBUG || exit $?

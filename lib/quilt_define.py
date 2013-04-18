@@ -22,8 +22,14 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         VARIABLEs, and VARIABLE to SOURCE_VARIABLE mappings), register
         this pattern with the query master"""
 
-        # create the spec with it's name
-        patternSpec=quilt_data.pat_spec_create(name=self._args.name[0])
+        # create the spec with it's requested name
+        requestedName = self._args.name
+        if requestedName == None:
+            requestedName = "pattern"
+        else:
+            requestedName = self._args.name[0]
+
+        patternSpec=quilt_data.pat_spec_create(name=requestedName)
 
         # create the specs for the variables
         variables=None

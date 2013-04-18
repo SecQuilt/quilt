@@ -9,3 +9,9 @@ Open:
         we can not fix it at this time, we need the power first to specify
         multiple source patterns in one pattern before we can thing it
         through.
+
+    ISSUE002
+    souce manager won't start!
+
+    ISSUE003
+    Command lines don't work!

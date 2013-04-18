@@ -85,6 +85,8 @@ class QuiltConfig:
         smdcfgs = [ f for f in listdir(smdcfgdir) 
             if isfile(join(smdcfgdir,f)) ]
 
+        #logging.debug("Source manager config files: " + str(smdcfgs))
+
         # read all sections from all config file sin the smd directory
         names = which == 'names'
 
@@ -98,6 +100,7 @@ class QuiltConfig:
             c.read(join(smdcfgdir, f))
             sections = c.sections()
             for s in sections:
+                #logging.debug("Reading section: " + s)
                 if names:
                     smds.append(s)
                 else:
@@ -127,8 +130,6 @@ def GetQueryMasterProxy(config=None):
         ", " + str(qmport))
     ns = Pyro4.locateNS(qmhost, qmport)
     uri = ns.lookup(qmname)
-
-    logging.debug(qmname + " is at uri: " + str(uri))
 
     return Pyro4.Proxy(uri)
 
@@ -319,7 +320,7 @@ def query_master_client_main_helper(
             logging.debug("executing " + str(len(s)) + " events in main loop")
             daemon.events(s)
         else:
-            time.sleep(0.05)
+            time.sleep(1.05)
  
         delDaemonObjs = {}
         # iterate the names and objects in clientObjectDic

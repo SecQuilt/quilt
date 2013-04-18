@@ -33,9 +33,10 @@ def unittest_main_helper(description='',argv=sys.argv):
             help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
     args,unknown = parser.parse_known_args(argv)
 
+    level = None
     if (args.log_level is not None):
         # if log level was specified, set the log level
-        quilt_core.configure_logging(args.log_level)
+        level = args.log_level
 
         # now strip off the log arguments before we pass on to unit 
         # test main
@@ -44,6 +45,8 @@ def unittest_main_helper(description='',argv=sys.argv):
             slot = sys.argv.index('--log-level')
         sys.argv.pop(slot)
         sys.argv.pop(slot)
+
+    quilt_core.common_init(os.path.basename(sys.argv[0]), level)
 
 def call_quilt_script( scriptName, args = []):
     """
