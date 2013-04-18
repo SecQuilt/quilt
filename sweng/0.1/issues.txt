@@ -10,8 +10,15 @@ Open:
         multiple source patterns in one pattern before we can thing it
         through.
 
-    ISSUE002
-    souce manager won't start!
 
     ISSUE003
     Command lines don't work!
+
+    ISSUE004
+    Need to remove lastQuery stuff from smd and unit tests
+
+
+Closed:
+
+    ISSUE002
+    souce manager won't start!

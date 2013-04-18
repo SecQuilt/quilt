@@ -17,6 +17,7 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._sourceName = sourceName
         self._sourceSpec = sourceSpec
         self._sourceResults = []
+        self._lastQuery = None
 
     def Query(self, queryId, sourceQuerySpec):
         """
@@ -72,19 +73,17 @@ class SourceManager(quilt_core.QueryMasterClient):
             _qm.SetQueryResults(queryId, self._sourceResults)
      
     # catch exception! 
-        except:
-            error = sys.exc_info()[0] 
+        except Exception, error:
             try:
                 _qm.OnSourceQueryError(
                     self._remotename, queryId, error)
-            except:
-                error2 = sys.exc_info()[0] 
+            except Exception, error2:
                 logging.error("Unable to send source query error to " +
                     "query master")
-                logging.error(str(error2))
+                logging.exception(error2)
             finally:
                 logging.error("Failed to execute source query")
-                logging.error(str(error))
+                logging.exception(error)
                 
 
              

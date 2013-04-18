@@ -48,7 +48,7 @@ def unittest_main_helper(description='',argv=sys.argv):
 
     quilt_core.common_init(os.path.basename(sys.argv[0]), level)
 
-def call_quilt_script( scriptName, args = []):
+def call_quilt_script( scriptName, args = [], checkCall=True):
     """
     returns the stdoutput of the script, checks for bad error code and
     throws exception
@@ -64,6 +64,7 @@ def call_quilt_script( scriptName, args = []):
     # call quilt_status (check return code, capture output)
     args = [script_file, '-l', 'DEBUG'] + args
     out = sei_core.run_process(args,
-        whichReturn=sei_core.STDOUT, logToPython=False)
+        whichReturn=sei_core.STDOUT, logToPython=False,
+        checkCall=checkCall)
 
     return out

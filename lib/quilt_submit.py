@@ -28,7 +28,6 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         # super(QuiltSubmit, self).__init__(GetType())
         quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
-        self.run = False
 
     def ValidateQuery(self, queryMetricMsg, queryId):
         """
@@ -61,9 +60,10 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             # submitter to exit
             self.SetProcesssEvents(False)
             
-    def Submit(self):
-        """submit the query to the query master"""
         
+    def OnRegisterEnd(self):
+        """After registration is complete submit the query to the 
+        query master"""
         # create a partial query spec dictionary
         #   set pattern name from args
         #   set notification address in spec
@@ -93,11 +93,6 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         
         # return True to allow event loop to start running, which
         # should soon recieve a validation callback from query master
-        return True
-        
-    def OnRegisterEnd(self):
-        """After registration is complete submit the query to the 
-        query master"""
         return True
 
     def GetType(self):
@@ -132,20 +127,21 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             lock the class lock
             read and return value of _processEvents
         """
-        if not self.run:
-            self.run = True
-            self.Submit()
         with self._lock:
             return self._processEvents
 
-    def OnSubmitProblem(self, queryId, msg):
+    def OnSubmitProblem(self, queryId, exception):
         """Recieve a message from the query master about a problem with
         the query submission"""
 
         try:
             # print out the query id and the message
-            logging.error(msg)
-            print "Query submission error for:", queryId
+            logging.error("Query submission error for: " + str(queryId) + 
+                " : " + str(type(exception)) + " : " + str(exception))
+
+            # I guess exception's don't keep their stacktrace over the pyro boundary
+            #            logging.exception(exception)
+
         finally:
             # set process events flag to false end event loop, allowing
             # submitter to exit

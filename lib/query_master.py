@@ -158,8 +158,20 @@ class QueryMaster:
         )
         """
 
+        
+        # qid must be set because we use it when reporting the error
+        if submitterNameKey != None:
+            qid = str(submitterNameKey) + " unnamed query"
+        else:
+            qid = "Unknown query"
+
         # try the following 
         try:
+
+            # a slightly better name for the query id
+            tqid = quilt_data.query_spec_tryget(querySpec, name=True)
+            if tqid != None:
+                qid = tqid
 
             # placeholder query spec to reserve the unique qid
             tmpQuerySpec = querySpec.copy()
@@ -344,8 +356,7 @@ class QueryMaster:
                 with get_client_proxy_from_type_and_name(
                     self, "QuiltSubmit", submitterNameKey) as submitter:
                     logging.info("Attempting to send error to submitter")
-                    submitter.OnSubmitProblem(qid,str(error))
-                    # Pyro4.async(submitter).OnSubmitProblem(qid,str(error))
+                    Pyro4.async(submitter).OnSubmitProblem(qid,error)
 
             except Exception, error2:
                 # stuff is going horribly wrong, we couldn't notify submitter
@@ -455,7 +466,7 @@ class QueryMaster:
         finally:
             logging.error("Source: " + source + 
                 " was unable to process query: " + qid)
-            logging.error(str(error))
+            logging.error((type(error)) + " : " + str(error))
             
 def get_client_proxy( clientRec):
     """
