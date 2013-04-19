@@ -17,6 +17,9 @@ Open:
     ISSUE004
     Need to remove lastQuery stuff from smd and unit tests
 
+    ISSUE005
+    Sources are a total hack, most notably not supporting concurent searches
+        at this time
 
 Closed:
 

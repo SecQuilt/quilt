@@ -5,7 +5,7 @@
 source $(dirname ${BASH_SOURCE[0]})/testenv.rc
 
 # start up quilt daemons
-$QUILT_HOME/bin/quilt_submit -v SEARCHSTRING Occur test_pattern
+$QUILT_HOME/bin/quilt_submit -v SEARCHSTRING Occur test_pattern -y
 
 
 

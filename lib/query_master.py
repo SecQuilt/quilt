@@ -189,7 +189,7 @@ class QueryMaster:
                 baseqid = submitterNameKey + "_" + patternName
                 i = 0
                 qid = baseqid 
-                while qid in self._queries:
+                while qid in self._queries or qid in self._history:
                     i = i + 1
                     qid = baseqid + "_" + str(i)
                 
@@ -201,7 +201,7 @@ class QueryMaster:
             # that we generate, we will eventually replace the placeholder
             # in the member q
             quilt_data.query_spec_set(querySpec, name=qid)
-                
+
 
             # group variable mapping's by target source and source pattern
             #   store in local collection.  We later want to iterare the
@@ -211,36 +211,41 @@ class QueryMaster:
             srcPatDict = {}
             patVarSpecs = quilt_data.pat_spec_tryget(
                 patternSpec, variables=True)
-            if patVarSpecs != None:
+                
+            mappings = quilt_data.pat_spec_tryget(
+                patternSpec, mappings=True)
+
+            #logging.info("got patVarSpecs: " + str(patVarSpecs))
+            #logging.info("got mappings: " + str(mappings))
+            if patVarSpecs != None and mappings != None:
                 for varName, varSpec in patVarSpecs.items():
-                    
-                    mappings = quilt_data.var_spec_tryget(
-                        varSpec, sourceMapping=True)
-                    if mappings:
-                        for m in mappings:
-                            src = quilt_data.src_var_mapping_spec_get(
-                                m, sourceName=True)
-                            pat = quilt_data.src_var_mapping_spec_get(
-                                m, sourcePattern=True)
-                            var = quilt_data.src_var_mapping_spec_get(
-                                m, sourceVariable=True)
+                    for m in mappings:
+                        src = quilt_data.src_var_mapping_spec_get(
+                            m, sourceName=True)
+                        pat = quilt_data.src_var_mapping_spec_get(
+                            m, sourcePattern=True)
+                        var = quilt_data.src_var_mapping_spec_get(
+                            m, sourceVariable=True)
 
-                            if src not in srcPatDict:
-                                patDict = {}
-                                srcPatDict[src] = patDict
-                            else:
-                                patDict = srcPatDict[src]
-                            
-                            # TODO, see issues list (ISSUE001)
-                            # need to reconcile what happens when there is a desire to
-                            # use the same srcPattern multiple times in one query
+                        if src not in srcPatDict:
+                            patDict = {}
+                            srcPatDict[src] = patDict
+                        else:
+                            patDict = srcPatDict[src]
+                        
+                        # TODO, see issues list (ISSUE001)
+                        # need to reconcile what happens when there is a desire to
+                        # use the same srcPattern multiple times in one query
 
-                            if pat not in patDict:
-                                element = {}
-                                patDict[pat] = element
-                            else:
-                                element = patDict[pat]
-                            element[src] = varName
+                        if pat not in patDict:
+                            element = {}
+                            patDict[pat] = element
+                        else:
+                            element = patDict[pat]
+                        element[var] = varName
+
+
+            #logging.info("got srcPatDict: " + str(srcPatDict))
 
             varSpecs = quilt_data.query_spec_tryget(
                 querySpec, variables=True)
@@ -274,7 +279,8 @@ class QueryMaster:
 
                         # create a query spec object
                         srcQuerySpec = create_src_query_spec(
-                            srcPatSpec, srcPatDict, varSpecs, patVarSpecs)
+                            srcPatSpec, srcPatDict, varSpecs, patVarSpecs, 
+                            qid, source, patternName)
 
                         # name for source pattern is generated from qid, which
                         # is already globally unique, then by taking on source
@@ -309,8 +315,8 @@ class QueryMaster:
 
             # if submitter refuses to validate, 
             if not validated:
-                logging.info("Submitter: " + submitterNameKey + """ did not
-                    validate the query: """ + qid)
+                logging.info("Submitter: " + submitterNameKey + 
+                    " did not validate the query: " + qid)
                 # acuire lock remove query id from q
                 # delete the query record, it was determined invalid
                 # return early
@@ -318,8 +324,8 @@ class QueryMaster:
                     quilt_data.query_specs_del(self._queries, qid)
                 return
 
-            logging.info("Submitter: " + submitterNameKey + """ did 
-                validate the query: """ + qid)
+            logging.info("Submitter: " + submitterNameKey + 
+                "did validate the query: " + qid)
 
             # acquire lock
             with self._lock:
@@ -453,7 +459,7 @@ class QueryMaster:
         try:
             with self._lock:
                 # mark the query as completed in state
-                querySpec = quilt_data.query_specs_del(self._queries, queryId)
+                querySpec = quilt_data.query_specs_del(self._queries, qid)
                 quilt_data.query_spec_set(querySpec,
                     state=quilt_data.STATE_ERROR)
                 # move query spec from q to history member collection
@@ -466,7 +472,7 @@ class QueryMaster:
         finally:
             logging.error("Source: " + source + 
                 " was unable to process query: " + qid)
-            logging.error((type(error)) + " : " + str(error))
+            logging.error(str(type(error)) + " : " + str(error))
             
 def get_client_proxy( clientRec):
     """
@@ -488,7 +494,7 @@ def get_client_proxy_from_type_and_name( qm, clientType, clientName):
     return get_client_proxy(rec)
     
 def create_src_query_spec(
-    srcPatSpec, srcPatDict, varSpecs, patVarSpecs, qid):
+    srcPatSpec, srcPatDict, varSpecs, patVarSpecs, qid, source, patternName):
     """Helper function for filling out a srcQuerySpec with variable values"""
 
     srcPatVars = quilt_data.src_pat_spec_get(
@@ -496,6 +502,7 @@ def create_src_query_spec(
     if srcPatVars == None:
         return
 
+    # logging.info("srcPatDict is " + str(srcPatDict))
     srcQueryVarSpecs = None
     # iterate the variables in the "new" 
     #   sourceQuerySpec
@@ -533,14 +540,15 @@ def create_src_query_spec(
         
         # create a source query variable value with the determined value
         srcQueryVarSpec = quilt_data.var_spec_create(
-            name=varName, value=varValue)
+            name=srcVarName, value=varValue)
         # append it to a list of src query variables
         srcQueryVarSpecs = quilt_data.var_specs_add(
             srcQueryVarSpecs, srcQueryVarSpec)
     
     # create and return a src query spec
     # TODO see Issue I001, this name may not be unique
-    srcPatName = quilt_data.src_pat_spec_get(srcPatSpec, name=true)
+    logging.info("srcPatSpec looks like: " + str(srcPatSpec))
+    srcPatName = quilt_data.src_pat_spec_get(srcPatSpec, name=True)
     return quilt_data.src_query_spec_create(
         name=qid + "_" + srcPatName,
         srcPatternName=srcPatName,

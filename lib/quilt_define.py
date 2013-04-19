@@ -75,11 +75,11 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                     sourcePattern=srcPat,
                     sourceVariable=srcVar)
             
-                quilt_data.src_var_mapping_specs_add(
+                mappings = quilt_data.src_var_mapping_specs_add(
                     mappings, srcVarMappingSpec)
 
         if mappings != None:
-            pat_spec_set(patternSpec,mappings=mappings)
+            quilt_data.pat_spec_set(patternSpec,mappings=mappings)
             
         # define patternSpec in the query master as a syncronous call
         # return will be the pattern name

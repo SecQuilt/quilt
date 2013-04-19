@@ -13,7 +13,8 @@ ps aux | grep quilt
 
 
 # start up quilt daemons
-source $(dirname ${BASH_SOURCE[0]})/testenv.rc
+$QUILT_HOME/test/bin/daemons_start
+sleep 1
 
 # run the quilt tests, exit with same failure code
 $QUILT_HOME/test/lib/quilt_test.py   -l DEBUG || exit $?

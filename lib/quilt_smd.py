@@ -6,6 +6,7 @@ import quilt_core
 import argparse
 from string import Template
 import sei_core
+import quilt_data
 
 class SourceManager(quilt_core.QueryMasterClient):
 
@@ -32,16 +33,18 @@ class SourceManager(quilt_core.QueryMasterClient):
 
             # _sourceName should not change, set at init, so ok to read
             # without lock
-            logging.info("Source Manager: " + self._sourceName + 
-                " recieved query: " + queryId + " as: " + sourceQuerySpec)
+            logging.info("Source Manager: " + str(self._sourceName) + 
+                " recieved query: " + str(queryId))
 
             # get the sourcePatternSpec from the pattern name in the
             #   sourceQuerySpec
             # pattern spec should be read only and safe to access without
             #   a lock
-            srcPatSpecs = quilt_data.src_spec_get(sourcePatterns=True)
+            srcPatSpecs = quilt_data.src_spec_get(self._sourceSpec, 
+                sourcePatterns=True)
             srcPatSpec = quilt_data.src_pat_specs_get(srcPatSpecs, 
-                quilt_data.src_query_spec_get(sourceQuerySpec, name=True))
+                quilt_data.src_query_spec_get(sourceQuerySpec, 
+                srcPatternName=True))
     
             # get the variables in the query
             srcQueryVars = quilt_data.src_query_spec_get(sourceQuerySpec, 
@@ -57,25 +60,35 @@ class SourceManager(quilt_core.QueryMasterClient):
             # create cmd line for the source
             # use the template in the sourcePatternSpec, and use the values
             #   provided for the variables, and environment variables
-            replacments = os.environ.copy()
+            replacments = {}
+            # replacments = os.environ.copy()
             for k,v in varNameValueDict.items():
                 replacments[k] = v
-            template = Template(replacments)
-            cmdline = template.safe_substitute(varNameValueDict)
+
+            # "template" was not added as oficial schema member because it is 
+            # specific to this command line case
+            templateCmd = srcPatSpec['template']
+            template = Template(templateCmd)
+            #logging.info ("Ready to use : " + templateCmd + 
+            #    " with replacments: " + str(replacments))
+            cmdline = template.safe_substitute(replacments)
+
+            # TODO fix ISSUE005
+            self._sourceResults = []
 
             # use run_process to execute cmd, give callback per line
             #   processing function
             sei_core.run_process(cmdline, shell=True,
-                whichReturn=sei_core.EXITCODE, outObj=self, 
-                outFunc=OnGrepLine)
-
+                whichReturn=sei_core.EXITCODE, 
+                outFunc=self.OnGrepLine, logToPython=False)
+            
             # Set query result events list in query master using query id
-            _qm.SetQueryResults(queryId, self._sourceResults)
+            self._qm.SetQueryResults(queryId, self._sourceResults)
      
     # catch exception! 
         except Exception, error:
             try:
-                _qm.OnSourceQueryError(
+                self._qm.OnSourceQueryError(
                     self._remotename, queryId, error)
             except Exception, error2:
                 logging.error("Unable to send source query error to " +
@@ -104,19 +117,25 @@ class SourceManager(quilt_core.QueryMasterClient):
         
 
     def GetSourcePatterns(self):
-        """Returns a list of names of defined source patterns"""
-        # non need to lock because noone shuld be writing to a source spec
-        # after init
+        try:
+            """Returns a list of names of defined source patterns"""
+            # non need to lock because noone shuld be writing to a source spec
+            # after init
 
-        # iterate sourceSpec member's patterns
-        # append returning list with pattern names
-        srcPatSpecs = quilt_data.src_spec_tryget(self._sourceSpec, 
-            sourcePatterns=True)
-       
-        if srcPatSpecs == None:
-            return []
-        
-        return srcPatSpecs.keys
+            # iterate sourceSpec member's patterns
+            # append returning list with pattern names
+            srcPatSpecs = quilt_data.src_spec_tryget(self._sourceSpec, 
+                sourcePatterns=True)
+           
+            if srcPatSpecs == None:
+                return []
+            
+            return srcPatSpecs.keys()
+
+        # we log exception because this was likely called from another process
+        except Exception, error:
+            logging.exception(error)
+            raise
 
     def GetSourcePattern(self, patternName):
         """return the specified source pattern specification dict"""

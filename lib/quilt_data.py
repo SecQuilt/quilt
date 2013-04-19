@@ -32,7 +32,7 @@ def spec_name_set(spec,name):
 def var_spec_get( spec,
     name=False,
     value=False,
-    sourceMapping=False,
+    #sourceMapping=False,
     description=False,
     default=False
     ):
@@ -41,7 +41,7 @@ def var_spec_get( spec,
     is returned"""
     if name: return spec_name_get(spec)
     if value: return spec['value']
-    if sourceMapping: return spec['sourceMapping']
+    #if sourceMapping: return spec['sourceMapping']
     if description: return spec['description']
     if default: return spec['default']
     raise Exception("Accessor not properly used")
@@ -49,7 +49,7 @@ def var_spec_get( spec,
 def var_spec_tryget( spec,
     name=False,
     value=False,
-    sourceMapping=False,
+    #sourceMapping=False,
     description=False,
     default=False
     ):
@@ -58,7 +58,7 @@ def var_spec_tryget( spec,
     is returned, if no parameters evaluate positively None is returned"""
     if name: return spec_name_tryget(name) 
     if value and 'value' in spec: return spec['value'] 
-    if sourceMapping and 'sourceMapping' in spec: return spec['sourceMapping'] 
+    #if sourceMapping and 'sourceMapping' in spec: return spec['sourceMapping'] 
     if description and 'description' in spec: return spec['description'] 
     if default and 'default' in spec: return spec['default']
     return None
@@ -66,7 +66,7 @@ def var_spec_tryget( spec,
 def var_spec_set( spec,
     name=None,
     value=None,
-    sourceMapping=None,
+    #sourceMapping=None,
     description=None,
     default=None
     ):
@@ -74,7 +74,7 @@ def var_spec_set( spec,
         spec = {}
     if name != None: spec_name_set(spec, name)
     if value != None: spec['value']= value
-    if sourceMapping != None: spec['sourceMapping']= sourceMapping
+    #if sourceMapping != None: spec['sourceMapping']= sourceMapping
     if description != None: spec['description']= description
     if default != None: spec['default']= default
     return spec
@@ -82,7 +82,7 @@ def var_spec_set( spec,
 def var_spec_create(
     name=None,
     value=None,
-    sourceMapping=None,
+    #sourceMapping=None,
     description=None,
     default=None
     ):
@@ -90,7 +90,7 @@ def var_spec_create(
         None,
         name=name,
         value=value,
-        sourceMapping=sourceMapping,
+        #sourceMapping=sourceMapping,
         description=description,
         default=default
         )
@@ -393,7 +393,7 @@ def src_query_spec_create(
     srcPatternName=None,
     variables=None
     ):
-    return src_pat_spec_set(
+    return src_query_spec_set(
         None,
         name=name,
         srcPatternName=srcPatternName,
@@ -497,6 +497,18 @@ def src_spec_create(cfgStr=None, cfgSection=None):
         
         cfgSrcPatSpecs = src_spec_get(cfgSrcSpec,sourcePatterns=True)
         for srcPatName, srcPatSpec in cfgSrcPatSpecs.items():
+
+            # We need to make sure that the name is set as a member of
+            # the srcPatSpec.  If user did not specify it just set it
+            # to the key value
+            srcPatSpecName = src_pat_spec_tryget(srcPatSpec, name=True)
+            if srcPatSpecName != None and srcPatSpecName != srcPatName:
+                # user has specified inconsistant names for a source pattern
+                # throw an error
+                raise Exception("Inconsitant names specified for source" +
+                    " pattern ( " + srcPatName + ", " + srcPatSpecName + " )")
+            src_pat_spec_set(srcPatSpec, name=srcPatName)
+
             cfgSrcPatVarSpecs = src_pat_spec_get(srcPatSpec,variables=True)
             for name,val in cfgSrcPatVarSpecs.items():
                 # lazy user only specified description, convert to a variable spec
