@@ -249,6 +249,9 @@ class QueryMaster:
 
             varSpecs = quilt_data.query_spec_tryget(
                 querySpec, variables=True)
+
+            logging.debug("query varspecs: " + str(varSpecs))
+
             srcQuerySpecsDict = {}
 
             # iterate the collection of sources, and build collection of 
@@ -514,9 +517,11 @@ def create_src_query_spec(
         varName = srcPatDict[source][patternName][srcVarName]
 
         # get the value of the query variable from the
-        #   querySpec
-        varSpec = quilt_data.var_specs_get(varSpecs, varName)
-        varValue = quilt_data.var_spec_tryget(varSpec, value=True)
+        #   querySpec, if it was given in the query spec
+        varValue = None
+        varSpec = quilt_data.var_specs_tryget(varSpecs, varName)
+        if varSpec != None:
+            varValue = quilt_data.var_spec_tryget(varSpec, value=True)
 
         if varValue == None:
             # user did not supply value for the variable in the
@@ -547,7 +552,7 @@ def create_src_query_spec(
     
     # create and return a src query spec
     # TODO see Issue I001, this name may not be unique
-    logging.info("srcPatSpec looks like: " + str(srcPatSpec))
+    # logging.info("srcPatSpec looks like: " + str(srcPatSpec))
     srcPatName = quilt_data.src_pat_spec_get(srcPatSpec, name=True)
     return quilt_data.src_query_spec_create(
         name=qid + "_" + srcPatName,

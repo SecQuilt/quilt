@@ -21,6 +21,9 @@ Open:
     Sources are a total hack, most notably not supporting concurent searches
         at this time
 
+    ISSUE006
+    No test cases are defined which test default heiarchy functionality
+
 Closed:
 
     ISSUE002

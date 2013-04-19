@@ -56,7 +56,7 @@ def var_spec_tryget( spec,
     """Accessor for information from the variable spec.  Only one parameter 
     should be set to true, otherwise first paramter that evaluates positively 
     is returned, if no parameters evaluate positively None is returned"""
-    if name: return spec_name_tryget(name) 
+    if name: return spec_name_tryget(spec) 
     if value and 'value' in spec: return spec['value'] 
     #if sourceMapping and 'sourceMapping' in spec: return spec['sourceMapping'] 
     if description and 'description' in spec: return spec['description'] 
@@ -107,6 +107,10 @@ def var_specs_add(specs, varspec):
 def var_specs_get(specs, varName):
     return specs[varName]
 
+def var_specs_tryget(specs, varName):
+    if specs == None or varName not in specs:
+        return None
+    return specs[varName]
 
 # Pattern Spec functions
 def src_var_mapping_spec_create(
@@ -512,12 +516,30 @@ def src_spec_create(cfgStr=None, cfgSection=None):
             cfgSrcPatVarSpecs = src_pat_spec_get(srcPatSpec,variables=True)
             for name,val in cfgSrcPatVarSpecs.items():
                 # lazy user only specified description, convert to a variable spec
-                if type(val)==str:
+                if type(val) == str:
                     vspec = var_spec_create( name=name, description=val)
             
-                    logging.info("Variable created: " + str(vspec))
 
                     var_specs_add(cfgSrcPatVarSpecs, vspec)
+                elif type(val) == dict:
+                    # check if lazy user did not set name for variable
+                    # logging.debug ("Val is : " + str(val))
+                    srcVarName = var_spec_tryget( val, name=True)
+
+                    # user may have specified conflicting name for key and 
+                    # actual name, guard against this stupidity
+                    if srcVarName != None and srcVarName != name:
+                        raise Exception("Inconsitant names specified for " +
+                            "source pattern variable: ( " + str(srcVarName) + 
+                            ", " + str(name) + " )")
+                    # set the official name into the variable spec
+                    var_spec_set( val, name=name )
+                else:
+                    raise Exception("Do not know how to specify source " +
+                        "variable with object of type: " + str(type(val)))
+
+                logging.info("Variable created: " + str(name))
+                    
         return cfgSrcSpec
     return {}
 
