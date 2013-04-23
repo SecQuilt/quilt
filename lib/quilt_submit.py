@@ -6,6 +6,8 @@ import quilt_core
 import Pyro4
 import query_master
 import argparse
+import quilt_data
+import pprint
 
 class QuiltSubmit(quilt_core.QueryMasterClient):
     """
@@ -58,31 +60,29 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             # submitter to exit
             self.SetProcesssEvents(False)
             
-    #REVIEW
-    def OnRegisterEnd(self):
-        """After registration is complete we submit the query to the 
-        query master"""
         
+    def OnRegisterEnd(self):
+        """After registration is complete submit the query to the 
+        query master"""
         # create a partial query spec dictionary
         #   set pattern name from args
         #   set notification address in spec
         #   set state as UNINITIALIZED
-        querySpec = {
-            'state' : 'uninitialized',
-            'patternName' : self._args.pattern,
-            'notificationEmail' : self._args.notifcation_email }
+        querySpec = quilt_data.query_spec_create(
+            name='new ' + self._args.pattern,
+            state = quilt_data.STATE_UNINITIALIZED,
+            patternName = self._args.pattern,
+            notificationEmail = self._args.notifcation_email )
         
         #   set variables/values from args
-        if len(self._args.variables) > 0:
-            varSpecs = {}
-            querySpec["variables"] = varSpecs
+        if self._args.variable != None and len(self._args.variable) > 0:
+            variables = quilt_data.var_specs_create()
             for v in self._args.variable:
                 vname = v[0]
                 vval = v[1]
-                varSpec = { 
-                    'name' : vname,
-                    'value' : vval } 
-                varSpecs[vname] = varSpec
+                quilt_data.var_specs_add( variables,
+                    quilt_data.var_spec_create( name=vname, value=vval))
+            quilt_data.query_spec_set(querySpec, variables=variables)
             
         logging.info('Submiting query: ' + pprint.pformat(querySpec))
 
@@ -94,7 +94,6 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         # return True to allow event loop to start running, which
         # should soon recieve a validation callback from query master
         return True
-        
 
     def GetType(self):
         return "QuiltSubmit"
@@ -118,6 +117,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             lock the class lock
             read and return value of _processEvents
         """
+
         with self._lock:
             return self._processEvents
 
@@ -130,15 +130,18 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         with self._lock:
             return self._processEvents
 
-    #REVIEW
-    def OnSubmitProblem(self, queryId, msg):
+    def OnSubmitProblem(self, queryId, exception):
         """Recieve a message from the query master about a problem with
         the query submission"""
 
         try:
             # print out the query id and the message
-            logging.error(msg)
-            print "Query submission error for:", queryId
+            logging.error("Query submission error for: " + str(queryId) + 
+                " : " + str(type(exception)) + " : " + str(exception))
+
+            # I guess exception's don't keep their stacktrace over the pyro boundary
+            #            logging.exception(exception)
+
         finally:
             # set process events flag to false end event loop, allowing
             # submitter to exit
@@ -146,7 +149,6 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         
 
 
-#REVIEW
 def main(argv):
     
     # setup command line interface

@@ -15,7 +15,6 @@ class QuiltStatus(quilt_core.QueryMasterClient):
         quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
 
-    #REVIEW
     def OnRegisterEnd(self):
         
         print 'Sources', self._qm.GetSourceManagerStats()

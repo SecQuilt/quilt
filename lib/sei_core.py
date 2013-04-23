@@ -30,7 +30,7 @@ EXITCODE=2
 
 def log_process(
     process,prefix='', postfix='',seperator=' ',loglevel='logging.DEBUG',
-    whichReturn=STDOUT,logToPython=True):
+    whichReturn=STDOUT,logToPython=True, outFunc=None):
     """perform nonblocking streaming of output from stderr and stdout of the specified process to the log"""
 
 # because it needs to be conenient to grab the stdout of a process (like for
@@ -55,20 +55,28 @@ def log_process(
     fcntl.fcntl(err, fcntl.F_SETFL, fl | os.O_NONBLOCK)
   
     grabOutput = whichReturn == STDOUT 
-    s = ''; 
-    exitCode = -1;
+    s = ''
+    exitCode = -1
        
     while True:
         somethingHappened = False
         try:
             out.flush()
             lineos = out.readline()
+            handled=False
             if grabOutput:
                 s += lineos;
+                handled = True
             if lineos: 
                 if logToPython:
                     log_line(lineos, prefix + ':stdout', postfix, seperator, loglevel)
-                else:
+                    handled=True
+
+                if outFunc != None:
+                    outFunc(lineos[:-1])
+                    handled=True
+                
+                if not handled:
                     print lineos[:-1]
 
                 somethingHappened = True
@@ -107,11 +115,13 @@ def log_process(
     return exitCode
         
     
-def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True, logToPython=True):
+def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True, 
+    logToPython=True, outFunc=None):
     """run the specified process and wait for completion, throw exception if nonzero exit occurs, log output of process to the logging module, return stdout as string"""
     logging.debug('run_process {begin}' + str(cmd) + '{end}')
     p = subprocess.Popen( cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
-    o = log_process(p,whichReturn=whichReturn, logToPython=logToPython)
+    o = log_process(p,whichReturn=whichReturn,
+        logToPython=logToPython,outFunc=outFunc)
     exitCode = p.poll()
     if checkCall and exitCode != 0:
         raise RuntimeError('cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(exitCode))

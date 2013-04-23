@@ -1,0 +1,72 @@
+quilt 0.1 quilt_data design
+---------------------------
+
+Module: quilt_data
+
+Type: Library
+
+External Dependencies:
+
+Responsibilities:
+    Provide functions for manipulating quilt compliant dictionaries.  Python
+    lets us write whatever we want into dicts, we want to use dicts because
+    they are fast and built in, but we don't want to loose control of the
+    data, so provide an interface for working with standardized dicts, which
+    we call "Specs" or specifications
+
+Inheritance and variations:
+
+    query's are basicaly patterns    
+    But there are source and regular flavors
+    
+Collections:
+
+    all *_spec are objects, and all *_specs are collections
+
+Functions:
+
+    Object accessors:
+        ${object}_[get/set/create/tryget/del]
+
+    These functions (named by the abreviations) are available for the 
+    following objects:
+
+General Objects:
+    var_spec:   Variable Specification
+        Variable specifications are used to define parameters and arguments
+        to patterns and queries.  They are not "subtyped" for each use but
+        any object containing variables uses them 
+
+Top Level Objects:
+    pat_spec:   Pattern Specification
+        Patterns are top level templates for queries.  You can instantiate
+        a pattern a create a query that will gather results from multiple
+        sources
+
+    src_var_mapping_spec:    Source Variable Mapping Specification
+        pat_spec's have a collection of these.  They provide instruction to
+        the system as to which variables in the pattern specification map to
+        which source variables in a source pattern
+
+    query_spec: Query Specification
+        Queries are instantiated patterns.  They have values set from the 
+        usert that completely fill out a pattern, providing enough
+        information to then query multiple sources.
+
+Source Level Objects:
+    src_pat_spec:   Source Pattern Specification
+        Source patterns provide information to the source manager about a
+        set of data that can be retrieved from that source
+
+    src_query_spec: Source Query Specification
+        Source Queries are instantiated Source Patterns.  They will have all
+        variables needed by the source pattern, and those variables will have
+        values provided
+    
+    src_spec:   Source Specification
+        Source Specification's define details about the source, such as
+        which patterns are available for the source
+    
+    
+    
+

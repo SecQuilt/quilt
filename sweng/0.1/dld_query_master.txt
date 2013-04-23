@@ -35,7 +35,7 @@ Classes:
             int nameServerPort,         # port for the nameserver
             string clientName           # name of the source manager on
                                         # the specified nameserver
-            string clientType           # nae of the type of the client
+            string clientType           # name of the type of the client
             )
             # acquire lock
             # determine unique name for source master (hopefuly just using the
@@ -77,43 +77,36 @@ Classes:
             # acquire lock
                 # copy the patternSpec the query references
                 # generate a query id
-                # get copy of sources
                 # store querySpec in Q to reserve query id
 
             # group variable mapping's by target source and source pattern
             #   store in local collection
         
-            # iterate the collection of sources
+            # iterate the collection of grouped sources
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
 
                 # iterate the collection of sourcePatterns for current source
-                    # get the sourcePatternSpec from the proxy as
-                    #   a new sourceQuerySpec
-                    #   logicaly we copy this into a sourceQuery and begin to 
-                    #   fill it with variables from the query.  But because we
-                    #   use pyro, we are already working with the copy
-
-                    # iterate the variables in the new sourceQuerySpec
-                        # find that source variable in the pattern's mappings                        # get the name of the query variable that maps to it
-                        # get the value of the query variable from the
-                        #   querySpec
-                        # assign the sourceVariable's value to that value
-
-                    # append completed sourceQuerySpec to querySpec
+                    # fill the a new src query spec from src pattern and
+                    #   variable information from the query
+                    #   by calling fill_src_query_spec
+                    # append completed sourceQuerySpec to list of srcQueries
+                    #   name sourceQuerySpec uniquely by combining the query
+                    #   name with the source pattern name
 
                     
-            # use querySpec to create a validation  string                    
+            # use querySpec and srcQueries to create a validation  string                    
             # ask submitter to validate the source Queries
             # if submitter refuses to validate, 
                 # acuire lock remove query id from q
                 # return early
 
             # acquire lock
-                #   store querySpec state as INITIALIZED
+                #   store querySpec state as INITIALIZED, and place 
+                    # validated contnts in member data
 
             # Process query...
-            # iterate the sourceQuerySpec's in the querySpec by source
+            # iterate the sourceQuerySpec's in srcQueries list by source
                 # get proxy to the source master
                 # query the source by sending it the source query spec as
                 #   asyncronous call
@@ -123,6 +116,7 @@ Classes:
                 # aware of the unexpected error
                 # call submit's OnSubmitProblem
                 # acquire lock, remove query id from pool
+                # add query to history with an error state
 
 
 
@@ -187,10 +181,11 @@ Classes:
             # set the results into the query spec
             
         void OnSourceQueryError(
-            Exception e)
+            queryid, Exception)
             """Called when an asyncronys source query produces an exeption"""
 
             # log the execption 
+            # remove query from q and place in history with error state
 
         # format a string with information about the specified query
         # from the history, or provide stats for all if no queryID is 
@@ -223,3 +218,18 @@ Functions:
 
     def get_client_proxy_from_type_and_name(qm, clientType, name)
         # overload for get_client_proxy
+
+    def create_src_query_spec
+        # get new sourceQuery spec from the sourcePatternSpec 
+
+        # iterate the variables in the new sourceQuerySpec
+            # find that source variable in the pattern's mappings 
+            # get the name of the query variable that maps to it
+            # get the value of the query variable from the
+            #   querySpec
+            # assign the sourceVariable's value to that value
+            #   but if the query does not have a value, use a
+            #   default provided by the pattern, but if that has
+            #   no default, use default provided by source pattern
+        # return new src_query from name, patternName, and variables
+        #   described in src pattern

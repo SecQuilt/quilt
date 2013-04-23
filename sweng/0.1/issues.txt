@@ -1,0 +1,30 @@
+quilt 0.1 issues
+----------------
+
+Open:
+
+    ISSUE001
+    There are some assumptions in the interface, and query instantiation logic
+        currently that prevent one source from beign used twice in a query.  
+        we can not fix it at this time, we need the power first to specify
+        multiple source patterns in one pattern before we can thing it
+        through.
+
+
+    ISSUE003
+    Command lines don't work!
+
+    ISSUE004
+    Need to remove lastQuery stuff from smd and unit tests
+
+    ISSUE005
+    Sources are a total hack, most notably not supporting concurent searches
+        at this time
+
+    ISSUE006
+    No test cases are defined which test default heiarchy functionality
+
+Closed:
+
+    ISSUE002
+    souce manager won't start!

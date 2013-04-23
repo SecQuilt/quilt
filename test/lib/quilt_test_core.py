@@ -33,9 +33,10 @@ def unittest_main_helper(description='',argv=sys.argv):
             help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
     args,unknown = parser.parse_known_args(argv)
 
+    level = None
     if (args.log_level is not None):
         # if log level was specified, set the log level
-        quilt_core.configure_logging(args.log_level)
+        level = args.log_level
 
         # now strip off the log arguments before we pass on to unit 
         # test main
@@ -45,7 +46,9 @@ def unittest_main_helper(description='',argv=sys.argv):
         sys.argv.pop(slot)
         sys.argv.pop(slot)
 
-def call_quilt_script( scriptName, args = []):
+    quilt_core.common_init(os.path.basename(sys.argv[0]), level)
+
+def call_quilt_script( scriptName, args = [], checkCall=True):
     """
     returns the stdoutput of the script, checks for bad error code and
     throws exception
@@ -61,6 +64,7 @@ def call_quilt_script( scriptName, args = []):
     # call quilt_status (check return code, capture output)
     args = [script_file, '-l', 'DEBUG'] + args
     out = sei_core.run_process(args,
-        whichReturn=sei_core.STDOUT, logToPython=False)
+        whichReturn=sei_core.STDOUT, logToPython=False,
+        checkCall=checkCall)
 
     return out

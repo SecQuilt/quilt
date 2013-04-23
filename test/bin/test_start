@@ -8,12 +8,13 @@ source $(dirname ${BASH_SOURCE[0]})/testenv.rc
 # stop old daemons if they exist, capture all the output, we
 # don't care if we called it an extra time
 $QUILT_HOME/test/bin/quilt_stop.py   &> /dev/null
-sleep 2
+sleep 4
+ps aux | grep quilt
+
 
 # start up quilt daemons
-$QUILT_HOME/lib/quilt_registrar.py   start -l DEBUG
-$QUILT_HOME/lib/quilt_qmd.py         start -l DEBUG
-$QUILT_HOME/lib/quilt_smd.py         start -l DEBUG
+$QUILT_HOME/test/bin/daemons_start
+sleep 1
 
 # run the quilt tests, exit with same failure code
 $QUILT_HOME/test/lib/quilt_test.py   -l DEBUG || exit $?

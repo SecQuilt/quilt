@@ -13,6 +13,7 @@ from daemon import runner
 import argparse
 import select
 import time
+import quilt_data
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -68,7 +69,6 @@ class QuiltConfig:
 
         return self._config.get(sectionName,valueName)
 
-    #REVIEW
     def GetSourceManagersUtil(self, which):
         """get list of all defined source managers"""
     
@@ -85,35 +85,37 @@ class QuiltConfig:
         smdcfgs = [ f for f in listdir(smdcfgdir) 
             if isfile(join(smdcfgdir,f)) ]
 
+        #logging.debug("Source manager config files: " + str(smdcfgs))
+
         # read all sections from all config file sin the smd directory
-        names = which == names
+        names = which == 'names'
 
         if names:
             smds = []
         else:
-            smds = {}
+            smds = quilt_data.src_specs_create()
  
         for f in smdcfgs:
             c = ConfigParser.ConfigParser()
             c.read(join(smdcfgdir, f))
             sections = c.sections()
             for s in sections:
+                #logging.debug("Reading section: " + s)
                 if names:
                     smds.append(s)
-                else
-                    # TODO assure security on access to
-                    # config files to assure safety of eval
-                    spec = eval(c.get(s,'sourceSpec')) 
-                    smds[s] = spec
+                else:
+                    specStr = c.get(s,'sourceSpec')
+                    quilt_data.src_specs_add( smds,
+                        quilt_data.src_spec_create(
+                            cfgStr=specStr, cfgSection=s))
+                    
         return smds
 
-    #REVIEW
     def GetSourceManagers(self):
-        return GetSourceManagersUtil("names")
+        return self.GetSourceManagersUtil("names")
 
-    #REVIEW               
     def GetSourceManagerSpecs(self):
-        return GetSourceManagersUtil("specs")
+        return self.GetSourceManagersUtil("specs")
 
 def GetQueryMasterProxy(config=None):
     """Access configuration to find query master, return proxy to it"""
@@ -128,8 +130,6 @@ def GetQueryMasterProxy(config=None):
         ", " + str(qmport))
     ns = Pyro4.locateNS(qmhost, qmport)
     uri = ns.lookup(qmname)
-
-    logging.debug(qmname + " is at uri: " + str(uri))
 
     return Pyro4.Proxy(uri)
 
@@ -320,7 +320,7 @@ def query_master_client_main_helper(
             logging.debug("executing " + str(len(s)) + " events in main loop")
             daemon.events(s)
         else:
-            time.sleep(0.05)
+            time.sleep(1.05)
  
         delDaemonObjs = {}
         # iterate the names and objects in clientObjectDic

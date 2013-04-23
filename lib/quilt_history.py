@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#REVIEW
 import os
 import sys
 import logging
@@ -17,7 +16,7 @@ class QuiltHistory(quilt_core.QueryMasterClient):
 
     def OnRegisterEnd(self):
         
-        o = self._qm.GetQueryHistoryStats()
+        o = self._qm.GetQueryHistoryStats(self._args.query_id)
             
         if o != None:
             print o

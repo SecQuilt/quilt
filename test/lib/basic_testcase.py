@@ -17,7 +17,7 @@ class BasicTestcase(unittest.TestCase):
         qstr = 'find me again ' + str(random.random())
         # call quilt_submit "find me again" (check return code)
         o = quilt_test_core.call_quilt_script('quilt_submit.py',
-            [ qstr, '-y' ])
+            [ qstr, '-y' ], checkCall=False)
         # sleep 1 seconds
         time.sleep(1)
         # Use QuiltConfig, Call GetSourceManagers, for each one
@@ -32,7 +32,14 @@ class BasicTestcase(unittest.TestCase):
                 clientRec =  qm.GetClientRec("SourceManager", smgr)
                 with query_master.get_client_proxy(clientRec) as smgrClient:
                     lastQuery = smgrClient.GetLastQuery()
-                    self.assertTrue(lastQuery == qstr )
+                    # after more functionality was added sources won't be called
+                    # unless referenced in the query.  we should no longer
+                    # see the unique query string down on the source
+                    # we wouldn't anyway because it isn't the ID.  The 
+                    # last query stuff was just a hack to get testing in
+                    # 0.1.c1, and is added to issue list to remove
+                    # TODO see ISSUE004
+                    self.assertTrue(lastQuery != qstr )
 
             # check qmd to be sure that all quilt_submit's have unregistered
             # do this by accessing Config, finding qmd name,
@@ -44,6 +51,11 @@ class BasicTestcase(unittest.TestCase):
     def test_basic_queue(self):
 
         qstr = 'find me again ' + str(random.random())
+
+        # define the query
+        o = quilt_test_core.call_quilt_script('quilt_define.py',
+            [ '-n', qstr ] )
+
         # call quilt_submit "find me again" (check return code)
         o = quilt_test_core.call_quilt_script('quilt_submit.py',
             [ qstr, '-y' ])
@@ -60,13 +72,13 @@ class BasicTestcase(unittest.TestCase):
         
 
         # call quilt_q -q query_id (check return code, capture output)
-        o = quilt_test_core.call_quilt_script('quilt_q.py',['-qid',qid])
+        o = quilt_test_core.call_quilt_script('quilt_q.py',[qid])
 
         # assure output contains same query id as before
         self.assertTrue(len(o) > 0)        
 
         # call quilt_q -q FAKEid (check return code, capture output)
-        o = quilt_test_core.call_quilt_script('quilt_q.py',['-qid',
+        o = quilt_test_core.call_quilt_script('quilt_q.py',[
             qid + 'FAKE'])
 
         # assure no output
