@@ -1,7 +1,7 @@
-quilt 0.1 basic source tests
-----------------------------
+quilt 0.1 pattern defaults testcase
+-----------------------------------
 
-Module: basic_source_testcase
+Module: pattern_defaults_testcase
 
 Type: Integration Test
 
@@ -11,24 +11,30 @@ Internal Dependencies:
 
 External Dependencies:
     python-unittest
-    python-pyro
 
 Prototype:
     see any unittest in seiscripts
 
 Responsibilities:
-    Perform a simple query of a basic data source.  Excersize all states
-of the system.
+    Quilt allows the specification of parameters and optional defaults that
+        will be used if an explicit value is not given.  There is a heiarchy
+        to the order in which defaults are used.  This is moderatly logically
+        complex and thus it is the responsibility of this module to test it.
 
 Classes:
 
-    class BasicSouceTestcase()
+    class PatternDefaultsTestcase()
 
-        NOTE: seed log with some unique text to search for
+        NOTE: Our test file is seeded with some unique values we can look for
             "Occurs_1_time"
             "Occurs_3_times"
             "Occurs_3_times"
             "Occurs_3_times"
+
+        NOTE: (ISSUE007)
+            pattern definition code may be moved once it is known where
+            and how pattern lifecycle managment is delt with in integration
+            tests
 
         def setUp():
             """Setup the query master with some patterns used by the tests"""

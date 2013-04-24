@@ -49,7 +49,78 @@ c2.Basic Source
         2. Null pattern (e.g., TRUE (producing whole database) or FALSE 
             (producing no events)) on small database
 
-c3.Adapation
+c3.Testability
+    Theme: Ensure testing fidelity and coverage
+
+    DESIGN
+
+    Design scheme for testing patterns, using rational from
+        design decision for  (ISSUE007)
+
+        Patterns added before, multiple tests run, patterns removed
+
+        The goal is to have all tests in a file run against a set of
+            patterns that only stay defined for the time it takes to run
+            those tests.
+
+        Prototype is needed to explore pyunit API and see if such
+            functionality exists.  Currently it is known that setUp and
+            tearDown methods are called before and after each test.
+
+        If pyunit api does not support our goal, we will investigate using
+            a work around like global variables, if it does not require
+            excessive heroics
+
+    Design test for pattern/source pattern defaults (ISSUE006)
+        According to the rules in the requirements, implment
+            automated test to ensure this functionality does not 
+            regress.
+        This functionality was verified by hand once in 0.1.c2 and
+            it should work
+
+    Design old testing hook in source Manager (ISSUE004)
+        a "lastQuery" attribute is in the Source Manager and called
+            from "basic_testcase".
+        This was only present to ensure the call was happening
+        This attribute should be removed and the calling test should be
+            refactored to more betterly test the desired functionality
+
+    Design Testability (new feature/refactoring) (ISSUE008)
+        currently the test's scrape the stdoutput and search for
+            strings of interest in each executable's output
+        Upgrade this functionality so that it is more scalable and
+            modifiable.
+        Provide (an overridable) output formatter 
+            Default formatter will be a balance between human and machine
+                reability.
+            Default formatter will output pretty print of python dictionary
+                objects.
+            Default formatter should enable and orderable output for
+                dictionaries
+    
+    IMPLEMENT
+
+    Implement all of the designed functionality in c3 in the most logical
+        order.  Logical order may become more apparent after completion of
+        detailed design.  At this time logical order is thought to be:
+   
+    ISSUE007 : With the design decsion made, more should be apparant
+    ISSUE004 : Fix existing tests before improving testing infrastructure
+    ISSUE008 : Refactor alle axisting tests with new output checking scheme
+    ISSUE006 : Implement the new test for unconvered functionality
+
+    TEST
+
+    We are improving the testing infrastructure, so all of this testing will
+    basically be already setup, all we have to do is run it.  When possible
+    We will use the iterative appraoch and test as functionality is delivered 
+   
+         
+    
+    
+    
+
+cX.Adapation
     Adopt a query language
 
     Design prototype pattern input format
@@ -67,22 +138,22 @@ c3.Adapation
         4. Dual-source pattern with cross-reference (e.g., flow.sip=1.2.3.4 and
         5. Multiple source pattern without cross-reference
         6. Multiple source pattern with cross reference
-c4.Execution
+cX.Execution
     Execute query specified from Query Master on the Source Master
 
     Design
         formalize query format
         formalize result format
 
-c4.Return
+cX.Return
     Return query results from Source Master to Query Master
 
-c5.Evaluation
+cX.Evaluation
     Determine and fix weak points and refactor
     Demo Prototype to likely adopting staeholders and gather reactions
 
-c6.UI
+cX.UI
     Polish user interaction points
 
-c7.Integration
+cX.Integration
     Perform integration of entire workflow, fill in TODO's

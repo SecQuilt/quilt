@@ -11,6 +11,10 @@ Queries:
 * Queries should support specification based on temporal order of events
 * Pattern matching of events supports temporal operators (BEFORE, CONCURRENT, 
         UNTIL)
+* Default values for query parameters can be provided in a source pattern or
+    in the quilt pattern
+* A default value specified in a quilt pattern will overide a default value
+    set in the source pattern
 
 Results:
 * results of query will be presented to the user as a collection of temporal
@@ -28,3 +32,4 @@ Data:
 Tasks:
 * Mine log files for events of interest
     ** using regular expressions
+* All functionality shall be verifiable via automated testing

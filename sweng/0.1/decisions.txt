@@ -1,0 +1,36 @@
+quilt 0.1 design decisions
+--------------------------
+
+Pattern lifecycle for testing (ISSUE007)
+
+Goal priority:
+    1.  realistic test coverage
+    2.  complete test coverage
+    3.  low overhead per new test/testcase
+    4.  low core test code complexity
+
+Sensitiviy Points:
+
+    Adding/removing patterns before/after each test
+        low realism
+        high coverage
+        medium overhead
+        low core
+
+    Adding/removing patterns before/after group of tests
+        med-high realism
+        med-high coverage
+        low overhead
+        med-high core
+
+    Adding patterns before each test, never removing them
+        med realism
+        high-low coverage
+        low overhead
+        low core
+
+Decision:
+    
+    Adding/removign patterns before each group of tests is an effective
+        balance between instantly defining and undefining them, and
+        letting them accumulate forever.

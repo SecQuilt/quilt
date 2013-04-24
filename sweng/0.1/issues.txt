@@ -1,5 +1,7 @@
 quilt 0.1 issues
 ----------------
+Identified for testability cycle (c3):
+    Issues 3,4,6,7
 
 Open:
 
@@ -24,7 +26,16 @@ Open:
     ISSUE006
     No test cases are defined which test default heiarchy functionality
 
+    ISSUE007
+    Strategy needs to be decided for if test patterns are redefined every time
+        are they reused?  Are they removed after completed?  Some kind of
+        tradeoff analyscis needs to inform a decision on this matter, for now
+        they are hacked
+
+    ISSUE008
+    Need standard way of output to stdout so that automated tests can be
+    more reliable and check results more betterly
+
 Closed:
 
-    ISSUE002
-    souce manager won't start!
+    ISSUE002 souce manager won't start!

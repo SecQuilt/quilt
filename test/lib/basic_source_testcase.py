@@ -21,6 +21,7 @@ class BasicSourceTestcase(unittest.TestCase):
     def setUp(self):
         """Setup the query master with some patterns used by the tests"""
 
+        # ISSUE007
         # TODO, pyunit's bright idea is to call setup before each test.  It
         # was defining multiple patterns which was annoying but not a problem.
         # The cleaneast way to do things is probably to remove patterns after

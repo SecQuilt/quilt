@@ -18,6 +18,12 @@ test_stop
     script will stop all daemons
 
  
+Unit Testing vs Integration Testing
+-----------------------------------
 
+Although Unit testing of complex functions is strongly encouraged.  We have
+    chosen to use pyunit as a tester for our integration tests.  Integration
+    tests of all functionality are absolutely required.  With a small
+    development staff we can not afford any regressions.
 
            
