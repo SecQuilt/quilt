@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-import os
 import logging
-import pprint
 
 STATE_COMPLETED="COMPLETED"
 STATE_INITIALIZED="INITIALIZED"
@@ -231,7 +229,7 @@ def pat_specs_add(patSpecs, patSpec):
     if patSpecs == None:
         patSpecs = pat_specs_create()
     name = pat_spec_get(patSpec,name=True)
-    patSpecs[pat_spec_get(patSpec,name=True)] = patSpec
+    patSpecs[name] = patSpec
     return patSpecs
     
 def pat_specs_get(patSpecs, patName):
@@ -256,6 +254,7 @@ def query_spec_set(
     if name != None: spec_name_set(spec, name)
     if state != None: spec['state']= state
     if patternName != None: spec['patternName']= patternName
+    if notificationEmail != None: spec['notificationEmail']= notificationEmail
     if results != None: spec['results']= results
     if variables != None: spec['variables']= variables
     return spec

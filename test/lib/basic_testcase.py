@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-import logging
 import unittest
-import subprocess
 import quilt_test_core
 import sei_core
 import quilt_core
@@ -16,7 +14,7 @@ class BasicTestcase(unittest.TestCase):
     def test_basic_query(self):
         qstr = 'find me again ' + str(random.random())
         # call quilt_submit "find me again" (check return code)
-        o = quilt_test_core.call_quilt_script('quilt_submit.py',
+        quilt_test_core.call_quilt_script('quilt_submit.py',
             [ qstr, '-y' ], checkCall=False)
         # sleep 1 seconds
         time.sleep(1)
@@ -57,8 +55,8 @@ class BasicTestcase(unittest.TestCase):
             [ '-n', qstr ] )
 
         # call quilt_submit "find me again" (check return code)
-        o = quilt_test_core.call_quilt_script('quilt_submit.py',
-            [ qstr, '-y' ])
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',
+            [ qstr, '-y' ]))
         # sleep 1 seconds
         time.sleep(1)
 

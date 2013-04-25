@@ -3,13 +3,9 @@ import os
 import sys
 import logging
 import unittest
-import subprocess
 import quilt_test_core
 import sei_core
-import quilt_core
 import time
-import query_master
-import random
 import quilt_data
 import re
 
@@ -41,7 +37,7 @@ class BasicSourceTestcase(unittest.TestCase):
         
 #        logging.debug("Determined source name as: " + srcName)
 
-        o = quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py',[
             '-n', 'test_pattern',
             '-v', 'SEARCHSTRING', 'the Search string',
             '-m', 'SEARCHSTRING', srcName, 'grep', 'OPTIONS'])
@@ -49,8 +45,8 @@ class BasicSourceTestcase(unittest.TestCase):
 
 
     def query(self,searchString):
-        o = quilt_test_core.call_quilt_script('quilt_submit.py',[
-            '-y', '-v', 'SEARCHSTRING', searchString, 'test_pattern'])
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+            '-y', '-v', 'SEARCHSTRING', searchString, 'test_pattern']))
         # capture query_id from std out 
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]
