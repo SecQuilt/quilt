@@ -1,0 +1,10 @@
+1   Where possible all individually identified defects with a pattern that can be identified is automatically searched across the code base
+2   String quoting and escaping of characters is correct
+3   Return types correspond to function calls
+4   Argument types are correct for funciton calls
+5   Null's / missing data are checked and handled properly
+6   Filesystem use is correct
+7   Areas where copy and paste are used are scruitinized heavily
+8   Function prototypes are correctly specified
+9   Proper (), : and ; ", etc..
+
