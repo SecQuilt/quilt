@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import os
 import sys
 import logging
 import quilt_core
@@ -13,15 +12,13 @@ class Qmd(quilt_core.QuiltDaemon):
         quilt_core.QuiltDaemon.__init__(self)
         self.setup_process("qmd")
 
-    def run(_self):
+    def run(self):
 
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()
         # access the registrar's host and port number from config
-        registrarHost = cfg.GetValue(
-            'registrar', 'host', None)
-        registrarPort = cfg.GetValue(
-            'registrar', 'port', None) 
+        registrarHost = cfg.GetValue( 'registrar', 'host', None)
+        registrarPort = cfg.GetValue( 'registrar', 'port', None) 
        
         # access the query master's name from the config file
         qmname = cfg.GetValue(

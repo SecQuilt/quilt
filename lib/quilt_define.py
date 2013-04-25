@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 
-import os
 import sys
-import logging
 import quilt_core
-import Pyro4
-import query_master
-import argparse
-import pprint
 import quilt_data
 
 class QuiltDefine(quilt_core.QueryMasterClient):
@@ -63,7 +57,6 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                 srcPat = m[2]
                 srcVar = m[3]
 
-                vSpec = quilt_data.var_specs_get(variables, varName)
         
                 # query variables are allowed to map to multiple
                 # source variables.  Initalize a blank list if it isn't present
@@ -133,7 +126,7 @@ def main(argv):
 
     # start the client
     quilt_core.query_master_client_main_helper({
-        client._localname : client})
+        client.localname : client})
         
 
 if __name__ == "__main__":

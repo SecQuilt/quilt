@@ -15,6 +15,29 @@ Open:
 
     ISSUE003
     Command lines don't work!
+    quilt/bin/quilt_define
+
+I only get the log options showing:
+
+[jdav@n005 ~]$ ./quilt/bin/quilt_define  -h
+usage:
+        Define a pattern to the query master.  A pattern is the template for a
+        query.  The specified name of the pattern may be modified so as to
+        become unique.  The official name of the pattern will be displayed.
+        quilt_define will not return until pattern is defined or an error has
+        occured.  It will output the finalized (unique) name for the pattern
+
+       [-h] [-l [LOG_LEVEL]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l [LOG_LEVEL], --log-level [LOG_LEVEL]
+                        logging level (DEBUG,INFO,WARN,ERROR) default: WARN
+
+My desire was for it to show the other options that I set in quilt_define. That are reflected in the functional specification.   But the extra options, though not listed in the usage will actually work because I can do the .-v. and .-m. options and those tests are running.
+
+So it is hopefully fixable the way it is designed, where we centralize the log initialization.  If necessary when fixed, please update the design documentation quilt/sweng/0.1  . Although I only mentio.ned quilt_define, I believe the same is true for all of the executable scripts that are listed in the functional specification.  Send me a note if you want we can talk at lunchtime tomorrow for a few minutes
+
 
     ISSUE004
     Need to remove lastQuery stuff from smd and unit tests

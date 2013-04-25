@@ -65,7 +65,7 @@ def log_process(
             lineos = out.readline()
             handled=False
             if grabOutput:
-                s += lineos;
+                s += lineos
                 handled = True
             if lineos: 
                 if logToPython:
@@ -81,8 +81,9 @@ def log_process(
 
                 somethingHappened = True
 
-        except:
-            pass
+        except Exception, e:
+            #TODO Only catch the IO exception
+            e = e
 
         try:
             err.flush()
@@ -96,8 +97,9 @@ def log_process(
                 somethingHappened = True
 
 
-        except:
-            pass
+        except Exception, e:
+            #TODO Only catch the IO exception
+            e = e
 
         exitCode = process.poll()
         if (exitCode is not None) and (not somethingHappened):

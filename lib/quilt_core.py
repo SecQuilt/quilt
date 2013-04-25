@@ -136,7 +136,11 @@ def GetQueryMasterProxy(config=None):
 class QuiltDaemon(object):
   
     def __init__(self): 
-        pass
+        self.stdin_path = None
+        self.stdout_path = None
+        self.stderr_path = None
+        self.pidfile_path =  None
+        self.pidfile_timeout = None
 
     name = ''
     def setup_process(self, name):
@@ -153,6 +157,7 @@ class QuiltDaemon(object):
         self.pidfile_timeout = 5
 
     def main(self, argv):
+        argv = argv 
         try:
             daemon_runner = runner.DaemonRunner(self)
             daemon_runner.do_action()
@@ -173,8 +178,10 @@ class QueryMasterClient:
         use user name and pid in the name of the object
         to generate a unique enough name for this machine
         """
-        self._localname = '_'.join(
+        self.localname = '_'.join(
             [basename, getpass.getuser(), str(os.getpid())])
+        self._qm = None
+        self._remotename = None
 
     def GetType(self):
         raise Exception("""Abstract function is rquired to be implemented by
@@ -197,13 +204,13 @@ class QueryMasterClient:
         if rport != None:
             rport = int(rport)
         rhost = config.GetValue("registrar", "host", None)
-        logging.debug("Registering " + self._localname + ", to query master" + 
+        logging.debug("Registering " + self.localname + ", to query master" + 
             ", via registrar: " + str(rhost) + ":" + str(rport))
         self._remotename = self._qm.RegisterClient(
-            rhost, rport, self._localname, self.GetType())
+            rhost, rport, self.localname, self.GetType())
 
         # connection complete, call our notification function
-        logging.info("Connection completed for " + self._localname)
+        logging.info("Connection completed for " + self.localname)
 
     def OnRegisterEnd(self):
         """
@@ -235,11 +242,7 @@ class QueryMasterClient:
     def UnregisterFromQueryMaster(self):
         if self._qm != None and self._remotename != None:
             self._qm.UnRegisterClient(self.GetType(), self._remotename)
-            logging.info("Unregistration completed for " + self._localname)
-
-    def Heartbeat(self):
-        logging.debug("Heartbeat happened")
-        pass
+            logging.info("Unregistration completed for " + self.localname)
 
 def query_master_client_main_helper(
         clientObjectDict       # map of instances to names of objects to
@@ -368,6 +371,7 @@ def main_helper( name, description, argv ):
         help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
 
     args, unknownArgs = argparser.parse_known_args(argv)
+    unknownArgs = unknownArgs # its a pylint thing
 
     common_init(name, args.log_level)
 

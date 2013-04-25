@@ -2,9 +2,7 @@
 import sys
 import os
 import argparse
-import logging
 import quilt_core
-import subprocess
 import sei_core
 
 def get_quilt_test_lib_dir():
@@ -18,10 +16,10 @@ def get_quilt_lib_dir():
 
 def get_test_cfg_dir():
     """Get the location of the quilt testing configuration file"""
-    d = os.path.dirname(__file__);
-    d = os.path.dirname(d);
-    d = os.path.join(d,'etc');
-    d = os.path.join(d,'quilt');
+    d = os.path.dirname(__file__)
+    d = os.path.dirname(d)
+    d = os.path.join(d,'etc')
+    d = os.path.join(d,'quilt')
     return d
     
 
@@ -32,6 +30,7 @@ def unittest_main_helper(description='',argv=sys.argv):
     parser.add_argument('-l','--log-level',nargs='?',
             help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
     args,unknown = parser.parse_known_args(argv)
+    unknown=unknown # pylint thing
 
     level = None
     if (args.log_level is not None):
@@ -48,7 +47,7 @@ def unittest_main_helper(description='',argv=sys.argv):
 
     quilt_core.common_init(os.path.basename(sys.argv[0]), level)
 
-def call_quilt_script( scriptName, args = [], checkCall=True):
+def call_quilt_script( scriptName, args = None, checkCall=True):
     """
     returns the stdoutput of the script, checks for bad error code and
     throws exception
@@ -56,7 +55,9 @@ def call_quilt_script( scriptName, args = [], checkCall=True):
                             #   directory
         args                # arguments to pass to the script):
     """
-    
+    if args == None:
+        args = []
+
     quilt_lib_dir = get_quilt_lib_dir()
     # assemble the filename for query master
     script_file = os.path.join(quilt_lib_dir,scriptName)
