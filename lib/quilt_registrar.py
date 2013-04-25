@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-import os
 import sys
-import logging
 import quilt_core
 import Pyro4
 
@@ -10,7 +8,7 @@ class Registrar(quilt_core.QuiltDaemon):
         quilt_core.QuiltDaemon.__init__(self)
         self.setup_process("registrar")
 
-    def run(_self):
+    def run(self):
 
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()
@@ -35,7 +33,7 @@ def main(argv):
 
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
     parser.parse_args()
-    args = parser.parse_args(argv)
+    parser.parse_args(argv)
 
     # start the daemon
     Registrar().main(argv)

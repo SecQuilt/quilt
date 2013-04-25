@@ -1,11 +1,6 @@
 #!/usr/bin/env python
-import os
 import sys
-import logging
 import quilt_core
-import Pyro4
-import query_master
-import argparse
 
 class QuiltQueue(quilt_core.QueryMasterClient):
 
@@ -53,7 +48,7 @@ def main(argv):
 
     # start the client
     quilt_core.query_master_client_main_helper({
-        client._localname : client})
+        client.localname : client})
         
 
 if __name__ == "__main__":

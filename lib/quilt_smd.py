@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-import os
 import sys
 import logging
 import quilt_core
-import argparse
 from string import Template
 import sei_core
 import quilt_data
@@ -117,8 +115,8 @@ class SourceManager(quilt_core.QueryMasterClient):
         
 
     def GetSourcePatterns(self):
+        """Returns a list of names of defined source patterns"""
         try:
-            """Returns a list of names of defined source patterns"""
             # non need to lock because noone shuld be writing to a source spec
             # after init
 
@@ -167,7 +165,7 @@ class Smd(quilt_core.QuiltDaemon):
             logging.debug(smname + " specified from configuration")
             # create each source manager object
             sm = SourceManager(self._args, smname, smspec)
-            objs[sm._localname] = sm
+            objs[sm.localname] = sm
         
         #logging.info("Creating source managers: " + str(objs))
             

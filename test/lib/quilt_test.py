@@ -3,16 +3,11 @@ import os
 import sys
 import logging
 import quilt_core
-import argparse
 import quilt_test_core
-import subprocess
 import atexit
-from daemon import runner
 import time
 import glob
 import unittest
-import lockfile
-import pprint
 
 # set environment variable for testing configuration directory
 cfgdir = quilt_test_core.get_test_cfg_dir()
@@ -24,7 +19,7 @@ def at_exit():
 
 def filename_to_modulename(scriptsHome,filename):
     if filename.startswith(scriptsHome):
-            filename = filename.replace(scriptsHome,'',1)
+        filename = filename.replace(scriptsHome,'',1)
     else:
         raise Exception('Unexpected filename: ' + filename)
 
@@ -38,11 +33,7 @@ def filename_to_modulename(scriptsHome,filename):
 class QuiltTest(object):
         
     def main(self, args):
-
-        # assemble the filename for query master
-        quilt_lib_dir = quilt_test_core.get_quilt_lib_dir()
-        quilt_reg_file = os.path.join(quilt_lib_dir,'quilt_registrar.py')
-        quilt_qmd_file = os.path.join(quilt_lib_dir,'quilt_qmd.py')
+        args=args # reserved for future use pylint!
 
         # start the query master daemon
         atexit.register(at_exit)
@@ -82,7 +73,7 @@ class QuiltTest(object):
             
             # load unit tests from those files
             tests = []
-            for testFile,testStatus in testFiles.items():
+            for testFile in testFiles.keys():
                 moduleName = filename_to_modulename(
                     quilt_test_lib_dir, testFile)
                 curtest = unittest.defaultTestLoader.loadTestsFromName(
@@ -92,12 +83,12 @@ class QuiltTest(object):
             
             # run the tests
             testSuite = unittest.TestSuite(tests)
-            runner = unittest.TextTestRunner().run(testSuite)
+            myrunner = unittest.TextTestRunner().run(testSuite)
 
             logging.info("End Itegration Testing iteration")
 
             # raise exception if tests failed
-            if (not runner.wasSuccessful()):
+            if (not myrunner.wasSuccessful()):
                 exit(1)
             
 

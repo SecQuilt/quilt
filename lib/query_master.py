@@ -1,20 +1,17 @@
 #!/usr/bin/env python
-import os
-import sys
 import logging
 import Pyro4
 import threading
-import quilt_smd
 import pprint
 import quilt_data
 
 class QueryMaster:
 
-    _clients = {}
+    clients = {}
     _queries = quilt_data.query_specs_create()
     _history = quilt_data.query_specs_create()
     _patterns = quilt_data.pat_specs_create()
-    _lock = threading.Lock()
+    lock = threading.Lock()
 
     def RegisterClient(
         self,
@@ -31,24 +28,24 @@ class QueryMaster:
                                         # the specified nameserver
             string clientType           # name of the type of the client
         """
-        with self._lock:
+        with self.lock:
 
             # get the proxy handle to the remote object 
             
             # determine unique name for client (hopefuly just using the
             # passed in name, but double check registered list.
             uniqueName = clientName
-            index = 1;
-            if clientType not in self._clients:
-                self._clients[clientType] = {}
+            index = 1
+            if clientType not in self.clients:
+                self.clients[clientType] = {}
 
-            while uniqueName in self._clients[clientType]:
+            while uniqueName in self.clients[clientType]:
                 uniqueName = '_'.join(clientName,str(index))
                 index = index + 1
                
             # Store in list of registered clients
             # use object's name and type to key it in the registerd list
-            self._clients[clientType][uniqueName] = {
+            self.clients[clientType][uniqueName] = {
                 'registrarHost' : nameServerHost,
                 'registrarPort' : nameServerPort,
                 'clientName' : clientName }
@@ -68,16 +65,16 @@ class QueryMaster:
          string clientNameKey - key that the qmd knows to id a client
         """
         clientDict = None
-        with self._lock:
+        with self.lock:
             # if not found in the list, do nothing
-            if clientType not in self._clients:
+            if clientType not in self.clients:
                 return
-            if clientNameKey not in self._clients[clientType]:
+            if clientNameKey not in self.clients[clientType]:
                 return
             logging.debug("Unregistering client: " + clientNameKey + "...")
-            clientDict = self._clients[clientType][clientNameKey]
+            clientDict = self.clients[clientType][clientNameKey]
             # remove the specified sm from registered list
-            del self._clients[clientType][clientNameKey]
+            del self.clients[clientType][clientNameKey]
 
         # client not found exit silently
         if clientDict == None:
@@ -105,16 +102,16 @@ class QueryMaster:
         type"""
         
         clients = []
-        with self._lock:
-            if objType in self._clients:
-                clients = self._clients[objType].copy()
+        with self.lock:
+            if objType in self.clients:
+                clients = self.clients[objType].copy()
 
         return clients
 
     def GetClientRec(self,objType,clientName):
         """return the master's client record for the specified client"""
-        with self._lock:
-            return self._clients[objType][clientName].copy()
+        with self.lock:
+            return self.clients[objType][clientName].copy()
 
     def DefinePattern(self, patternSpec):
         """Define the specified pattern in the query master, return
@@ -127,9 +124,9 @@ class QueryMaster:
             if rootName == None:
                 rootName = "pattern"
             patternName = rootName
-            i = 1;
+            i = 1
 
-            with self._lock:
+            with self.lock:
                 while patternName in self._patterns.keys():
                     patternName = '_'.join([rootName,str(i)])
                     i = i + 1
@@ -181,7 +178,7 @@ class QueryMaster:
                 querySpec, patternName=True)
 
             # acquire lock
-            with self._lock:
+            with self.lock:
                 # copy the patternSpec the query references
                 patternSpec = quilt_data.pat_specs_get(
                     self._patterns, patternName).copy()
@@ -218,7 +215,7 @@ class QueryMaster:
             #logging.info("got patVarSpecs: " + str(patVarSpecs))
             #logging.info("got mappings: " + str(mappings))
             if patVarSpecs != None and mappings != None:
-                for varName, varSpec in patVarSpecs.items():
+                for varName in patVarSpecs.keys():
                     for m in mappings:
                         src = quilt_data.src_var_mapping_spec_get(
                             m, sourceName=True)
@@ -323,7 +320,7 @@ class QueryMaster:
                 # acuire lock remove query id from q
                 # delete the query record, it was determined invalid
                 # return early
-                with self._lock:
+                with self.lock:
                     quilt_data.query_specs_del(self._queries, qid)
                 return
 
@@ -331,7 +328,7 @@ class QueryMaster:
                 "did validate the query: " + qid)
 
             # acquire lock
-            with self._lock:
+            with self.lock:
                 # store querySpec state as INITIALIZED, and place 
                 # validated contnts in member data
                 quilt_data.query_spec_set(querySpec,
@@ -391,7 +388,7 @@ class QueryMaster:
         """
         format a string with information about all the Query's in the q   
         """
-        with self._lock:
+        with self.lock:
             return pprint.pformat(self._queries.keys())
 
     def TryGetQueryStats(self, queryId):
@@ -400,7 +397,7 @@ class QueryMaster:
         return None if not found
         """
         
-        with self._lock:
+        with self.lock:
             if queryId not in self._queries:
                 return None
             else:
@@ -414,7 +411,7 @@ class QueryMaster:
         """
         try:
             # acquire lock
-            with self._lock:
+            with self.lock:
             # if queryID specified
                 if queryId != None:
                     # throw error if query not found in history, 
@@ -438,7 +435,7 @@ class QueryMaster:
         """Return a string describing the patterns defined in the query
         master"""
 
-        with self._lock:
+        with self.lock:
             return pprint.pformat(self._patterns)
 
     def SetQueryResults(self, queryId, eventList):
@@ -446,7 +443,7 @@ class QueryMaster:
         and mark it complete, and move it to history list"""
 
         # acquire lock
-        with self._lock:
+        with self.lock:
             # mark the query as completed in state
             querySpec = quilt_data.query_specs_del(self._queries, queryId)
             quilt_data.query_spec_set(querySpec,
@@ -460,7 +457,7 @@ class QueryMaster:
         """Called when an asyncronys source query produces an exeption"""
 
         try:
-            with self._lock:
+            with self.lock:
                 # mark the query as completed in state
                 querySpec = quilt_data.query_specs_del(self._queries, qid)
                 quilt_data.query_spec_set(querySpec,
@@ -492,8 +489,8 @@ def get_client_proxy( clientRec):
 
 def get_client_proxy_from_type_and_name( qm, clientType, clientName):
     # lock access to the clients of the query masteter
-    with qm._lock:
-        rec = qm._clients[clientType][clientName].copy()
+    with qm.lock:
+        rec = qm.clients[clientType][clientName].copy()
     return get_client_proxy(rec)
     
 def create_src_query_spec(

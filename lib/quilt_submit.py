@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-import os
 import sys
 import logging
 import quilt_core
 import Pyro4
-import query_master
-import argparse
 import quilt_data
 import pprint
 
@@ -16,12 +13,12 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
     then exit
     """
 
+#   """
+#   the event loop control variable, if false event loop will
+#   not run, or stop running.  This variable is shared between threads
+#   and should not be accessed without a lock
+#   """
     _processEvents = True
-    """
-    the event loop control variable, if false event loop will
-    not run, or stop running.  This variable is shared between threads
-    and should not be accessed without a lock
-    """
 
     def __init__(self, args):
         # chain to call super class constructor 
@@ -179,7 +176,7 @@ def main(argv):
 
     # start the client
     quilt_core.query_master_client_main_helper({
-        client._localname : client})
+        client.localname : client})
         
 
 if __name__ == "__main__":
