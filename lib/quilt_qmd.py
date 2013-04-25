@@ -13,7 +13,7 @@ class Qmd(quilt_core.QuiltDaemon):
         quilt_core.QuiltDaemon.__init__(self)
         self.setup_process("qmd")
 
-    def run(_self):
+    def run(self):
 
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()

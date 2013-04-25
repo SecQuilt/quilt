@@ -222,7 +222,7 @@ def pat_spec_tryget(
 
 # shortcut function dereferences variables for you
 def pat_spec_var_get( spec, varName):
-    return var_specs_get(pat_spec_vars_get(spec), varName)
+    return var_specs_get(pat_spec_get(spec,variables=True), varName)
     
 def pat_specs_create():
     return {}
