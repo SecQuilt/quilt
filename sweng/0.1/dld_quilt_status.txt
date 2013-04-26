@@ -25,6 +25,8 @@ Classes:
 
          OnRegisterEnd()
 
+            #REVIEW (ISSUE008)
+            # using util's show functions
             # print out statistics about the manager's sources
             #   using remote call to query master
             #   GetSourceManagerStats() 

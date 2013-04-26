@@ -67,9 +67,16 @@ c3.Testability
             functionality exists.  Currently it is known that setUp and
             tearDown methods are called before and after each test.
 
-        If pyunit api does not support our goal, we will investigate using
-            a work around like global variables, if it does not require
-            excessive heroics
+        So far pyunit API in (python 2.6) does not look like it directly
+            supports this.  Early prototyping has not shown an easy way to
+            get testcase class level cleanup code to run.  We don't want to
+            do unneccessary work, particularly if this is fixed in a later
+            version of pyunit.
+
+        Possibly we should just improve the current hack for a class level
+            initialization code, and just ignore the cleanup of the
+            patterns
+
 
     Design test for pattern/source pattern defaults (ISSUE006)
         According to the rules in the requirements, implment
@@ -95,8 +102,6 @@ c3.Testability
                 reability.
             Default formatter will output pretty print of python dictionary
                 objects.
-            Default formatter should enable and orderable output for
-                dictionaries
     
     IMPLEMENT
 
@@ -104,9 +109,10 @@ c3.Testability
         order.  Logical order may become more apparent after completion of
         detailed design.  At this time logical order is thought to be:
    
-    ISSUE007 : With the design decsion made, more should be apparant
+    ISSUE007 : With the wdesign decsion made, more should be apparant
+    ISSUE008 : Refactor all axisting tests with new output checking scheme
+        Modify tests as well as outputting code
     ISSUE004 : Fix existing tests before improving testing infrastructure
-    ISSUE008 : Refactor alle axisting tests with new output checking scheme
     ISSUE006 : Implement the new test for unconvered functionality
 
     TEST

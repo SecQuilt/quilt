@@ -15,6 +15,6 @@ class a:
         self._b = a.b(self)
 
 
-mya = a();
-mya._b.bfunc()
+# mya = a();
+# mya._b.bfunc()
 

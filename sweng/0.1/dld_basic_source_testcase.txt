@@ -14,7 +14,7 @@ External Dependencies:
     python-pyro
 
 Prototype:
-    see any unittest in seiscripts
+    some_test.py
 
 Responsibilities:
     Perform a simple query of a basic data source.  Excersize all states

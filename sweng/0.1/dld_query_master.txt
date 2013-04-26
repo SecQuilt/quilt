@@ -10,7 +10,6 @@ Internal Dependencies:
     
 External Dependenies:
     python-pyro(4)
-    python-daemon
     threading
 
 Prototypes:

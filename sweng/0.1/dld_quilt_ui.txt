@@ -1,0 +1,46 @@
+#REVIEW (ISSUE008)
+quilt 0.1 quilt_ui design
+-------------------------
+
+Module: quilt_ui
+
+Type: Library
+
+External Dependencies:
+    pprint
+
+Responsibilities:
+    Provide common pathways for input/output to quilt programs.
+    facilitate testability
+
+Functions:
+
+    def prepare(msg):
+        """
+        prepare a message for the user interface
+        """
+        # call pprint.pformat on the msg, return it
+
+
+    def show(outputMsg):
+        """
+        Show the message specified to the user
+        outputMsg is of any primitive or collection of primitives
+        """
+        # if outputMsg != string
+            # print out the prepared version of outputMsg
+        # else
+            # print our outputMsg
+
+    NOTE: in future when requirements grow more common functionality
+        can be pushed to "tell"   
+    def tell(inputMsg):
+        """
+        receive input message from the user
+        """
+
+        # call read line
+
+
+
+

@@ -37,11 +37,13 @@ Classes:
             # ALWAYS set process events flag to false end event loop, allowing
             # submitter to exit
 
-            # print out query ID
+            #REVIEW (ISSUE008)
+            # print out query ID, using util show function
 
             # if args specify validation should occur
                 # display message to std output
-                # read y/n from std input
+                #REVIEW (ISSUE008)
+                # read y/n from std input using util tell function
                 # if n return false to stop the query
 
             
@@ -80,7 +82,9 @@ Classes:
             # ALWAYS set process events flag to false end event loop, allowing
             # submitter to exit
 
+            #REVIEW (ISSUE008)
             # print out the query id and the message
+            #   using util show function
             
 
 Functions:

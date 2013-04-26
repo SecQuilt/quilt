@@ -23,13 +23,15 @@ Classes:
             # store args as member variable
             # chain to super constructor
 
+         # REVIEW
          OnRegisterEnd()
-            # print out statistics about the manager's Q
             # if q id specified
                 # TryGetQueryStats from master
             # else 
                 # GetQueryQueueStats from master
-            # DisconnectFromQueryMaster
+            # print out statistics about the manager's Q
+            #   using utility tell function
+            # return false to DisconnectFromQueryMaster
 
 
 Functions:

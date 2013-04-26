@@ -23,9 +23,12 @@ Classes:
             # store args as member variable
             # chain to super constructor
 
+        # REVIEW
          OnRegisterEnd()
             # print out statistics about the manager's History 
+            
             # GetQueryQueueStats from master, display them
+            #   using util show function
             # return False to DisconnectFromQueryMaster
 
 

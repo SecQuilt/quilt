@@ -23,6 +23,7 @@ Classes:
         def GetType(self):
             return "QuiltDefine"
 
+        # REVIEW
         void OnRegisterEnd()
 
             # create a patternSpec dict from arguments (name, 
@@ -30,7 +31,7 @@ Classes:
 
             # define patternSpec in the query master as a syncronous call
             # return will be the pattern name
-            # print out pattern Name
+            # print out pattern object using util show function
 
             # return False so that the event loop does not start
     

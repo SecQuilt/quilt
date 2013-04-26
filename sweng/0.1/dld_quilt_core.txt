@@ -232,6 +232,17 @@ from main and other initializeation"""
         This functionality will grow as needed, but have common site for
         logging config here   
         
+    def ui_show(outputMsg)
+        """
+        Show the output message
+        """
+        chain call to quilt_ui.show
+
+    def ui_tell()
+        """
+        Get input message from the user
+        """
+        chain return from quilt_ui.inputMsg
 
         
 
