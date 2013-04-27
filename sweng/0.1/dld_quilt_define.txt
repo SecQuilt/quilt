@@ -26,8 +26,16 @@ Classes:
         # REVIEW
         void OnRegisterEnd()
 
-            # create a patternSpec dict from arguments (name, 
+            #REVIEW
+            # parse the input pattern
+
+            # perform first pass parse on the pattern to ensure syntax
+            # call get_pattern_vars from parser, but ignore the result
+            #   this will check the syntax
+
+            # create a patternSpec dict from arguments (name, PATTERN
             #   VARIEABLEs, and VARIABLE to SOURCE_VARIABLE mappings)
+
 
             # define patternSpec in the query master as a syncronous call
             # return will be the pattern name

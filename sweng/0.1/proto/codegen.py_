@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+#Parsing-> concurrent(access_log, error_log)
+#   Module
+#    | Expr
+#    |  | Call
+#    |  |  | Name(concurrent)
+#    |  |  |  | Load
+#    |  |  | Name(access_log)
+#    |  |  |  | Load
+#    |  |  | Name(error_log)
+#    |  |  |  | Load
+
+
+#want
+
+# listener = concurrent()
+
+# i = 0
+# parallel_for src in [access_log, error_log]
+#   src.emit(listener,i)
+#   i++
+
+# listner.flush()
+
+
+def run_func(funcType,args)
+    pass
+
+def emit_from_src(srcName)
+    pass
+
+
+class Module:
+    def run(self):
+        return self.expr.run()
+    class Expr:
+        def run(self):
+            return self.call.run()
+        class Call:
+            def run(self):
+                concurrent.run(
+                    [access_log.run(),
+                    error_log.run()])
+
+            class Concurrent:
+                def run(self,args):
+                    return  
+                    
+
+            concurrent = Concurrent()
+            
+            class Access_log:
+                pass
+
+            access_log = Access_log()
+
+            class Error_log:
+                pass
+
+            error_log = Error_log()
+
+        call = Call()
+    expr = Expr()
+module = Module()
+
+module.run()

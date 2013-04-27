@@ -124,18 +124,36 @@ c3.Testability
          
     
     
-    
-
-cX.Adapation
+c4.Grammar
     Adopt a query language
 
-    Design prototype pattern input format
-        in-fix pattern specification language (e.g., some logical
-            expressions)
-        query-by example (e.g., collection of data samples with query
-            attributes/relations identified)
-        SQL-form query (e.g., closer to a programming language)
-        other (e.g., whatever bright ideas we have later)
+    Design 
+        Support simple parsing of pattern code
+        Support verifying variables in pattern code correspond to sources
+        Support multiple sources
+    
+    Implement
+        Use prototype parser to implement new quilt_parse module
+        Update QueryMaster to handle queries to multiple sources
+
+    Test
+        Add second grep based source to test configured environment
+
+        Add new Test case file
+            setup should define patterns:
+                same source multiple times
+                same source multiple times plus another source
+
+            queries shall be run on these patterns and results checked
+            
+            
+
+cX.Execution
+    Execute query specified from Query Master on the Source Master
+
+    Design
+        formalize query format
+        formalize result format
 
     Test
         3. Dual-source pattern without cross-reference (e.g. flow.sip=1.2.3.4 
@@ -144,13 +162,6 @@ cX.Adapation
         4. Dual-source pattern with cross-reference (e.g., flow.sip=1.2.3.4 and
         5. Multiple source pattern without cross-reference
         6. Multiple source pattern with cross reference
-cX.Execution
-    Execute query specified from Query Master on the Source Master
-
-    Design
-        formalize query format
-        formalize result format
-
 cX.Return
     Return query results from Source Master to Query Master
 

@@ -59,31 +59,13 @@ smd.d/syslog.conf
 
 # command will output event spec in object parseable string format
 # prototype: see tojson.sh, tojson.py, cfgproto.py
-grepOutputToObjStr : sed -e 's,",\\\",g' -e 's#\(^.*[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\)\( \)\(.*\)#"timestamp":"\1","content":"\3"#' -e 's#.*#{\0}#g' 
-sourceSpec : {
-    sourcePatterns : {
-        "grep"  :   {
-
-            # the template for the pattern     
-            'template' : "grep $OPTIONS | %(grepOutputToObjStr)s" ,
-            
-
-            'variables' : {
-                'OPTIONS' : 'grep command line options',
+# see QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
 
 
-            # per-event data for results
-            'eventSpec' : {
-                'timestamp' : 'Month, day, and time of the log message',
-                'content' : 'Content of the log message'},
-
-            # data common to all result events
-            'eventMetadata' : {
-                'timeFormat' : "%b %m %H:%M:%S",
-                'timeOffset' : THIS_YEAR }
-
-     } } }
-
+#REVIEW
+[multipattern]
+# make two patterns similar to QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
+# but in one source
 
 
 

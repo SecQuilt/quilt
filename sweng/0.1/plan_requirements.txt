@@ -15,6 +15,29 @@ Queries:
     in the quilt pattern
 * A default value specified in a quilt pattern will overide a default value
     set in the source pattern
+* Quilt Grammer is supported for queries:
+
+    pattern ::= until(pattern,pattern) |
+        concurrent(pattern,pattern,...) |
+        follows(dt, pattern, pattern) |
+        expr
+    expr ::= and(expr, expr, ...) |
+        or (expr, expr, ...) |
+        not(expr) | condition
+    condition ::= Term > Term | Term == Term |
+        term < term | term >= term |
+        term != term | term <= term |
+        term
+    term ::= term ˆ term | term * term |
+        term / term | factor
+    factor ::= factor + factor |
+        factor - factor | value
+    value ::= ( pattern ) | literal |
+        source.field
+    literal ::= string | numeric
+    source ::= identifier
+    field ::= identifier | identifier [ term ]
+
 
 Results:
 * results of query will be presented to the user as a collection of temporal

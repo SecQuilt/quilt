@@ -1,0 +1,64 @@
+quilt 0.1 quilt_parser design
+-----------------------------
+
+Module: quilt_parser
+
+Type: Library
+
+External Dependencies:
+    ast
+
+Internal Dependencies:
+
+Prototype:
+    protoparser.py
+
+Responsibilities:
+    Manage the parsing of the pattern string
+
+Classes:
+
+    
+Functions:
+
+
+    def get_pattern_vars(pattern)
+        """
+        Parse a pattern string, throw exception if syntax is invalid.
+        return the set of variables mentioned in the pattern
+        """
+        # use the ast module, ast.walk() iterator
+        # parse the pattern string and return set
+
+
+
+Notepad:
+
+Recall the port scanning behavior of 3 system logs
+
+secure          : ----+-------------+----+------
+httpd/access_log: ------------+----+--+-+-------
+httpd/error_log : -----------------+-+-+--------
+
+Thought Expirement 1
+concurrent(access_log, error_log)
+
+Traverse the tree
+
+Parsing-> concurrent(access_log, error_log)
+Module
+ | Expr
+ |  | Call
+ |  |  | Name(concurrent)
+ |  |  |  | Load
+ |  |  | Name(access_log)
+ |  |  |  | Load
+ |  |  | Name(error_log)
+ |  |  |  | Load
+
+
+
+
+
+
+

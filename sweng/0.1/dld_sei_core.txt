@@ -31,6 +31,6 @@ Functions:
     as specified"""
 
     # if outFunc is defined, call it for each line output
-    # pass outObj as first argument
+    # pass outObj as second argument after the line
     # if return stdout is specified, return stdout
  
