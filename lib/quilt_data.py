@@ -115,6 +115,7 @@ def src_var_mapping_spec_create(
     name=None,
     sourceName=None,
     sourcePattern=None,
+    sourcePatternInstance=None,
     sourceVariable=None
     ):
     return src_var_mapping_spec_set(
@@ -122,6 +123,7 @@ def src_var_mapping_spec_create(
         name=name,
         sourceName=sourceName,
         sourcePattern=sourcePattern,
+        sourcePatternInstance=sourcePatternInstance,
         sourceVariable=sourceVariable)
 
 def src_var_mapping_spec_set(
@@ -129,12 +131,14 @@ def src_var_mapping_spec_set(
     name=None,
     sourceName=None,
     sourcePattern=None,
+    sourcePatternInstance=None,
     sourceVariable=None
     ):
     if spec == None: spec = {}
     if name != None: spec_name_set(spec, name)
     if sourceName != None: spec['sourceName'] = sourceName
     if sourcePattern != None: spec['sourcePattern'] = sourcePattern
+    if sourcePatternInstance != None: spec['sourcePatternInstance'] = sourcePatternInstance
     if sourceVariable != None: spec['sourceVariable'] = sourceVariable
     return spec
 
@@ -143,6 +147,7 @@ def src_var_mapping_spec_get(
     name=False,
     sourceName=False,
     sourcePattern=False,
+    sourcePatternInstance=False,
     sourceVariable=False
     ):
     """Accessor for information from the query spec.  Only one parameter should
@@ -151,8 +156,28 @@ def src_var_mapping_spec_get(
     if name: return spec_name_get(spec)
     if sourceName: return spec['sourceName']
     if sourcePattern: return spec['sourcePattern']
+    if sourcePatternInstance: return spec['sourcePatternInstance']
     if sourceVariable: return spec['sourceVariable']
     raise Exception("Accessor not properly used")
+
+def src_var_mapping_spec_tryget(
+    spec,
+    name=False,
+    sourceName=False,
+    sourcePattern=False,
+    sourcePatternInstance=False,
+    sourceVariable=False
+    ):
+    """Accessor for information from the query spec.  Only one parameter should
+    be set to true, otherwise first paramter that evaluates positively is 
+    returned.  If no parameters evaluate positively, or object has not been
+    sey, None is returned"""
+    if name: return spec_name_tryget(spec)
+    if sourceName and 'sourceName' in spec: return spec['sourceName']
+    if sourcePattern and 'sourcePattern' in spec: return spec['sourcePattern']
+    if sourcePatternInstance and 'sourcePatternInstance' in spec: return spec['sourcePatternInstance']
+    if sourceVariable and 'sourceVariable' in spec: return spec['sourceVariable']
+    return None
 
 def src_var_mapping_specs_create():
     return []
@@ -169,29 +194,34 @@ def pat_spec_set(
     spec,
     name=None,
     mappings=None,
+    code=None,
     variables=None
     ):
     if spec == None: spec = {}
     if name != None: spec_name_set(spec, name)
     if mappings != None: spec['mappings'] = mappings
+    if code != None: spec['code'] = code
     if variables != None: spec['variables']= variables
     return spec
 
 def pat_spec_create(
     name=None,
     mappings=None,
+    code=None,
     variables=None
     ):
     return pat_spec_set(
         None,
         name=name,
         mappings=mappings,
+        code=code,
         variables=variables)
 
 def pat_spec_get(
     spec,
     name=False,
     mappings=False,
+    code=False,
     variables=False
     ):
     """Accessor for information from the pattern spec.  
@@ -200,6 +230,7 @@ def pat_spec_get(
     returned"""
     if name: return spec_name_get(spec)
     if mappings: return spec['mappings'] 
+    if code: return spec['code'] 
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
 
@@ -207,6 +238,7 @@ def pat_spec_tryget(
     spec,
     name=False,
     mappings=False,
+    code=False,
     variables=False
     ):
     """Accessor for information from the pattern spec.  
@@ -215,6 +247,7 @@ def pat_spec_tryget(
     returned.  If no parameter evaluates to True, None is returned"""
     if name: return spec_name_tryget(spec)
     if mappings and 'mappings' in spec: return spec['mappings'] 
+    if code and 'code' in spec: return spec['code'] 
     if variables and 'variables' in spec: return spec['variables']
     return None
 
@@ -332,11 +365,21 @@ def query_specs_add(querySpecs, querySpec):
 def query_specs_get(querySpecs, querySpecName):
     return querySpecs[querySpecName]
 
+def query_specs_tryget(querySpecs, querySpecName):
+    if querySpecName in querySpecs:
+        return querySpecs[querySpecName]
+    return None
+
 def query_specs_del(querySpecs, querySpecName):
     spec = query_specs_get(querySpecs, querySpecName)
     del querySpecs[querySpecName]
     return spec
 
+def query_specs_trydel(querySpecs, querySpecName):
+    spec = query_specs_tryget(querySpecs, querySpecName)
+    if spec != None:
+        del querySpecs[querySpecName]
+    return spec
 # Source Pattern Spec functions
 
 def src_pat_spec_set(

@@ -69,3 +69,13 @@ def call_quilt_script( scriptName, args = None, checkCall=True):
         checkCall=checkCall)
 
     return out
+
+def get_source_name(partialName):
+    # call quilt status and parse out the name of the syslog source
+    cmd = os.path.join(get_quilt_lib_dir(),"quilt_status.py") + (
+        " | grep " + partialName + 
+        "syslog | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\"")
+    srcName = sei_core.run_process(cmd, whichReturn=sei_core.STDOUT, 
+        logToPython=False, shell=True)
+    return srcName
+

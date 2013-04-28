@@ -89,7 +89,8 @@ Query Master
                                           # and a text description
                                           # of the purpose of the variable
                                           # and the default of the variable
-        [-m VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE] ...    
+        [-m VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE
+            [SOURCE_PATTERN_INSTANCE]] ...    
                                                     # provide mapping from a 
                                                     # pattern variable to a 
                                                     # source variable

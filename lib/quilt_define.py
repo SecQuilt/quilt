@@ -3,6 +3,7 @@
 import sys
 import quilt_core
 import quilt_data
+import quilt_parser
 
 class QuiltDefine(quilt_core.QueryMasterClient):
 
@@ -24,6 +25,18 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             requestedName = self._args.name[0]
 
         patternSpec=quilt_data.pat_spec_create(name=requestedName)
+
+#REVIEW
+        # if the pattern code is specified, set it in the pattern as 
+        #   a string
+        if (self._args.code != None):
+            # perform first pass parse on the pattern to ensure syntax
+            # call get_pattern_vars from parser, but ignore the result
+            #   this will check the syntax
+            codestr = "\n".join(self._args.code)
+            quilt_parser.get_pattern_vars(codestr)
+            # store the code in the pattern
+            quilt_data.pat_spec_set(patternSpec, code=codestr)
 
         # create the specs for the variables
         variables=None
@@ -48,6 +61,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         quilt_data.pat_spec_set(patternSpec,variables=variables)
         
+#REVIEW 
         mappings = None
         # create the specs for the variable mappings
         if self._args.mapping != None:
@@ -56,6 +70,10 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                 src = m[1]
                 srcPat = m[2]
                 srcVar = m[3]
+                srcPatInstance = None
+                if len(m) > 4:
+                    srcPatInstance = m[4]
+
 
         
                 # query variables are allowed to map to multiple
@@ -66,7 +84,8 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                     name=varName,
                     sourceName=src,
                     sourcePattern=srcPat,
-                    sourceVariable=srcVar)
+                    sourceVariable=srcVar,
+                    sourcePatternInstance=srcPatInstance)
             
                 mappings = quilt_data.src_var_mapping_specs_add(
                     mappings, srcVarMappingSpec)
@@ -87,7 +106,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
     def GetType(self):
         return "QuiltDefine"
-        
+
 
 
 
@@ -103,6 +122,10 @@ def main(argv):
         """,
         argv)
 
+    parser.add_argument('code',nargs='?',
+            help="the code for the pattern")
+
+#REVIEW
     parser.add_argument('-n','--name', nargs=1,
         help="suggested name of the pattern")
 

@@ -59,6 +59,7 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Need standard way of output to stdout so that automated tests can be
     more reliable and check results more betterly
 
+    
 Closed:
 
     ISSUE002 souce manager won't start!

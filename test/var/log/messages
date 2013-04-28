@@ -6,3 +6,6 @@ Apr  4 13:13:49 jack kernel: IOAPIC[0]: apic_id 2, version 32, address 0xfec0000
 Apr  4 13:13:49 jack kernel: firewire_ohci: Added fw-ohci device 0000:0b:00.0, OHCI version 1.10
 Apr  4 13:13:49 jack kernel: iTCO_wdt: Found a Cougar Point TCO device (Version=2, TCOBASE=0x0460)
 Apr  4 13:14:56 jack kernel: vpn0: Occurs_3_times asd2 asd23
+Apr  4 13:14:56 jack kernel: src default for pat1 occurs once
+Apr  4 13:14:56 jack kernel: src default for pat2 occurs twice
+Apr  4 13:14:56 jack kernel: src default for pat2 occurs twice
