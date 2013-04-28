@@ -79,9 +79,12 @@ Classes:
                 # generate a query id
                 # store querySpec in Q to reserve query id
 
-            # parse the pattern text, and get set of variables mentioned
+            # if pattern cond specified
+            #   parse the pattern text, and get set of variables mentioned
             #   in the pattern code
 
+            # using the set of sources described in the query code if
+            #   they exist, or the ones described by mappings otherwise
             # group variable mapping's by target source and source pattern
             #   store in local collection, if mentioned in the pattern code
             #   map{source:

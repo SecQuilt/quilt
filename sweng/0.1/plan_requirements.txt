@@ -1,8 +1,8 @@
 quilt 0.1 requirements
 ----------------------
 
-Quilt 0.1 is a system which brings together multiple types of data and provides
-a distributed mechanism for querying the data.
+Quilt 0.1 is a system which brings together multiple types of data and 
+    provides a distributed mechanism for querying the data.
 
 Queries:
 * Queries are submitted from an analyst system with no or partial local data
@@ -55,4 +55,4 @@ Data:
 Tasks:
 * Mine log files for events of interest
     ** using regular expressions
-* All functionality shall be verifiable via automated testing
+* All functionality shall be easily verifiable via automated testing

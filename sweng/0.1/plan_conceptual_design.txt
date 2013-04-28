@@ -38,3 +38,8 @@ Testing Environment Normalizer (M)
 
 New New:
 Parser (VL)
+dld_basic_sources_testcase.txt: (L)
+dld_query_master.txt:   (L) 
+dld_quilt_define.txt:   (S)    
+dld_quilt_parser.txt:   (M)   
+dld_quilt_test.txt:     (L)

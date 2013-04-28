@@ -27,7 +27,7 @@ Classes:
         void OnRegisterEnd()
 
             #REVIEW
-            # parse the input pattern
+            # parse the input pattern if it is specified
 
             # perform first pass parse on the pattern to ensure syntax
             # call get_pattern_vars from parser, but ignore the result

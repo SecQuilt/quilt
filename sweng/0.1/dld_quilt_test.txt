@@ -66,6 +66,7 @@ smd.d/syslog.conf
 [multipattern]
 # make two patterns similar to QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
 # but in one source
+# named pat1, pat1srcvar and pat2, pat2srcvar
 
 
 

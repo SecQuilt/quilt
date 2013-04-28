@@ -82,7 +82,7 @@ Query Master
 
         
     quilt_define
-        [PATTERN]           # the pattern statment
+        [PATTERN]           # the code for the pattern
         [-n NAME]           # suggested name of the pattern
         [-v VARIABLE [DESCRIPTION [DEFAULT]]] ...    # the variable(s) that 
                                           # are part of the pattern, 

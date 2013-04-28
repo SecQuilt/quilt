@@ -1,6 +1,8 @@
 quilt 0.1 basic sources tests
 -----------------------------
 
+#REVIEW
+
 Module: basic_sources_testcase
 
 Type: Integration Test
@@ -35,37 +37,26 @@ Classes:
 
             # define a query pattern
             # call quilt_define 
-            #   -n "test_pattern"
-            #   -v SEARCHSTRING 'The search string'
-            #   -m SEARCHSTRING syslog grep OPTIONS
+            #   -n "bigpattern"
+            #   -v SEARCHSTRING1 'The search string1'
+            #   -v SEARCHSTRING2 'The search string2'
+            #   -v SEARCHSTRING3 'The search string3'
+            #   -v SEARCHSTRING4 'The search string4'
+            #   -m SEARCHSTRING3 syslog grep OPTIONS
+            #   -m SEARCHSTRING4 syslog grep OPTIONS
+            #   -m SEARCHSTRING1 multipattern pat1 pat1srcvar
+            #   -m SEARCHSTRING2 multipattern pat2 pat2srcvar
+            #   SEARCHSTRING1 + SEARCHSTRING2 / (SEARCHSTRING3 ^
+            #       SEARCHSTRING4)
 
 
-        def test_status():
-            # check for the query pattern
-            # call quilt_status 
-            # check errorcode and output contains 
-            #   "test_pattern" 
-
-        def test_valid_query_one_result():
-            # issue a valid query
-            # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_1_time
-            # capture query_id from std out 
-            # sleep 1 second
-            
-            # check that the query is in the history showing good state
-            # call quilt_history 
-            # asuure success, captrue stdout, 
-            # check it contains query_id
-            # check it shows good state (completed)
-
-            # call quilt_history query_id
-            # asure success, capture stdout, check it contains event
-            #   text "Occurs_1_time"
-            #   assure only one result
-
-        def test_valid_query_multi_result():
-            # issue a valid query
-            # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_3_time
+        def test_multi_sources():
+            # issue valid query for big pattern
+            # call quilt_submit test_pattern -y 
+            #   -v SEARCHSTRING1 Occurs_3_times
+            #   -v SEARCHSTRING2 Occurs_1_times
+            #   -v SEARCHSTRING3 Not gonna find it
+            #   -v SEARCHSTRING3 "Now we are testing with python"
             # assure success, capture query_id from stdout
 
             # sleep 1 second
@@ -73,35 +64,8 @@ Classes:
             # Check results
             # call quilt_history query_id
             # capture stdout, assure good exitcode
-            #   assure 3 results
-            #   assure contains text "Occurs_3_times"
-
-        def test_valid_query_no_results():
-            # issue a valid query
-            # call quilt_submit test_pattern -y -v SEARCHSTRING Zappadappa_Occurs_3_time
-            # assure success, capture query_id from stdout
-
-            # sleep 1 second
-
-            # Check results
-            # call quilt_history query_id
-            # capture stdout, assure good exitcode
-            #   assure 0 results
-
-        def test_valid_query_all_results():
-            
-            # issue a valid query
-            # call quilt_submit test_pattern -y -v SEARCHSTRING '.*' 
-            # assure success, capture query_id from stdout
-
-            # sleep 1 second
-
-            # Check results
-            # call quilt_history query_id
-            # capture stdout, assure good exitcode
-            #   assure results > 4
-
-        
+            #   assure 5 results
+            #   assure no error state
 
 
 def main:

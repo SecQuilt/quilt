@@ -1,4 +1,4 @@
-equirements and simple variations of requirements are met by the design
+1   Requirements and simple variations of requirements are met by the design
 2   Design covers sufficient combanatorial possibilities of major states / data contexts of the system
 3   All design based on assumptions of external frameworks/components has been prototyped
 4   Novel techniques have been prototyped or validated
