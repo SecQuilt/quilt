@@ -71,9 +71,6 @@ class SourceManager(quilt_core.QueryMasterClient):
             #    " with replacments: " + str(replacments))
             cmdline = template.safe_substitute(replacments)
 
-            # TODO fix ISSUE005
-            self._sourceResults = []
-
             context = {
                     'queryId' : queryId,
                     'srcQueryId' :

@@ -210,12 +210,10 @@ class QueryMaster:
                 codeVars = quilt_parser.get_pattern_vars(code)
 
 
-
-#REVIEW
             # using the set of sources described in the query code if
             #   they exist, or the ones described by mappings otherwise
             # group variable mapping's by target source and source pattern
-            #   store in local collection, if mentioned in the pattern code
+            #   store in local collection, 
             #   map{source:
             #       map{sourcePattern:
             #           map{sourcePatternInstance:
@@ -224,7 +222,8 @@ class QueryMaster:
             #   store in local collection.  We later want to iterare the
             #   source mangers efficiently, so we preprocess a srcPatDict here
             #   which provides a direct mapping from srcVariables to 
-            #   queryVariables, grouped by sources and patterns
+            #   queryVariables, grouped by sources and patterns and pattern 
+            #   instances
             srcPatDict = {}
             patVarSpecs = quilt_data.pat_spec_tryget(
                 patternSpec, variables=True)
@@ -480,11 +479,11 @@ class QueryMaster:
         with self.lock:
             return pprint.pformat(self._patterns)
 
-#REVIEW
     def AppendQueryResults(self, queryId, srcQueryId, eventList):
         """Append the specified eventList to the specified queryId,
         and mark it complete, and move it to history list"""
 
+        # TODO
         #TODO use srcQueryId to allow results to know where they came form
 
         srcQueryId=srcQueryId

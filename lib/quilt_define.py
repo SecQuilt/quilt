@@ -26,7 +26,6 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         patternSpec=quilt_data.pat_spec_create(name=requestedName)
 
-#REVIEW
         # if the pattern code is specified, set it in the pattern as 
         #   a string
         if (self._args.code != None):
@@ -61,7 +60,6 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         quilt_data.pat_spec_set(patternSpec,variables=variables)
         
-#REVIEW 
         mappings = None
         # create the specs for the variable mappings
         if self._args.mapping != None:
@@ -125,7 +123,6 @@ def main(argv):
     parser.add_argument('code',nargs='?',
             help="the code for the pattern")
 
-#REVIEW
     parser.add_argument('-n','--name', nargs=1,
         help="suggested name of the pattern")
 
