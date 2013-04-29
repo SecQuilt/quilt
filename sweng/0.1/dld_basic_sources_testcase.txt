@@ -37,17 +37,10 @@ Classes:
 
             # define a query pattern
             # call quilt_define 
-            #   -n "bigpattern"
-            #   -v SEARCHSTRING1 'The search string1'
-            #   -v SEARCHSTRING2 'The search string2'
-            #   -v SEARCHSTRING3 'The search string3'
-            #   -v SEARCHSTRING4 'The search string4'
-            #   -m SEARCHSTRING3 syslog grep OPTIONS
-            #   -m SEARCHSTRING4 syslog grep OPTIONS
-            #   -m SEARCHSTRING1 multipattern pat1 pat1srcvar
-            #   -m SEARCHSTRING2 multipattern pat2 pat2srcvar
-            #   SEARCHSTRING1 + SEARCHSTRING2 / (SEARCHSTRING3 ^
-            #       SEARCHSTRING4)
+            #   Define a pattern using 6 variables, the 4 in multisource
+            #   from two patterns, and then 2 from ss=yslog including the
+            #   same pattern twice.  Reference all 6 in  the code
+            #
 
 
         def test_multi_sources():

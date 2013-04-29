@@ -72,6 +72,7 @@ def call_quilt_script( scriptName, args = None, checkCall=True):
 
 def get_source_name(partialName):
     # call quilt status and parse out the name of the syslog source
+    # fix with ISSUE008
     cmd = os.path.join(get_quilt_lib_dir(),"quilt_status.py") + (
         " | grep " + partialName + 
         "syslog | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\"")
