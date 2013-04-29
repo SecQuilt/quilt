@@ -9,7 +9,7 @@ import re
 
 firstTime=True
 
-class BasicSourceTestcase(unittest.TestCase):
+class BasicSourcesTestcase(unittest.TestCase):
 
 
     def setUp(self):
@@ -88,23 +88,27 @@ class BasicSourceTestcase(unittest.TestCase):
         occurences = (
             len([m.start() for m in re.finditer(
                 "Occurs_3_times", o)]))
-
-        # have to +1 because the search variable is also in the stdout
         self.assertTrue(occurences == 1 + 3)
 
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "src default for pat1 occurs once", o)]))
-
-        # have to +1 because the search variable is also in the stdout
-        self.assertTrue(occurences == 1 + 1)
         
         occurences = (
             len([m.start() for m in re.finditer(
                 "src default for pat2 occurs twice", o)]))
-
-        # have to +1 because the search variable is also in the stdout
         self.assertTrue(occurences == 1 + 2)
+
+        # In this instance we passed a -l for line numbers only
+        # so check that it didn't output the search string
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "src default for pat1 occurs once", o)]))
+        self.assertTrue(occurences == 0 + 1)
+
+        # but the file name should have been outputt for a match with -l
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "messages", o)]))
+
+        self.assertTrue(occurences == 0 + 1)
 
 
 if __name__ == "__main__":

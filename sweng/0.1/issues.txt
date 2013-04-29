@@ -42,9 +42,6 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     ISSUE004
     Need to remove lastQuery stuff from smd and unit tests
 
-    ISSUE005
-    Sources are a total hack, most notably not supporting concurent searches
-        at this time
 
     ISSUE006
     No test cases are defined which test default heiarchy functionality
@@ -63,3 +60,8 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
 Closed:
 
     ISSUE002 souce manager won't start!
+
+    ISSUE005
+    Sources are a total hack, most notably not supporting concurent searches
+        at this time
+

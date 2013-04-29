@@ -75,7 +75,7 @@ def get_source_name(partialName):
     # fix with ISSUE008
     cmd = os.path.join(get_quilt_lib_dir(),"quilt_status.py") + (
         " | grep " + partialName + 
-        "syslog | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\"")
+        " | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\"")
     srcName = sei_core.run_process(cmd, whichReturn=sei_core.STDOUT, 
         logToPython=False, shell=True)
     return srcName

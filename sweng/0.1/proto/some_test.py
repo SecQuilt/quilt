@@ -4,8 +4,8 @@ import unittest
 
 class SomeTest(unittest.TestCase):
 
-    def __enter__(self):
-        pass
+#    def __enter__(self):
+#        pass
 
     def get(self):
         if self.lazy == None:

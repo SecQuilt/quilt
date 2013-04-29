@@ -271,7 +271,7 @@ class QueryMaster:
                             varDict = {}
                             insDict[ins] = varDict
                         else:
-                            vardict = insDict[ins]
+                            varDict = insDict[ins]
 
                         varDict[var] = varName
 
@@ -566,7 +566,7 @@ def create_src_query_specs(
 
         curSrcQuerySpec = create_src_query_spec(
                 srcPatSpec, patInstanceName, varSpecs, patVarSpecs, qid, source,
-                patternName)
+                patternName, srcPatDict)
         srcQuerySpecs = quilt_data.src_query_specs_add( srcQuerySpecs,
                 curSrcQuerySpec)
 
@@ -577,7 +577,8 @@ def create_src_query_specs(
 
 
 def create_src_query_spec(
-    srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source, patternName):
+    srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source, patternName,
+    srcPatDict):
     """Helper function for filling out a srcQuerySpec with variable values"""
 
     srcPatVars = quilt_data.src_pat_spec_get(
@@ -636,10 +637,8 @@ def create_src_query_spec(
     instName = ""
     if srcPatInstance != None:
         instName = str(srcPatInstance)
-    srcQueryName = '_'.join([qid,source,patternName,srcPatInstance])
+    srcQueryName = '_'.join([qid,source,patternName,instName])
 
-    quilt_data.src_query_spec_set(srcQuerySpec,
-        name=srcQueryName)
     # create and return a src query spec
     # TODO see Issue I001, this name may not be unique
     # logging.info("srcPatSpec looks like: " + str(srcPatSpec))
