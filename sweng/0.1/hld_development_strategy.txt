@@ -49,7 +49,29 @@ c2.Basic Source
         2. Null pattern (e.g., TRUE (producing whole database) or FALSE 
             (producing no events)) on small database
 
-c3.Testability
+c3.Grammar
+    Adopt a query language
+
+    Design 
+        Support simple parsing of pattern code
+        Support verifying variables in pattern code correspond to sources
+        Support multiple sources
+    
+    Implement
+        Use prototype parser to implement new quilt_parse module
+        Update QueryMaster to handle queries to multiple sources
+
+    Test
+        Add second grep based source to test configured environment
+
+        Add new Test case file
+            setup should define patterns:
+                same source multiple times
+                same source multiple times plus another source
+
+            queries shall be run on these patterns and results checked
+
+c4.Testability
     Theme: Ensure testing fidelity and coverage
 
     DESIGN
@@ -124,27 +146,6 @@ c3.Testability
          
     
     
-c4.Grammar
-    Adopt a query language
-
-    Design 
-        Support simple parsing of pattern code
-        Support verifying variables in pattern code correspond to sources
-        Support multiple sources
-    
-    Implement
-        Use prototype parser to implement new quilt_parse module
-        Update QueryMaster to handle queries to multiple sources
-
-    Test
-        Add second grep based source to test configured environment
-
-        Add new Test case file
-            setup should define patterns:
-                same source multiple times
-                same source multiple times plus another source
-
-            queries shall be run on these patterns and results checked
             
             
 
