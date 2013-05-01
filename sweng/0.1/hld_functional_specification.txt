@@ -82,13 +82,15 @@ Query Master
 
         
     quilt_define
+        [PATTERN]           # the code for the pattern
         [-n NAME]           # suggested name of the pattern
         [-v VARIABLE [DESCRIPTION [DEFAULT]]] ...    # the variable(s) that 
                                           # are part of the pattern, 
                                           # and a text description
                                           # of the purpose of the variable
                                           # and the default of the variable
-        [-m VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE] ...    
+        [-m VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE
+            [SOURCE_PATTERN_INSTANCE]] ...    
                                                     # provide mapping from a 
                                                     # pattern variable to a 
                                                     # source variable

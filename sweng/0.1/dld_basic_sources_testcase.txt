@@ -1,0 +1,68 @@
+quilt 0.1 basic sources tests
+-----------------------------
+
+#REVIEW
+
+Module: basic_sources_testcase
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test
+    seeded values in mock test logs
+
+External Dependencies:
+    python-unittest
+    python-pyro
+
+Prototype:
+    some_test.py
+
+Responsibilities:
+    Perform a simple query of a multiple basic data sources.  Also pass
+query code to ensure that it is parsed correctly
+
+Classes:
+
+    class BasicSoucesTestcase()
+
+        NOTE   : Depend on seed values from BasicSourceTestcase plus
+            
+            "Now we are testing with python" 
+
+
+        def setUp():
+            """Setup the query master with some patterns used by the tests"""
+
+            # define a query pattern
+            # call quilt_define 
+            #   Define a pattern using 6 variables, the 4 in multisource
+            #   from two patterns, and then 2 from ss=yslog including the
+            #   same pattern twice.  Reference all 6 in  the code
+            #
+
+
+        def test_multi_sources():
+            # issue valid query for big pattern
+            # call quilt_submit test_pattern -y 
+            #   -v SEARCHSTRING1 Occurs_3_times
+            #   -v SEARCHSTRING2 Occurs_1_times
+            #   -v SEARCHSTRING3 Not gonna find it
+            #   -v SEARCHSTRING3 "Now we are testing with python"
+            # assure success, capture query_id from stdout
+
+            # sleep 1 second
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            #   assure 5 results
+            #   assure no error state
+
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

@@ -50,3 +50,10 @@ Functions:
         # invoke the command, exception thrown on bad error code
         # return stdout from the command
         
+    def get_source_name(    # returns the unique proper name of a source
+        partialName         # base name for the source
+        )
+
+        # fix with ISSUE008
+        # call quilt_status, grep and awk out the actual name
+        #   of the data source and return it

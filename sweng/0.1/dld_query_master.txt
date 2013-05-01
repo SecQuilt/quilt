@@ -64,6 +64,7 @@ Classes:
             # remove the specified sm from registered list
             # if not found in the list, do nothing
 
+        #REVIEW
         string Query(                       # return the ID of the query
             string submitterNameKey         # key that the submitter recieved
                                             #   when it was registered with this
@@ -78,18 +79,31 @@ Classes:
                 # generate a query id
                 # store querySpec in Q to reserve query id
 
-            # group variable mapping's by target source and source pattern
-            #   store in local collection
+            # if pattern code specified
+            #   parse the pattern text, and get set of variables mentioned
+            #   in the pattern code
+
+            # using the set of sources described in the query code if
+            #   they exist, or the ones described by mappings otherwise
+            # group variable mapping's by target source and isource pattern
+            #   store in local collection, if mentioned in the pattern code
+            #   map{source:
+            #       map{sourcePattern:
+            #           map{sourcePatternInstance:
+            #               map{srcVar:Var}}}}
+
+            # ensure that all variables mentioned in the pattern code have
+            #   corresponding variables in the query
         
             # iterate the collection of grouped sources
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
 
                 # iterate the collection of sourcePatterns for current source
-                    # fill the a new src query spec from src pattern and
+                    # fill the a new src query specs from src patterns and
                     #   variable information from the query
-                    #   by calling fill_src_query_spec
-                    # append completed sourceQuerySpec to list of srcQueries
+                    #   by calling create_src_query_specs
+                    # append completed sourceQuerySpecs to list of srcQueries
                     #   name sourceQuerySpec uniquely by combining the query
                     #   name with the source pattern name
 
@@ -107,7 +121,7 @@ Classes:
             # Process query...
             # iterate the sourceQuerySpec's in srcQueries list by source
                 # get proxy to the source master
-                # query the source by sending it the source query spec as
+                # query the source by sending it the source query specs as
                 #   asyncronous call
 
             #catch exception! 
@@ -169,15 +183,21 @@ Classes:
             # return stats
             
         
-        void SetQueryResults(
+        #REVIEW
+        void AppendQueryResults(
             string queryId,
+            string sourceQueryId,
             eventList)
             """Append the specified eventList to the specified queryId"""
 
             # acquire lock
-            # mark the query as completed in state
-            # move query spec from q to history member collection
-            # set the results into the query spec
+                # if queryId is in Q
+                    # mark the query as completed in state
+                    # move query spec from q to history member collection
+                # else find queryId in history
+                # else throw exception
+
+                # append the results into the query spec
             
         void OnSourceQueryError(
             queryid, Exception)
@@ -218,6 +238,14 @@ Functions:
     def get_client_proxy_from_type_and_name(qm, clientType, name)
         # overload for get_client_proxy
 
+    #REVIEW
+    def create_src_query_specs
+        # get new sourceQuery specs from the sourcePatternSpec
+        
+        # iterate the number of source queries in the list
+        #   srcPatDict[source][patternName]
+        # call create_src_query_spec with  the current pattern
+        
     def create_src_query_spec
         # get new sourceQuery spec from the sourcePatternSpec 
 

@@ -5,7 +5,6 @@ import unittest
 import quilt_test_core
 import sei_core
 import quilt_core
-import time
 import query_master
 import random
 
@@ -16,8 +15,8 @@ class BasicTestcase(unittest.TestCase):
         # call quilt_submit "find me again" (check return code)
         quilt_test_core.call_quilt_script('quilt_submit.py',
             [ qstr, '-y' ], checkCall=False)
-        # sleep 1 seconds
-        time.sleep(1)
+        # sleep a small ammount
+        quilt_test_core.sleep_small()
         # Use QuiltConfig, Call GetSourceManagers, for each one
             # use pyro, create proxy for the smd
             # call GetLastQuery()
@@ -57,8 +56,8 @@ class BasicTestcase(unittest.TestCase):
         # call quilt_submit "find me again" (check return code)
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py',
             [ qstr, '-y' ]))
-        # sleep 1 seconds
-        time.sleep(1)
+        # sleep a small ammount
+        quilt_test_core.sleep_small()
 
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]

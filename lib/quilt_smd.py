@@ -15,7 +15,7 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._args = args
         self._sourceName = sourceName
         self._sourceSpec = sourceSpec
-        self._sourceResults = []
+        self._sourceResults = {}
         self._lastQuery = None
 
     def Query(self, queryId, sourceQuerySpec):
@@ -71,17 +71,25 @@ class SourceManager(quilt_core.QueryMasterClient):
             #    " with replacments: " + str(replacments))
             cmdline = template.safe_substitute(replacments)
 
-            # TODO fix ISSUE005
-            self._sourceResults = []
+            # setup context for the cmdline stdout callback
+            srcQueryId = quilt_data.src_query_spec_get(
+                    sourceQuerySpec,name=True)
+            context = { 'queryId' : queryId, 'srcQueryId' : srcQueryId  } 
 
             # use run_process to execute cmd, give callback per line
             #   processing function
             sei_core.run_process(cmdline, shell=True,
                 whichReturn=sei_core.EXITCODE, 
-                outFunc=self.OnGrepLine, logToPython=False)
+                outFunc=self.OnGrepLine, outObj=context, logToPython=False)
             
             # Set query result events list in query master using query id
-            self._qm.SetQueryResults(queryId, self._sourceResults)
+            results = []
+            with self._lock:
+                if queryId in self._sourceResults:
+                    if srcQueryId in self._sourceResults[queryId]:
+                        results = list(self._sourceResults[queryId][srcQueryId])
+            self._qm.AppendQueryResults(
+                    queryId, srcQueryId, results)
      
     # catch exception! 
         except Exception, error:
@@ -101,14 +109,34 @@ class SourceManager(quilt_core.QueryMasterClient):
     def GetLastQuery(self):
         with self._lock:
             return self._lastQuery
-        
-    def OnGrepLine(self, line):
+
+    def OnGrepLine(self, line, contextData):
         # assemble a jason string for an object representing an event
         # based on eventSpec and eventSpec meta data
         # convert that string to a python event object
         # append event to list of events member
-        #TODO fix security problem
-        self._sourceResults.append(eval(line))
+        queryId = contextData['queryId']
+        srcQueryId = contextData['srcQueryId']
+        srcRes = []
+        with self._lock:
+            
+            # list in query master using query id and srcQuery Id
+
+            if queryId not in self._sourceResults:
+                queryRes = {}
+                self._sourceResults[queryId] = queryRes
+            else:
+                queryRes = self._sourceResults[queryId]
+
+            if srcQueryId not in queryRes:
+                self._sourceResults[queryId][srcQueryId] = srcRes
+            else:
+                srcRes = self._sourceResults[queryId][srcQueryId]
+
+        # only one source will be writing to the source event list at a
+        #   time, so we can do so outside of the lock
+        #TODO fix security problem with eval
+        srcRes.append(eval(line))
 
     def GetType(self):
         return "SourceManager"

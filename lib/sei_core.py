@@ -30,7 +30,7 @@ EXITCODE=2
 
 def log_process(
     process,prefix='', postfix='',seperator=' ',loglevel='logging.DEBUG',
-    whichReturn=STDOUT,logToPython=True, outFunc=None):
+    whichReturn=STDOUT,logToPython=True, outFunc=None, outObj=None):
     """perform nonblocking streaming of output from stderr and stdout of the specified process to the log"""
 
 # because it needs to be conenient to grab the stdout of a process (like for
@@ -73,7 +73,7 @@ def log_process(
                     handled=True
 
                 if outFunc != None:
-                    outFunc(lineos[:-1])
+                    outFunc(lineos[:-1],outObj)
                     handled=True
                 
                 if not handled:
@@ -118,12 +118,12 @@ def log_process(
         
     
 def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True, 
-    logToPython=True, outFunc=None):
+    logToPython=True, outFunc=None, outObj=None):
     """run the specified process and wait for completion, throw exception if nonzero exit occurs, log output of process to the logging module, return stdout as string"""
     logging.debug('run_process {begin}' + str(cmd) + '{end}')
     p = subprocess.Popen( cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
     o = log_process(p,whichReturn=whichReturn,
-        logToPython=logToPython,outFunc=outFunc)
+        logToPython=logToPython,outFunc=outFunc,outObj=outObj)
     exitCode = p.poll()
     if checkCall and exitCode != 0:
         raise RuntimeError('cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(exitCode))

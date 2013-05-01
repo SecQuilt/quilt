@@ -4,6 +4,7 @@ import os
 import argparse
 import quilt_core
 import sei_core
+import time
 
 def get_quilt_test_lib_dir():
     """grab the location of quilt test scritps"""
@@ -69,3 +70,24 @@ def call_quilt_script( scriptName, args = None, checkCall=True):
         checkCall=checkCall)
 
     return out
+
+def get_source_name(partialName):
+    # call quilt status and parse out the name of the syslog source
+    # fix with ISSUE008
+    cmd = os.path.join(get_quilt_lib_dir(),"quilt_status.py") + (
+        " | grep " + partialName + 
+        " | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\" -e \"s/'//g\" ")
+    srcName = sei_core.run_process(cmd, whichReturn=sei_core.STDOUT, 
+        logToPython=False, shell=True)
+    return srcName
+
+def sleep_small():
+    time.sleep(0.25)
+def sleep_medium():
+    for i in range(4): 
+        i=i
+        sleep_small() 
+def sleep_large():
+    for i in range(4): 
+        i=i
+        sleep_medium() 

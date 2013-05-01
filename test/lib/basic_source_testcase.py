@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-import os
 import sys
 import logging
 import unittest
 import quilt_test_core
-import sei_core
-import time
 import quilt_data
 import re
 
@@ -32,12 +29,12 @@ class BasicSourceTestcase(unittest.TestCase):
         firstTime = False
 
         # call quilt status and parse out the name of the syslog source
-        cmd = os.path.join(quilt_test_core.get_quilt_lib_dir(),"quilt_status.py") + " | grep syslog | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\" "
-        srcName = sei_core.run_process(cmd, whichReturn=sei_core.STDOUT, 
-            logToPython=False, shell=True)
+        srcName = quilt_test_core.get_source_name("syslog")
         
 #        logging.debug("Determined source name as: " + srcName)
 
+        #TODO REad the pattern id from the std output then query that one
+        # See ISSUE007 and ISSUE008
         quilt_test_core.call_quilt_script('quilt_define.py',[
             '-n', 'test_pattern',
             '-v', 'SEARCHSTRING', 'the Search string',
@@ -52,8 +49,8 @@ class BasicSourceTestcase(unittest.TestCase):
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]
         self.assertTrue(len(qid) > 0)
-        # sleep 1 second
-        time.sleep(1)
+        # sleep a small ammount
+        quilt_test_core.sleep_small()
         return qid
 
     def check(self,qid):

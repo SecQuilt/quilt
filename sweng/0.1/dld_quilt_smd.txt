@@ -29,6 +29,7 @@ Classes:
             # use name to init base class
             # store sourceSpec as a member
             
+        # REVIEW
         def Query(string queryId, dict sourceQuerySpec)
     
             # ALWAYS catch errors, report them to the query master
@@ -46,17 +47,19 @@ Classes:
             #   use string.Template as per install_config.py example
 
             # use run_process to execute grep, give callback per line
-            #   processing function
+            #   processing function, pass as data the queryId and srcQueryId
 
-            # Set query result events list in query master using query id
+            # Append query result events list in query master using query id
         
-        def OnGrepLine(string line)
+        # REVIEW
+        def OnGrepLine(string line, contextData)
 
 
             # assemble a pytho dict string for an object representing an event
             # based on eventSpec and eventSpec meta data
             # convert that string to a python event spec
-            # append event to list of events member
+            # append event to dict of events member, keyed by
+            #   queryId and srcqueryId in the contextData
            
              
         

@@ -4,6 +4,7 @@ import Pyro4
 import threading
 import pprint
 import quilt_data
+import quilt_parser
 
 class QueryMaster:
 
@@ -199,12 +200,30 @@ class QueryMaster:
             # in the member q
             quilt_data.query_spec_set(querySpec, name=qid)
 
+            code = quilt_data.pat_spec_tryget(
+                    patternSpec, code=True)
+            # if pattern code specified
+            #   parse the pattern text, and get set of variables mentioned
+            #   in the pattern code
+            codeVars = None
+            if code != None:
+                codeVars = quilt_parser.get_pattern_vars(code)
 
+
+            # using the set of sources described in the query code if
+            #   they exist, or the ones described by mappings otherwise
             # group variable mapping's by target source and source pattern
+            #   store in local collection, 
+            #   map{source:
+            #       map{sourcePattern:
+            #           map{sourcePatternInstance:
+            #               map{srcVar:Var}}}}
+
             #   store in local collection.  We later want to iterare the
             #   source mangers efficiently, so we preprocess a srcPatDict here
             #   which provides a direct mapping from srcVariables to 
-            #   queryVariables, grouped by sources and patterns
+            #   queryVariables, grouped by sources and patterns and pattern 
+            #   instances
             srcPatDict = {}
             patVarSpecs = quilt_data.pat_spec_tryget(
                 patternSpec, variables=True)
@@ -212,42 +231,64 @@ class QueryMaster:
             mappings = quilt_data.pat_spec_tryget(
                 patternSpec, mappings=True)
 
+
             #logging.info("got patVarSpecs: " + str(patVarSpecs))
             #logging.info("got mappings: " + str(mappings))
             if patVarSpecs != None and mappings != None:
-                for varName in patVarSpecs.keys():
-                    for m in mappings:
-                        src = quilt_data.src_var_mapping_spec_get(
-                            m, sourceName=True)
-                        pat = quilt_data.src_var_mapping_spec_get(
-                            m, sourcePattern=True)
-                        var = quilt_data.src_var_mapping_spec_get(
-                            m, sourceVariable=True)
 
-                        if src not in srcPatDict:
-                            patDict = {}
-                            srcPatDict[src] = patDict
-                        else:
-                            patDict = srcPatDict[src]
-                        
-                        # TODO, see issues list (ISSUE001)
-                        # need to reconcile what happens when there is a desire to
-                        # use the same srcPattern multiple times in one query
+                # if code was specified, only bother making the map for
+                #   variables referenced in the code, otherwise use anything
+                #   that was declared in the pattern spec
+                patVars = patVarSpecs.keys()
+                if codeVars != None:
+                    patVars = codeVars
 
-                        if pat not in patDict:
-                            element = {}
-                            patDict[pat] = element
-                        else:
-                            element = patDict[pat]
-                        element[var] = varName
+                # logging.debug("Iterating variables: " + str(patVars))
+
+                for m in mappings:
+                    varName = quilt_data.src_var_mapping_spec_get(
+                        m, name=True)
+                    if varName not in patVars:
+                        continue
+                    
+                    src = quilt_data.src_var_mapping_spec_get(
+                        m, sourceName=True)
+                    pat = quilt_data.src_var_mapping_spec_get(
+                        m, sourcePattern=True)
+                    var = quilt_data.src_var_mapping_spec_get(
+                        m, sourceVariable=True)
+                    ins = quilt_data.src_var_mapping_spec_tryget(
+                            m, sourcePatternInstance=True)
+
+                    if src not in srcPatDict:
+                        patDict = {}
+                        srcPatDict[src] = patDict
+                    else:
+                        patDict = srcPatDict[src]
+                    
+                    if pat not in patDict:
+                        insDict = {}
+                        patDict[pat] = insDict
+                    else:
+                        insDict = patDict[pat]
+
+                    if ins not in insDict:
+                        varDict = {}
+                        insDict[ins] = varDict
+                    else:
+                        varDict = insDict[ins]
+
+                    varDict[var] = str(varName)
+                    # logging.debug("Assignig: varDict[" + var + "] = " + str(varName))
 
 
-            #logging.info("got srcPatDict: " + str(srcPatDict))
+
+            # logging.info("got srcPatDict:\n " + pprint.pformat(srcPatDict))
 
             varSpecs = quilt_data.query_spec_tryget(
                 querySpec, variables=True)
 
-            logging.debug("query varspecs: " + str(varSpecs))
+            # logging.debug("query varspecs: " + str(varSpecs))
 
             srcQuerySpecsDict = {}
 
@@ -277,23 +318,16 @@ class QueryMaster:
                         # get the sourcePatternSpec from the proxy 
                         srcPatSpec = srcMgr.GetSourcePattern(patternName)
 
-                        # create a query spec object
-                        srcQuerySpec = create_src_query_spec(
+                        # create a query spec objects
+                        srcQuerySpecs = create_src_query_specs(
                             srcPatSpec, srcPatDict, varSpecs, patVarSpecs, 
                             qid, source, patternName)
 
-                        # name for source pattern is generated from qid, which
-                        # is already globally unique, then by taking on source
-                        # and pattern
-                        # TODO assure name is unique w.r.t ISSUE001
-                        srcQueryName = '_'.join([qid,source,patternName])
-                        quilt_data.src_query_spec_set(srcQuerySpec,
-                            name=srcQueryName)
-                        
-                        # append completed sourceQuerySpec to querySpec
-                        srcQuerySpecsDict[source] = (
-                            quilt_data.src_query_specs_add(
-                                srcQuerySpecsDict[source], srcQuerySpec))
+                        for srcQuerySpec in srcQuerySpecs.values():
+                            # append completed sourceQuerySpec to querySpec
+                            srcQuerySpecsDict[source] = (
+                                quilt_data.src_query_specs_add(
+                                    srcQuerySpecsDict[source], srcQuerySpec))
                         
             # use querySpec and srcQuery list
             # to create a validation string                    
@@ -338,16 +372,29 @@ class QueryMaster:
 
             # Process query...
             
+#REVIEW
             # iterate the sourceQuerySpec's in the src queries by source
-            for source, srcQuerySpec in srcQuerySpecsDict.items():
+            for source, srcQuerySpecs in srcQuerySpecsDict.items():
                 # get proxy to the source manager
                 with get_client_proxy_from_type_and_name( self,
                     "SourceManager", source) as smgr:
-                    logging.debug("Submitting query: " + qid + " to: " + 
-                        source)
-                    # query the source by sending it the source query spec as
-                    #   asyncronous call
-                    Pyro4.async(smgr).Query(qid, srcQuerySpec)
+
+                    # NOTE:
+                    # we possibly make multiple calls to the same source
+                    #   this could be considered inefficient, if this happens
+                    #   a lot because of the overhead with the call.  But we
+                    #   get free parallelism on the client side, so not
+                    #   changing this now.  Otherwise we would send all the
+                    #   queries at once, and then let the client have to worry
+                    #   about how to parrallelize these, but it might help the
+                    #   client if the client is trying to consolidate things
+                    #   to make things efficient
+                    for srcQuerySpec in srcQuerySpecs.values():
+                        logging.debug("Submitting query: " + qid + " to: " + 
+                            source)
+                        # query the source by sending it the source query spec 
+                        #   as asyncronous call
+                        Pyro4.async(smgr).Query(qid, srcQuerySpec)
 
         # catch exception! 
         except Exception, error:
@@ -373,12 +420,13 @@ class QueryMaster:
 
             try:
                 logging.info("Cleaning up after query error")
-                # acquire lock, remove query id from pool
-                querySpec = quilt_data.query_specs_del(self._queries, qid)
-                # add it to the history with an error state
-                quilt_data.query_spec_set(querySpec,
-                    state=quilt_data.STATE_ERROR)
-                quilt_data.query_specs_add(self._history, querySpec)
+                if self.lock.locked():
+                    self._try_move_query_to_hist(
+                            qid,quilt_data.STATE_ERROR)
+                else:
+                    with self.lock:
+                        self._try_move_query_to_hist(
+                                qid,quilt_data.STATE_ERROR)
             except Exception, error2:
                 logging.error("Failed to move error'd query to history")
                 logging.exception(error2)
@@ -438,20 +486,61 @@ class QueryMaster:
         with self.lock:
             return pprint.pformat(self._patterns)
 
-    def SetQueryResults(self, queryId, eventList):
+    def _try_move_query_to_hist(self, queryId, state):
+        """Private function, only call with self_lock engaged"""
+        querySpec = quilt_data.query_specs_trydel(self._queries, queryId)
+        # else find queryId in history
+        if querySpec == None:
+            querySpec = quilt_data.query_specs_tryget(self._history,
+                    queryId)
+        else:
+            # move query spec from q to history member collection
+            quilt_data.query_specs_add(self._history, querySpec)
+
+        if querySpec != None:
+            # mark the query as the specified state
+            quilt_data.query_spec_set(querySpec, state=state)
+
+        return querySpec
+
+    def AppendQueryResults(self, queryId, srcQueryId, eventList):
         """Append the specified eventList to the specified queryId,
         and mark it complete, and move it to history list"""
 
-        # acquire lock
-        with self.lock:
-            # mark the query as completed in state
-            querySpec = quilt_data.query_specs_del(self._queries, queryId)
-            quilt_data.query_spec_set(querySpec,
-                state=quilt_data.STATE_COMPLETED)
-            # set the results into the query spec
-            quilt_data.query_spec_set(querySpec, results=eventList)
-            # move query spec from q to history member collection
-            quilt_data.query_specs_add(self._history, querySpec)
+        try:
+            # TODO
+            #TODO use srcQueryId to allow results to know where they came form
+
+            srcQueryId=srcQueryId
+            # acquire lock
+            with self.lock:
+                querySpec = self._try_move_query_to_hist(
+                        queryId, quilt_data.STATE_COMPLETED)
+
+                if querySpec == None:
+                    raise Exception("Query " + str(queryId) + 
+                        "could not be found for results appending")
+
+                # set the results into the query spec
+                existingEvents = quilt_data.query_spec_tryget(
+                         querySpec, results=True)
+
+                if existingEvents == None:
+                    existingEvents = []
+
+                # append the results into the query spec
+                quilt_data.query_spec_set(querySpec, 
+                        results=(existingEvents + eventList))
+        except Exception, error:
+            try:
+                # log exception here, because there is no detail in it once we 
+                #   pass it across pyro
+                logging.error("Unable append results for query: " + 
+                        str(queryId))
+                logging.exception(error)
+            finally:
+                # throw the exception back over to the calling process
+                raise error
 
     def OnSourceQueryError(self, source, qid, error):
         """Called when an asyncronys source query produces an exeption"""
@@ -459,19 +548,17 @@ class QueryMaster:
         try:
             with self.lock:
                 # mark the query as completed in state
-                querySpec = quilt_data.query_specs_del(self._queries, qid)
-                quilt_data.query_spec_set(querySpec,
-                    state=quilt_data.STATE_ERROR)
-                # move query spec from q to history member collection
-                quilt_data.query_specs_add(self._history, querySpec)
+                self._try_move_query_to_hist(
+                        qid, quilt_data.STATE_ERROR)
+
         except Exception, e:
             logging.error("Unable to properly process source error")
             logging.exception(e)
             raise
         
         finally:
-            logging.error("Source: " + source + 
-                " was unable to process query: " + qid)
+            logging.error("Source: " + str(source) + 
+                " was unable to process query: " + str(qid))
             logging.error(str(type(error)) + " : " + str(error))
             
 def get_client_proxy( clientRec):
@@ -493,14 +580,47 @@ def get_client_proxy_from_type_and_name( qm, clientType, clientName):
         rec = qm.clients[clientType][clientName].copy()
     return get_client_proxy(rec)
     
-def create_src_query_spec(
+def create_src_query_specs(
     srcPatSpec, srcPatDict, varSpecs, patVarSpecs, qid, source, patternName):
+    """
+    get new sourceQuery specs from the sourcePatternSpec and the
+    srcPatDict
+    """
+
+    srcQuerySpecs = None
+
+    patInstanceDict = srcPatDict[source][patternName]
+
+    
+    for patInstanceName in patInstanceDict.keys():
+
+        curSrcQuerySpec = create_src_query_spec(
+                srcPatSpec, patInstanceName, varSpecs, patVarSpecs, qid, source,
+                patternName, srcPatDict)
+
+        srcQuerySpecs = quilt_data.src_query_specs_add( srcQuerySpecs,
+                curSrcQuerySpec)
+
+
+    return srcQuerySpecs
+
+
+
+
+
+def create_src_query_spec(
+    srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source, patternName,
+    srcPatDict):
     """Helper function for filling out a srcQuerySpec with variable values"""
 
     srcPatVars = quilt_data.src_pat_spec_get(
         srcPatSpec, variables=True)
     if srcPatVars == None:
         return
+
+    srcVarToVarDict = srcPatDict[source][patternName][srcPatInstance]
+
+    # logging.debug("srcVarToVarDict: " + str(srcVarToVarDict))
 
     # logging.info("srcPatDict is " + str(srcPatDict))
     srcQueryVarSpecs = None
@@ -511,7 +631,7 @@ def create_src_query_spec(
         # find that source variable in the pattern's 
         #   mappings
         # get the name of the query variable that maps to it
-        varName = srcPatDict[source][patternName][srcVarName]
+        varName = srcVarToVarDict[srcVarName]
 
         # get the value of the query variable from the
         #   querySpec, if it was given in the query spec
@@ -547,12 +667,18 @@ def create_src_query_spec(
         srcQueryVarSpecs = quilt_data.var_specs_add(
             srcQueryVarSpecs, srcQueryVarSpec)
     
+    # Combine strings to get a name for this source query
+    srcQueryName = '_'.join([qid,source,patternName])
+    if srcPatInstance != None:
+        srcQueryName += "_" + str(srcPatInstance)
+
     # create and return a src query spec
     # TODO see Issue I001, this name may not be unique
     # logging.info("srcPatSpec looks like: " + str(srcPatSpec))
     srcPatName = quilt_data.src_pat_spec_get(srcPatSpec, name=True)
+    logging.debug("Creating " + srcQueryName + " from " + srcPatName)
     return quilt_data.src_query_spec_create(
-        name=qid + "_" + srcPatName,
+        name=srcQueryName,
         srcPatternName=srcPatName,
         variables=srcQueryVarSpecs)
 

@@ -1,8 +1,8 @@
 quilt 0.1 requirements
 ----------------------
 
-Quilt 0.1 is a system which brings together multiple types of data and provides
-a distributed mechanism for querying the data.
+Quilt 0.1 is a system which brings together multiple types of data and 
+    provides a distributed mechanism for querying the data.
 
 Queries:
 * Queries are submitted from an analyst system with no or partial local data
@@ -15,6 +15,29 @@ Queries:
     in the quilt pattern
 * A default value specified in a quilt pattern will overide a default value
     set in the source pattern
+* Quilt Grammer is supported for queries:
+
+    pattern ::= until(pattern,pattern) |
+        concurrent(pattern,pattern,...) |
+        follows(dt, pattern, pattern) |
+        expr
+    expr ::= and(expr, expr, ...) |
+        or (expr, expr, ...) |
+        not(expr) | condition
+    condition ::= Term > Term | Term == Term |
+        term < term | term >= term |
+        term != term | term <= term |
+        term
+    term ::= term ˆ term | term * term |
+        term / term | factor
+    factor ::= factor + factor |
+        factor - factor | value
+    value ::= ( pattern ) | literal |
+        source.field
+    literal ::= string | numeric
+    source ::= identifier
+    field ::= identifier | identifier [ term ]
+
 
 Results:
 * results of query will be presented to the user as a collection of temporal
@@ -32,4 +55,4 @@ Data:
 Tasks:
 * Mine log files for events of interest
     ** using regular expressions
-* All functionality shall be verifiable via automated testing
+* All functionality shall be easily verifiable via automated testing
