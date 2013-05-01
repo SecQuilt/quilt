@@ -3,7 +3,6 @@
 import sys
 import unittest
 import quilt_test_core
-import time
 import quilt_data
 import re
 
@@ -69,7 +68,8 @@ class BasicSourcesTestcase(unittest.TestCase):
             '-v', 'SEARCHSTRING3', "word-regexp",
             '-v', 'SEARCHSTRING5', "word-regexp"
             ]))
-        time.sleep(1)
+        # sleep a small ammount
+        quilt_test_core.sleep_small()
 
         # capture query_id from std out 
         a = o.index("Query ID is: ") + len(str("Query ID is: "))

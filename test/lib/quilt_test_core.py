@@ -4,6 +4,7 @@ import os
 import argparse
 import quilt_core
 import sei_core
+import time
 
 def get_quilt_test_lib_dir():
     """grab the location of quilt test scritps"""
@@ -80,3 +81,13 @@ def get_source_name(partialName):
         logToPython=False, shell=True)
     return srcName
 
+def sleep_small():
+    time.sleep(0.25)
+def sleep_medium():
+    for i in range(4): 
+        i=i
+        sleep_small() 
+def sleep_large():
+    for i in range(4): 
+        i=i
+        sleep_medium() 

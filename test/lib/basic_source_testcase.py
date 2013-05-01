@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-import os
 import sys
 import logging
 import unittest
 import quilt_test_core
-import sei_core
-import time
 import quilt_data
 import re
 
@@ -52,8 +49,8 @@ class BasicSourceTestcase(unittest.TestCase):
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]
         self.assertTrue(len(qid) > 0)
-        # sleep 1 second
-        time.sleep(1)
+        # sleep a small ammount
+        quilt_test_core.sleep_small()
         return qid
 
     def check(self,qid):
