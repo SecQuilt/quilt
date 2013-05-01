@@ -3,7 +3,7 @@
 # set python path for modules under test and test modules
 # set config dir to test config
 source $(dirname ${BASH_SOURCE[0]})/testenv.rc
-srcName=$($QUILT_HOME/bin/quilt_status | grep syslog | head -n 1 | awk '{print $1}' | sed  -e "s/{'//" -e "s/'://")
+srcName=$($QUILT_HOME/bin/quilt_status | grep syslog | head -n 1 | awk '{print $1}' | sed  -e "s/{'//" -e "s/'://" -e "s/'//g")
 # start up quilt daemons
 $QUILT_HOME/bin/quilt_define -n test_pattern \
     -v SEARCHSTRING \

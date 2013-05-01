@@ -30,9 +30,13 @@ class BasicSourcesTestcase(unittest.TestCase):
         firstTime = False
 
         syslog = quilt_test_core.get_source_name("syslog")
-        multisource = quilt_test_core.get_source_name("multisource")
+        multisource = quilt_test_core.get_source_name("multipattern")
 
+        #TODO REad the pattern id from the std output then query that one
+        # See ISSUE007 and ISSUE008
         quilt_test_core.call_quilt_script('quilt_define.py',[
+            "(SEARCHSTRING6/SEARCHSTRING5)-(SEARCHSTRING4^SEARCHSTRING3)*" + 
+                "((SEARCHSTRING2+SEARCHSTRING1))",
             '-n', 'bigpattern',
             '-v', 'SEARCHSTRING1', 'the Search string1',
             '-v', 'SEARCHSTRING2', 'the Search string2',
@@ -45,9 +49,7 @@ class BasicSourcesTestcase(unittest.TestCase):
             '-m', 'SEARCHSTRING3', multisource, 'pat1', 'PAT1SRCVAR1', 
             '-m', 'SEARCHSTRING4', multisource, 'pat1', 'PAT1SRCVAR2', 
             '-m', 'SEARCHSTRING5', multisource, 'pat2', 'PAT2SRCVAR1', 
-            '-m', 'SEARCHSTRING6', multisource, 'pat2', 'PAT2SRCVAR2',
-            "(SEARCHSTRING6/SEARCHSTRING5)-(SEARCHSTRING4^SEARCHSTRING3)*" + 
-                "((SEARCHSTRING2+SEARCHSTRING1))"
+            '-m', 'SEARCHSTRING6', multisource, 'pat2', 'PAT2SRCVAR2'
             ])
 
 
@@ -60,16 +62,19 @@ class BasicSourcesTestcase(unittest.TestCase):
 
         # defaults specified in source patterns for SEARCHSTRING[4,6]
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+            'bigpattern',
             '-y', 
             '-v', 'SEARCHSTRING1', "Occurs_1_time",
             '-v', 'SEARCHSTRING2', "Occurs_3_times",
-            '-v', 'SEARCHSTRING3', "-l",
-            '-v', 'SEARCHSTRING5', "-w"
+            '-v', 'SEARCHSTRING3', "word-regexp",
+            '-v', 'SEARCHSTRING5', "word-regexp"
             ]))
         time.sleep(1)
 
         # capture query_id from std out 
-        qid = o.index("Query ID is: ") + len(str("Query ID is: "))
+        a = o.index("Query ID is: ") + len(str("Query ID is: "))
+        qid = o[a:]
+
         # issue a valid query
 
         # call quilt_history query_id
@@ -90,25 +95,19 @@ class BasicSourcesTestcase(unittest.TestCase):
                 "Occurs_3_times", o)]))
         self.assertTrue(occurences == 1 + 3)
 
+
+        # have no + 1, these are defaults set from src pattern
         
         occurences = (
             len([m.start() for m in re.finditer(
                 "src default for pat2 occurs twice", o)]))
-        self.assertTrue(occurences == 1 + 2)
+        self.assertTrue(occurences ==  2)
 
-        # In this instance we passed a -l for line numbers only
-        # so check that it didn't output the search string
         occurences = (
             len([m.start() for m in re.finditer(
                 "src default for pat1 occurs once", o)]))
-        self.assertTrue(occurences == 0 + 1)
+        self.assertTrue(occurences ==  1)
 
-        # but the file name should have been outputt for a match with -l
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "messages", o)]))
-
-        self.assertTrue(occurences == 0 + 1)
 
 
 if __name__ == "__main__":

@@ -32,7 +32,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             # perform first pass parse on the pattern to ensure syntax
             # call get_pattern_vars from parser, but ignore the result
             #   this will check the syntax
-            codestr = "\n".join(self._args.code)
+            codestr = str(self._args.code)
             quilt_parser.get_pattern_vars(codestr)
             # store the code in the pattern
             quilt_data.pat_spec_set(patternSpec, code=codestr)
@@ -132,12 +132,15 @@ def main(argv):
             purpose of the variable, and the oprional default value of the 
             variable""")
 
-    parser.add_argument('-m','--mapping', nargs=4, action='append',
-        help="""VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE  Provide 
-            mapping from a pattern variable to a source variable.
-            pattern variables are described with the -v, --variable command.
-            source variables are described in the data source manger's 
-            configuration files""")
+    parser.add_argument('-m','--mapping', nargs='+', action='append',
+        help="""VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE 
+            [SOURCE_PATTERN_INSTANCE] Provide mapping from a pattern variable 
+            to a source variable.  Pattern variables are described with the 
+            -v, --variable command.  Source variables are described in the 
+            data source manger's configuration files.  Source pattern
+            instance is optional, but required if pattern is using the same 
+            source pattern multiple times so the source variables can be 
+            disambiguated""")
 
     args = parser.parse_args(argv)
 

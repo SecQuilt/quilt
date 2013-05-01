@@ -494,7 +494,7 @@ def src_query_specs_add(srcQuerySpecs, srcQuerySpec):
         srcQuerySpecs = src_query_specs_create()
     name = src_query_spec_get(srcQuerySpec,name=True)
     srcQuerySpecs[name] = srcQuerySpec
-    return srcQuerySpec
+    return srcQuerySpecs
 
 def src_spec_set(spec,
     name=None,

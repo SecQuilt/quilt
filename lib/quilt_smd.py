@@ -71,11 +71,10 @@ class SourceManager(quilt_core.QueryMasterClient):
             #    " with replacments: " + str(replacments))
             cmdline = template.safe_substitute(replacments)
 
-            context = {
-                    'queryId' : queryId,
-                    'srcQueryId' :
-                    quilt_data.src_query_spec_get(sourceQuerySpec,name=True)
-                    }
+            # setup context for the cmdline stdout callback
+            srcQueryId = quilt_data.src_query_spec_get(
+                    sourceQuerySpec,name=True)
+            context = { 'queryId' : queryId, 'srcQueryId' : srcQueryId  } 
 
             # use run_process to execute cmd, give callback per line
             #   processing function
@@ -84,7 +83,13 @@ class SourceManager(quilt_core.QueryMasterClient):
                 outFunc=self.OnGrepLine, outObj=context, logToPython=False)
             
             # Set query result events list in query master using query id
-            self._qm.SetQueryResults(queryId, self._sourceResults)
+            results = []
+            with self._lock:
+                if queryId in self._sourceResults:
+                    if srcQueryId in self._sourceResults[queryId]:
+                        results = list(self._sourceResults[queryId][srcQueryId])
+            self._qm.AppendQueryResults(
+                    queryId, srcQueryId, results)
      
     # catch exception! 
         except Exception, error:

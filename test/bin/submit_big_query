@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# set python path for modules under test and test modules
+# set config dir to test config
+source $(dirname ${BASH_SOURCE[0]})/testenv.rc
+
+# start up quilt daemons
+$QUILT_HOME/bin/quilt_submit '-l' 'DEBUG' 'bigpattern' '-v' 'SEARCHSTRING1' 'Occurs_1_time' '-v' 'SEARCHSTRING2' 'Occurs_3_times' '-v' 'SEARCHSTRING3' 'files-with-matches' '-v' 'SEARCHSTRING5' 'word-regexp'
+
