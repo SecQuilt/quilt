@@ -1,0 +1,337 @@
+* TO DO
+  - [ ] figure out how to capture stderr
+  - [ ] figure out how to capture output from daemon processes forked from the shell
+  - [ ] pass -y to quilt_submit to avoid hanging the process waiting for input
+  - [ ] in babel can I do input to a script?
+
+* Files
+  - testenv.rc :: setup. BASH_SOURCE broken? 
+    file:/home/gmj/quilt/test/bin/testenv.rc
+  - rwcut.conf :: Source manager configuration file for rwcut. 
+    Defines the sourceSpec. 
+    file:~/quilt/test/etc/quilt/smd.d/rwcut.conf 
+
+* Setup
+  - run from /home/gmj/quilt/test/bin/ because dirname is broken
+
+#+BEGIN_SRC sh :session barSession :results output
+source /home/gmj/quilt/test/bin/testenv.rc
+env | grep quilt
+cd /home/gmj/quilt/test/bin
+#+END_SRC
+
+#+RESULTS:
+: 
+: 2 [15:13:39] gmj@so quilt/ $ PWD=/home/gmj/quilt
+: QUILT_TEST_BIN=/home/gmj/quilt/test/bin/
+: QUILT_HOME=/home/gmj/quilt
+: PYTHONPATH=/home/gmj/quilt/lib:/home/gmj/quilt/test/lib
+: QUILT_CFG_DIR=/home/gmj/quilt/test/etc/quilt
+: ~/quilt/test/bin ~/quilt
+
+* Start the daemon
+  - Logging all goes to STDERR
+  - Log to file:
+#+BEGIN_SRC sh :session barSession :results output
+cd /home/gmj/quilt/test/bin
+./daemons_start 
+#+END_SRC
+
+#+RESULTS:
+: ~/quilt/test/bin ~/quilt/bin ~/quilt/test/bin ~/quilt/test/bin ~/quilt
+
+* Checking status
+#+BEGIN_SRC sh :session barSession :results output
+cd /home/gmj/quilt/bin
+./quilt_status 
+#+END_SRC    
+
+#+RESULTS:
+#+begin_example
+~/quilt/bin ~/quilt/test/bin ~/quilt
+Sources 4 source manager(s): 
+{'multipattern_gmj_20250': {'clientName': 'multipattern_gmj_20250',
+                            'registrarHost': None,
+                            'registrarPort': None},
+ 'rwcut_gmj_20250': {'clientName': 'rwcut_gmj_20250',
+                     'registrarHost': None,
+                     'registrarPort': None},
+ 'syslog_gmj_20250': {'clientName': 'syslog_gmj_20250',
+                      'registrarHost': None,
+                      'registrarPort': None},
+ 'tailpw_gmj_20250': {'clientName': 'tailpw_gmj_20250',
+                      'registrarHost': None,
+                      'registrarPort': None}}
+Patterns {'rwcutSomething': {'mappings': [{'name': 'maxstuff',
+                                  'sourceName': 'rwcut_gmj_20250',
+                                  'sourcePattern': 'rwcut',
+                                  'sourceVariable': 'MAXPASS'}],
+                    'name': 'rwcutSomething',
+                    'variables': {'maxstuff': {'name': 'maxstuff'}}}}
+#+end_example
+
+* Stop the daemon
+#+BEGIN_SRC sh :session barSession :results output
+cd /home/gmj/quilt/test/bin
+./test_stop
+#+END_SRC
+
+#+RESULTS:
+: ~/quilt/test/bin ~/quilt/test/bin ~/quilt/bin ~/quilt/test/bin ~/quilt/test/bin ~/quilt
+: 2013-05-02 14:44:43,670:smd19733:WARNING:smd Failed to stop daemon: PID file '/tmp/smd.pid' not locked
+: Terminating on signal 15
+
+* Define a quilt pattern
+  - This defines a quilt
+  - the name (-n) is rwcutSomething
+  - the queryMaster varraible name is maxstuff
+  - the queryMaster varraible maxstuff maps to the 
+    the source varraible MAXPASS in the source patttern rwcut
+    in the source rwcut_gmj_####.  The ### comes from /quilt_status/ output.
+#+BEGIN_SRC sh :session barSession :results output
+./quilt_define -n rwcutSomething -v maxstuff -m maxstuff rwcut_gmj_20250 rwcut MAXPASS
+#+END_SRC
+
+#+RESULTS:
+: Pattern rwcutSomething  defined
+
+* Submit a query using the pattern just defined
+#+BEGIN_SRC sh :session barSession :results output
+oenv
+cd /home/gmj/quilt/bin
+./quilt_submit -y rwcutSomething -v maxstuff 3
+#+END_SRC
+
+#+RESULTS:
+: bash: ./quilt_submit: No such file or directory
+
+* See the pattern we just created
+#+BEGIN_SRC sh :session barSession :results output
+./quilt_status
+#+END_SRC
+
+* See in progress queries
+#+BEGIN_SRC sh :session barSession :results output
+./quilt_q
+#+END_SRC
+
+#+RESULTS:
+: []
+
+* See completed queries
+  - for now, "history" means we have at least one result, 
+    not that we have all results we will get
+#+BEGIN_SRC sh :session barSession :results output
+./quilt_history
+#+END_SRC
+
+#+RESULTS:
+: {'QuiltSubmit_gmj_22045_rwcutSomething': {'name': 'QuiltSubmit_gmj_22045_rwcutSomething',
+:                                           'patternName': 'rwcutSomething',
+:                                           'state': 'ERROR',
+:                                           'variables': {'maxstuff': {'name': 'maxstuff',
+:                                                                      'value': '3'}}}}
+
+
+ 
+* Integration Test
+#+BEGIN_SRC sh :session barSession :results output
+cd ~/quilt/test/bin
+env
+./basic_source_testcase
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+~/quilt/test/bin ~/quilt/bin ~/quilt/test/bin ~/quilt
+SSH_AGENT_PID=2365
+GLADE_PIXMAP_PATH=:
+XDG_MENU_PREFIX=xfce-
+SHELL=/bin/bash
+TERM=dumb
+XDG_SESSION_COOKIE=3e054a7187e50f581ac0876200000007-1367434020.471047-664708105
+TMPDIR=.
+WINDOWID=65011716
+GNOME_KEYRING_CONTROL=/tmp/keyring-G2kZ7I
+myPublicIP=128.237.249.240
+SILK_IPV6_POLICY=asv4
+USER=gmj
+EMACS=t
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:
+GLADE_MODULE_PATH=:
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+SSH_AUTH_SOCK=/tmp/ssh-gOFTYtQD2333/agent.2333
+TERMCAP=
+DEFAULTS_PATH=/usr/share/gconf/xubuntu.default.path
+SESSION_MANAGER=local/so:@/tmp/.ICE-unix/2384,unix/so:/tmp/.ICE-unix/2384
+COLUMNS=86
+XDG_CONFIG_DIRS=/etc/xdg/xdg-xubuntu:/etc/xdg:/etc/xdg
+myPublicDomainName=
+DESKTOP_SESSION=xubuntu
+PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/bro/bin:/home/gmj/bin
+PWD=/home/gmj/quilt/test/bin
+myLocation=
+EDITOR=emacs
+LANG=en_US.UTF-8
+GNOME_KEYRING_PID=2322
+MANDATORY_PATH=/usr/share/gconf/xubuntu.mandatory.path
+[\t] \u@\h \W/ $ 
+GDMSESSION=xubuntu
+QUILT_TEST_BIN=/home/gmj/quilt/test/bin/
+myOS=linux
+HOME=/home/gmj
+SHLVL=3
+QUILT_HOME=/home/gmj/quilt
+SILK_DATA_ROOTDIR=/data
+LOGNAME=gmj
+PYTHONPATH=/home/gmj/quilt/lib:/home/gmj/quilt/test/lib
+VISUAL=emacs
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-76sQSgyd6r,guid=523a27cdb5bd6d5310db54f400000019
+XDG_DATA_DIRS=/usr/share/xubuntu:/usr/local/share/:/usr/share/:/usr/share
+s
+DISPLAY=:0.0
+LIBGLADE_MODULE_PATH=:
+GLADE_CATALOG_PATH=:
+XDG_CURRENT_DESKTOP=XFCE
+QUILT_CFG_DIR=/home/gmj/quilt/test/etc/quilt
+INSIDE_EMACS=24.3.50.1,comint
+s %s
+XAUTHORITY=/home/gmj/.Xauthority
+COLORTERM=Terminal
+OLDPWD=/home/gmj/quilt/bin
+_=/usr/bin/env
+2013-05-02 15:18:24,089:qdef23337:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:24,095:qdef23337:DEBUG:Registering QuiltDefine_gmj_23337, to query master, via registrar: None:None
+2013-05-02 15:18:24,098:qdef23337:INFO:Connection completed for QuiltDefine_gmj_23337
+2013-05-02 15:18:24,099:qdef23337:INFO:Unregistration completed for QuiltDefine_gmj_23337
+2013-05-02 15:18:24,216:qstat23346:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:24,220:qstat23346:DEBUG:Registering QuiltStatus_gmj_23346, to query master, via registrar: None:None
+2013-05-02 15:18:24,225:qstat23346:INFO:Connection completed for QuiltStatus_gmj_23346
+2013-05-02 15:18:24,228:qstat23346:INFO:Unregistration completed for QuiltStatus_gmj_23346
+.2013-05-02 15:18:24,437:qsub23355:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:24,451:qsub23355:DEBUG:Registering QuiltSubmit_gmj_23355, to query master, via registrar: None:None
+2013-05-02 15:18:24,453:qsub23355:INFO:Connection completed for QuiltSubmit_gmj_23355
+2013-05-02 15:18:24,454:qsub23355:INFO:Submiting query: {'name': 'new test_pattern',
+ 'patternName': 'test_pattern',
+ 'state': 'UNINITIALIZED',
+ 'variables': {'SEARCHSTRING': {'name': 'SEARCHSTRING', 'value': '.*'}}}
+2013-05-02 15:18:25,557:qsub23355:DEBUG:executing 1 events in main loop
+2013-05-02 15:18:25,563:qsub23355:INFO:Reciving validation request for query: QuiltSubmit_gmj_23355_test_pattern
+2013-05-02 15:18:25,563:qsub23355:DEBUG:soon will no longer process events
+2013-05-02 15:18:26,661:qsub23355:INFO:Unregistration completed for QuiltSubmit_gmj_23355
+2013-05-02 15:18:27,084:qhist23372:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:27,132:qhist23372:DEBUG:Registering QuiltHistory_gmj_23372, to query master, via registrar: None:None
+2013-05-02 15:18:27,134:qhist23372:INFO:Connection completed for QuiltHistory_gmj_23372
+2013-05-02 15:18:27,138:qhist23372:INFO:Unregistration completed for QuiltHistory_gmj_23372
+2013-05-02 15:18:27,301:qhist23381:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:27,306:qhist23381:DEBUG:Registering QuiltHistory_gmj_23381, to query master, via registrar: None:None
+2013-05-02 15:18:27,341:qhist23381:INFO:Connection completed for QuiltHistory_gmj_23381
+2013-05-02 15:18:27,345:qhist23381:INFO:Unregistration completed for QuiltHistory_gmj_23381
+2013-05-02 15:18:27,474:qhist23394:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:27,512:qhist23394:DEBUG:Registering QuiltHistory_gmj_23394, to query master, via registrar: None:None
+2013-05-02 15:18:27,516:qhist23394:INFO:Connection completed for QuiltHistory_gmj_23394
+2013-05-02 15:18:27,520:qhist23394:INFO:Unregistration completed for QuiltHistory_gmj_23394
+.2013-05-02 15:18:27,733:qsub23403:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:27,739:qsub23403:DEBUG:Registering QuiltSubmit_gmj_23403, to query master, via registrar: None:None
+2013-05-02 15:18:27,772:qsub23403:INFO:Connection completed for QuiltSubmit_gmj_23403
+2013-05-02 15:18:27,772:qsub23403:INFO:Submiting query: {'name': 'new test_pattern',
+ 'patternName': 'test_pattern',
+ 'state': 'UNINITIALIZED',
+ 'variables': {'SEARCHSTRING': {'name': 'SEARCHSTRING',
+                                'value': 'Occurs_3_times'}}}
+2013-05-02 15:18:28,875:qsub23403:DEBUG:executing 1 events in main loop
+2013-05-02 15:18:28,920:qsub23403:INFO:Reciving validation request for query: QuiltSubmit_gmj_23403_test_pattern
+2013-05-02 15:18:28,920:qsub23403:DEBUG:soon will no longer process events
+2013-05-02 15:18:29,978:qsub23403:INFO:Unregistration completed for QuiltSubmit_gmj_23403
+2013-05-02 15:18:30,389:qhist23425:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:30,399:qhist23425:DEBUG:Registering QuiltHistory_gmj_23425, to query master, via registrar: None:None
+2013-05-02 15:18:30,439:qhist23425:INFO:Connection completed for QuiltHistory_gmj_23425
+2013-05-02 15:18:30,445:qhist23425:INFO:Unregistration completed for QuiltHistory_gmj_23425
+2013-05-02 15:18:30,566:qhist23434:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:30,614:qhist23434:DEBUG:Registering QuiltHistory_gmj_23434, to query master, via registrar: None:None
+2013-05-02 15:18:30,659:qhist23434:INFO:Connection completed for QuiltHistory_gmj_23434
+2013-05-02 15:18:30,660:qhist23434:INFO:Unregistration completed for QuiltHistory_gmj_23434
+2013-05-02 15:18:30,781:qhist23443:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:30,828:qhist23443:DEBUG:Registering QuiltHistory_gmj_23443, to query master, via registrar: None:None
+2013-05-02 15:18:30,876:qhist23443:INFO:Connection completed for QuiltHistory_gmj_23443
+2013-05-02 15:18:30,877:qhist23443:INFO:Unregistration completed for QuiltHistory_gmj_23443
+.2013-05-02 15:18:30,996:qsub23452:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:30,997:qsub23452:DEBUG:Registering QuiltSubmit_gmj_23452, to query master, via registrar: None:None
+2013-05-02 15:18:31,035:qsub23452:INFO:Connection completed for QuiltSubmit_gmj_23452
+2013-05-02 15:18:31,036:qsub23452:INFO:Submiting query: {'name': 'new test_pattern',
+ 'patternName': 'test_pattern',
+ 'state': 'UNINITIALIZED',
+ 'variables': {'SEARCHSTRING': {'name': 'SEARCHSTRING',
+                                'value': 'Occurs_no_times'}}}
+2013-05-02 15:18:32,139:qsub23452:DEBUG:executing 1 events in main loop
+2013-05-02 15:18:32,156:qsub23452:INFO:Reciving validation request for query: QuiltSubmit_gmj_23452_test_pattern
+2013-05-02 15:18:32,156:qsub23452:DEBUG:soon will no longer process events
+2013-05-02 15:18:33,243:qsub23452:INFO:Unregistration completed for QuiltSubmit_gmj_23452
+Exception in thread Pyro-Worker-24790992  (most likely raised during interpreter shutdown):
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 551, in __bootstrap_inner
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 48, in run
+ Exception in thread Pyro-Worker-24790224  (most likely raised during interpreter shutdown):
+Traceback (most recent call last):Exception in thread Pyro-Worker-24790544  (most likely raised during interpreter shutdown):
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 551, in __bootstrap_inner
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 48, in run
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 189, in getJob
+: 'NoneType' object has no attribute 'Empty'
+
+  File "/usr/lib/python2.7/threading.py", line 551, in __bootstrap_inner
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 48, in run
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 189, in getJob
+: 'NoneType' object has no attribute 'Empty'
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 189, in getJob
+: 'NoneType' object has no attribute 'Empty'
+2013-05-02 15:18:33,691:qhist23471:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:33,713:qhist23471:DEBUG:Registering QuiltHistory_gmj_23471, to query master, via registrar: None:None
+2013-05-02 15:18:33,744:qhist23471:INFO:Connection completed for QuiltHistory_gmj_23471
+2013-05-02 15:18:33,754:qhist23471:INFO:Unregistration completed for QuiltHistory_gmj_23471
+2013-05-02 15:18:33,880:qhist23480:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:33,926:qhist23480:DEBUG:Registering QuiltHistory_gmj_23480, to query master, via registrar: None:None
+2013-05-02 15:18:33,973:qhist23480:INFO:Connection completed for QuiltHistory_gmj_23480
+2013-05-02 15:18:33,974:qhist23480:INFO:Unregistration completed for QuiltHistory_gmj_23480
+2013-05-02 15:18:34,093:qhist23489:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:34,143:qhist23489:DEBUG:Registering QuiltHistory_gmj_23489, to query master, via registrar: None:None
+2013-05-02 15:18:34,190:qhist23489:INFO:Connection completed for QuiltHistory_gmj_23489
+2013-05-02 15:18:34,191:qhist23489:INFO:Unregistration completed for QuiltHistory_gmj_23489
+.2013-05-02 15:18:34,412:qsub23498:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:34,459:qsub23498:DEBUG:Registering QuiltSubmit_gmj_23498, to query master, via registrar: None:None
+2013-05-02 15:18:34,502:qsub23498:INFO:Connection completed for QuiltSubmit_gmj_23498
+2013-05-02 15:18:34,502:qsub23498:INFO:Submiting query: {'name': 'new test_pattern',
+ 'patternName': 'test_pattern',
+ 'state': 'UNINITIALIZED',
+ 'variables': {'SEARCHSTRING': {'name': 'SEARCHSTRING',
+                                'value': 'Occurs_1_time'}}}
+2013-05-02 15:18:35,605:qsub23498:DEBUG:executing 1 events in main loop
+2013-05-02 15:18:35,639:qsub23498:INFO:Reciving validation request for query: QuiltSubmit_gmj_23498_test_pattern
+2013-05-02 15:18:35,639:qsub23498:DEBUG:soon will no longer process events
+2013-05-02 15:18:36,708:qsub23498:INFO:Unregistration completed for QuiltSubmit_gmj_23498
+Exception in thread Pyro-Worker-37352336  (most likely raised during interpreter shutdown):
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 551, in __bootstrap_inner
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 48, in run
+  File "/usr/local/lib/python2.7/dist-packages/Pyro4/tpjobqueue.py", line 189, in getJob
+: 'NoneType' object has no attribute 'Empty'
+2013-05-02 15:18:37,151:qhist23513:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:37,183:qhist23513:DEBUG:Registering QuiltHistory_gmj_23513, to query master, via registrar: None:None
+2013-05-02 15:18:37,206:qhist23513:INFO:Connection completed for QuiltHistory_gmj_23513
+2013-05-02 15:18:37,214:qhist23513:INFO:Unregistration completed for QuiltHistory_gmj_23513
+2013-05-02 15:18:37,350:qhist23526:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:37,382:qhist23526:DEBUG:Registering QuiltHistory_gmj_23526, to query master, via registrar: None:None
+2013-05-02 15:18:37,390:qhist23526:INFO:Connection completed for QuiltHistory_gmj_23526
+2013-05-02 15:18:37,391:qhist23526:INFO:Unregistration completed for QuiltHistory_gmj_23526
+2013-05-02 15:18:37,550:qhist23535:DEBUG:Locating name server for query master: None, None
+2013-05-02 15:18:37,562:qhist23535:DEBUG:Registering QuiltHistory_gmj_23535, to query master, via registrar: None:None
+2013-05-02 15:18:37,590:qhist23535:INFO:Connection completed for QuiltHistory_gmj_23535
+2013-05-02 15:18:37,592:qhist23535:INFO:Unregistration completed for QuiltHistory_gmj_23535
+.
+----------------------------------------------------------------------
+Ran 5 tests in 13.872s
+
+OK
+#+end_example
+
