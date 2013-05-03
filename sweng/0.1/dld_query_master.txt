@@ -11,6 +11,7 @@ Internal Dependencies:
 External Dependenies:
     python-pyro(4)
     threading
+    subprocess
 
 Prototypes:
     nested.py
@@ -107,7 +108,6 @@ Classes:
                     #   name with the source pattern name
 
                     
-            #REVIEW
             # store sourceQueries in the querySpec
             # use querySpec to create a validation  string                    
             # ask submitter to validate the query/source Queries
@@ -119,7 +119,11 @@ Classes:
                 #   store querySpec state as INITIALIZED, and place 
                     # validated contnts in member data
 
-            # Process query by calling utility function to launch quilt
+            # Process query
+            # get the path to the current directory
+            # formulate the command line for quilt_query
+            # use subprocess module to fork off the process
+
             # script, pass the query ID
 
 
@@ -182,7 +186,6 @@ Classes:
             # return stats
             
         
-        #REVIEW
         void AppendQueryResults(
             string queryId,
             results)
@@ -198,7 +201,6 @@ Classes:
 
 
             
-        #REVIEW
         void OnQueryError(
             queryid, Exception)
             """Called when an asyncronys query produces an exeption"""
@@ -221,31 +223,27 @@ Classes:
             # else
             #   return complete history summary
 
-        #REVIEW
-        querySpec GetQuerySpecAndTransitionState(
+        querySpec BeginQuery(
             string queryID          # the query we are interested in
-            string currentState     # the expected current state of the query
-            string transitionState  # the state to set the query into
             """
-            Get the specified query, first by looking Q or history.  Assure
-            that the state matches the currentState.  Set the state to the
-            transitionState, and return the query.
+            Called by quilt_query to Move a query into the an active state,
+            and return a copy of the query
             """
 
             # lock self
-                # try to get the query from the Q
-                # if not in Q try to get from history
-                # if still can't get it rasie exception
+                # get the query from the Q
+                # if can't get it rasie exception
 
-                # if query state is not expected currentState
+                # if query state is not expected INITIALIZED state
                     # raise exception
 
-                # if transitionState is COMPLETED or ERROR
-                    move query to history
+                # move query to ACTIVE state
+                # create a  copy of the query
+ 
+            # returning copy because we con't want to stay locked when asking
+            #   pyro to marshall across process bounds
+            # return the query spec copy
 
-            # return the query spec
-
-        #REVIEW
         void CompleteQuery(queryId)
             """
             Called by quilt_query upon completion of all source queries
@@ -283,10 +281,8 @@ Functions:
         #   srcPatDict[source][patternName]
         # call create_src_query_spec with  the current pattern
         
-    #REVIEW
     def create_src_query_spec
         # get new sourceQuery spec from the sourcePatternSpec 
-        # set state to UNINITIALIZED
 
         # iterate the variables in the new sourceQuerySpec
             # find that source variable in the pattern's mappings 
@@ -297,6 +293,5 @@ Functions:
             #   but if the query does not have a value, use a
             #   default provided by the pattern, but if that has
             #   no default, use default provided by source pattern
-        # set source query state to INITIALIZED
         # return new src_query from name, patternName, and variables
         #   described in src pattern

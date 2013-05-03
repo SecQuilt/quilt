@@ -29,7 +29,6 @@ Classes:
             # use name to init base class
             # store sourceSpec as a member
             
-        #REVIEW
         def Query(
             string queryId, 
             dict sourceQuerySpec, 
@@ -38,7 +37,7 @@ Classes:
             string queryClientNamseServerPort)
     
             # ALWAYS catch errors, report them to the queryClient
-            #   calling OnSourceQueryError()           
+            #   calling OnSourceQueryError(), and CompleteSrcQuery()
  
             # lock self
                 # set last query member to queryId
@@ -76,9 +75,6 @@ Classes:
         def GetType(self):
             return "SourceManager"
 
-        #   def OnRegisterEnd()
-        #       """After basic client registration completes, source manager
-        #       initiates the source pattern registration"""
 
         def GetSourcePatterns()
             """Returns a list of defined source patterns"""

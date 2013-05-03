@@ -1,6 +1,5 @@
 quilt 0.1 quilt_query design
 ----------------------------
-#REVIEW
 Module: quilt_query
 
 Type: Executable Script
@@ -32,11 +31,11 @@ Classes:
             # get the query spec from query master
             #   check that the state is INITIALIZED
             #   set the state to ACTIVE
-            #   by calling GetQuerySpecAndTransitionState
+            #   by calling BeginQuery
             
             # iterate the sourceQuerySpec's in srcQueries list by source
                 # get proxy to the source master
-                # mark the sourceQuery
+                # mark the sourceQuery ACTIVE
                 # query the source by sending it the source query specs as
                 #   asyncronous call
 
@@ -46,6 +45,8 @@ Classes:
 
         OnSourceQueryError( srcQueryId, exception)
             # log the source's exception
+            # lock self
+                # mark source query state with ERROR
             # call query Master
             #   OnQueryError
 
@@ -119,7 +120,7 @@ Functions:
     def main(argc,argv)
         # setup argument parser in accordance with funcitonal specification
         # parse the arguments, exit with error message if unparseable
-        # create the quilt q object
+        # create the quilt query object
         # call query_master_client_main_helper
 
 
