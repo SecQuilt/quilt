@@ -142,10 +142,50 @@ c4.Testability
     We are improving the testing infrastructure, so all of this testing will
     basically be already setup, all we have to do is run it.  When possible
     We will use the iterative appraoch and test as functionality is delivered 
+
+
    
-         
-    
-    
+c5.Query
+    Implement the before operator.  Filter pattern results with a basic
+        temporal constraint.
+
+    Design
+        add new executable script, quilt_query.  Input will be a query id
+
+        quilt_query will be responsible for retrieving source specs and
+        filling them out.  This funcitonality is currently in the query
+        master.  
+
+        After all query Results are returned to quilt_query
+            sourceResults are returned to the quilt_query
+                inside the querySpec add a sourceResults field
+                sourceResults are keyed to the sourcePattern (instance)
+                    they came from
+
+        at result appending time, determine if this is the last piece
+            of data
+        track list of active source queries in the query spec
+        When list is empty we know the query is done.
+        Send final results to the query master, and tell master it si complete
+
+
+cX.Semantics
+        Iterate the AST of the query code
+        push identifiers on stack
+        When encountering the "before" function
+            pop off the last two items on the stack
+            Filter results where x < y
+        Save results in the completed query
+
+
+    Implement
+        
+
+    Test
+
+        Seed log file with specific message at early time
+        Seed log file with specific message at late time
+        Define a pattern to detect this and submit a query, and check results
             
             
 

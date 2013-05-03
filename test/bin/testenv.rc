@@ -4,6 +4,6 @@ export QUILT_TEST_BIN=$(cd $relativedir && pwd)
 export QUILT_HOME=$(dirname $(dirname $QUILT_TEST_BIN))
 export QUILT_CFG_DIR=$QUILT_HOME/test/etc/quilt
 export PYTHONPATH=$QUILT_HOME/lib:$QUILT_HOME/test/lib
-
+export PATH=$PATH:$QUILT_HOME/bin:$QUILT_HOME/test/bin
 
 

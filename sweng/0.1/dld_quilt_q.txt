@@ -23,7 +23,6 @@ Classes:
             # store args as member variable
             # chain to super constructor
 
-         # REVIEW
          OnRegisterEnd()
             # if q id specified
                 # TryGetQueryStats from master

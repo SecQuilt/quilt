@@ -29,10 +29,15 @@ Classes:
             # use name to init base class
             # store sourceSpec as a member
             
-        # REVIEW
-        def Query(string queryId, dict sourceQuerySpec)
+        #REVIEW
+        def Query(
+            string queryId, 
+            dict sourceQuerySpec, 
+            string queryClientName,
+            string queryClientNamseServerHost,
+            string queryClientNamseServerPort)
     
-            # ALWAYS catch errors, report them to the query master
+            # ALWAYS catch errors, report them to the queryClient
             #   calling OnSourceQueryError()           
  
             # lock self
@@ -49,9 +54,11 @@ Classes:
             # use run_process to execute grep, give callback per line
             #   processing function, pass as data the queryId and srcQueryId
 
-            # Append query result events list in query master using query id
+            # Append query result events list in query client using query ids
+
+            # tell the query clinet the srcSquery is complete
+
         
-        # REVIEW
         def OnGrepLine(string line, contextData)
 
 

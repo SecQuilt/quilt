@@ -62,7 +62,6 @@ smd.d/syslog.conf
 # see QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
 
 
-#REVIEW
 [multipattern]
 # make two patterns similar to QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
 # but in one source

@@ -1,7 +1,6 @@
 quilt 0.1 basic sources tests
 -----------------------------
 
-#REVIEW
 
 Module: basic_sources_testcase
 
