@@ -106,6 +106,12 @@ Classes:
         bool OnRegisterEnd()
             # return true
 
+        # funciton called once when client's first event loop occurs
+        # function called in event loop main thread
+        # return False to end participation in event loop
+        bool OnFirstEventLoop()
+            # return true
+
         # funciton called when client's owning daemon begins an event loop
         # iteration, function called in event loop main thread
         # return False to end participation in event loop
@@ -179,6 +185,16 @@ Functions:
         # do a daemon event loop, 
 
         # while clientObjectDic has elements in it
+            On very first iteration of loop
+                # initialized a removedClientDic
+                # iterate the names and objects in clientObjectDic
+                    # call OnFirstEventLoop() if False is returned
+                        # remove object from clientObjectDic
+                        # place object in removedClientDic
+                        # UnRegisterClient from Query Master
+
+                # if all objects have been removed break out
+
             # initialized a removedClientDic
             # iterate the names and objects in clientObjectDic
                 # call OnEventLoopBegin() if False is returned
@@ -232,12 +248,14 @@ from main and other initializeation"""
         This functionality will grow as needed, but have common site for
         logging config here   
         
+    #REVIEW (ISSUE008)
     def ui_show(outputMsg)
         """
         Show the output message
         """
         chain call to quilt_ui.show
 
+    #REVIEW (ISSUE008)
     def ui_tell()
         """
         Get input message from the user

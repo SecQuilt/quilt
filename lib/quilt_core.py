@@ -244,6 +244,13 @@ class QueryMasterClient:
             self._qm.UnRegisterClient(self.GetType(), self._remotename)
             logging.info("Unregistration completed for " + self.localname)
 
+def unregister_clients(daemonObjs, delDaemonObjs):
+    # remove objects from object list
+    # unregister clients from query master
+    for name,obj in delDaemonObjs.items():
+        del daemonObjs[name]
+        obj.UnregisterFromQueryMaster()
+
 def query_master_client_main_helper(
         clientObjectDict       # map of instances to names of objects to
                                # host as pyro objects
@@ -289,9 +296,30 @@ def query_master_client_main_helper(
             
     
     # start the Daemon's event loop
+    firstTime = True
 
     # continue looping while there are daemon objects
     while len(daemonObjs) > 0 :
+
+        #REVIEW
+        if firstTime:
+            firstTime = False
+            delDaemonObjs = {}
+            # iterate the names and objects in clientObjectDic
+            # this funciton will return false if it wants to be
+            # removed
+            for name,obj in daemonObjs.items():
+                if not obj.OnFirstEventLoop():
+                    delDaemonObjs[name] = obj
+
+            # remove objects from object list
+            # unregister clients from query master
+            unregister_clients(daemonObjs, delDaemonObjs)
+
+            # if all objects have been removed break out
+            if len(daemonObjs) == 0:
+                break
+
 
         delDaemonObjs = {}
         # iterate the names and objects in clientObjectDic
@@ -301,12 +329,11 @@ def query_master_client_main_helper(
             if not obj.OnEventLoopBegin():
                 delDaemonObjs[name] = obj
 
+            
         # remove objects from object list
         # unregister clients from query master
-        for name,obj in delDaemonObjs.items():
-            del daemonObjs[name]
-            obj.UnregisterFromQueryMaster()
-            
+        unregister_clients(daemonObjs, delDaemonObjs)
+
         # if all objects have been removed break out
         if len(daemonObjs) == 0:
             break
@@ -335,10 +362,6 @@ def query_master_client_main_helper(
 
         # remove objects from object list
         # unregister clients from query master
-        for name,obj in delDaemonObjs.items():
-            del daemonObjs[name]
-            obj.UnregisterFromQueryMaster()
-            
         # if all objects have been removed break out
         if len(daemonObjs) == 0:
             break

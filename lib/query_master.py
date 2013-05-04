@@ -1,3 +1,5 @@
+#FIXME Add BeginQuery
+
 #!/usr/bin/env python
 import logging
 import Pyro4

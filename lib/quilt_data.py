@@ -1,3 +1,5 @@
+#FIXME add srcQuerySpecs to querySpec
+
 #!/usr/bin/env python
 import logging
 

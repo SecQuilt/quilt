@@ -23,25 +23,26 @@ Classes:
         )
             # store args as member variable
             # chain to super constructor
+            # set _srcQueriesSent member to False
 
          OnRegisterEnd()
+            """
+            Retrive the querySpec from the query master and issue the
+            srcQueries to the source
+            """
 
-            # use query id passed in arguments
+            # try the following, send error to query master if it occrs
 
-            # get the query spec from query master
-            #   check that the state is INITIALIZED
-            #   set the state to ACTIVE
-            #   by calling BeginQuery
-            
-            # iterate the sourceQuerySpec's in srcQueries list by source
-                # get proxy to the source master
-                # mark the sourceQuery ACTIVE
-                # query the source by sending it the source query specs as
-                #   asyncronous call
+                # use query id passed in arguments
 
-            # store query as a data memeber
+                # get the query spec from query master
+                #   check that the state is INITIALIZED
+                #   set the state to ACTIVE
+                #   by calling BeginQuery
+                
+                # store query as a data memeber
 
-            # return True so event loop starts running
+                # return True so event loop starts running
 
         OnSourceQueryError( srcQueryId, exception)
             # log the source's exception
@@ -105,7 +106,14 @@ Classes:
 
         void OnEventLoopBegin()
             # lock the class lock
-            # read and return value of _processEvents
+                # if _srcQueriesSent is False
+                    # iterate the sourceQuerySpec's in srcQueries list by source
+                        # get proxy to the source master
+                        # mark the sourceQuery ACTIVE
+                        # query the source by sending it the source query specs as
+                        #   asyncronous call
+                # set _srcQueriesSent to true
+                # read and return value of _processEvents
 
         void OnEventLoopEnd()
             # lock the class lock
