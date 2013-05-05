@@ -141,6 +141,7 @@ class QuiltDaemon(object):
         self.stderr_path = None
         self.pidfile_path =  None
         self.pidfile_timeout = None
+        self.args = None
 
     name = ''
     def setup_process(self, name):
@@ -400,3 +401,12 @@ def main_helper( name, description, argv ):
 
     return argparser
         
+#REVIEW
+def exception_to_string(error):
+    """
+    Display a stirng with information about an exeception
+    Usefull for logging exceptions that come from other proceses who do not
+    have a stack trace
+    """
+    return (str(type(error)) + " : " + str(error))
+    

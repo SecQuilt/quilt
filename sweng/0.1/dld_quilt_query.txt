@@ -23,7 +23,6 @@ Classes:
         )
             # store args as member variable
             # chain to super constructor
-            # set _srcQueriesSent member to False
 
          OnRegisterEnd()
             """
@@ -42,6 +41,14 @@ Classes:
                 
                 # store query as a data memeber
 
+                # iterate the sourceQuerySpec's in srcQueries list by source
+                    # get proxy to the source master
+                    # mark the sourceQuery ACTIVE
+                    # query the source by sending it the source query specs as
+                    # Note: no locking needed 
+                    #   asyncronous call, and returnign messages not processe until
+                    #   this funciton exits
+                
                 # return True so event loop starts running
 
         OnSourceQueryError( srcQueryId, exception)
@@ -51,8 +58,9 @@ Classes:
             # call query Master
             #   OnQueryError
 
+            # stop processing events
+
         AppendSourceQueryResults( 
-            string queryId      # id for the top level query
             string srcQueryId   # id for the source query
             sourceResults       # results of the source Query)
             """
@@ -61,17 +69,15 @@ Classes:
             """
 
             # acquire lock
-                # if queryId and srcQueryId are not yet in 
+                # if srcQueryId are not yet in 
                 #   the results dictionary, add their keys in
 
                 # try to get any previous results at this key
 
                 # append the sourceResults at this key
 
-                # append the results into the query spec
 
         CompleteSourceQuery(
-            string queryId      # id for the top level query
             string srcQueryId   # id for the source query)
             """
             Called by sourceManager when it is done processing the query
@@ -82,6 +88,7 @@ Classes:
                 just a safe idea to lock in case of API misuse
 
             # acquire lock
+                # throw exception if source query is not in active
                 # set srcQuerie's state to COMPLETED
                 # Detect if all src queries are completed
 
@@ -106,14 +113,7 @@ Classes:
 
         void OnEventLoopBegin()
             # lock the class lock
-                # if _srcQueriesSent is False
-                    # iterate the sourceQuerySpec's in srcQueries list by source
-                        # get proxy to the source master
-                        # mark the sourceQuery ACTIVE
-                        # query the source by sending it the source query specs as
-                        #   asyncronous call
-                # set _srcQueriesSent to true
-                # read and return value of _processEvents
+            # read and return value of _processEvents
 
         void OnEventLoopEnd()
             # lock the class lock

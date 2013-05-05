@@ -5,6 +5,7 @@ import quilt_core
 from string import Template
 import sei_core
 import quilt_data
+import Pyro4
 
 class SourceManager(quilt_core.QueryMasterClient):
 
@@ -18,7 +19,10 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._sourceResults = {}
         self._lastQuery = None
 
-    def Query(self, queryId, sourceQuerySpec):
+    def Query(self, queryId, sourceQuerySpec,
+            queryClientName,
+            queryClientNamseServerHost,
+            queryClientNamseServerPort):
         """
         Query the source, currently hardcoded to behave as calling a cmdline
         tool that outputs source results on each output line
@@ -88,14 +92,30 @@ class SourceManager(quilt_core.QueryMasterClient):
                 if queryId in self._sourceResults:
                     if srcQueryId in self._sourceResults[queryId]:
                         results = list(self._sourceResults[queryId][srcQueryId])
-            self._qm.AppendQueryResults(
-                    queryId, srcQueryId, results)
+
+            ns = Pyro4.locateNS(
+                    queryClientNamseServerHost, 
+                    queryClientNamseServerPort,)
+            uri = ns.lookup(queryClientName)
+            with Pyro4.Proxy(uri) as query:
+                query.AppendSourceQueryResults(srcQueryId, results)
+                query.CompleteSrcQuery(srcQueryId)
      
     # catch exception! 
         except Exception, error:
             try:
-                self._qm.OnSourceQueryError(
-                    self._remotename, queryId, error)
+
+                # attempt to report error to the query client
+                ns = Pyro4.locateNS(
+                        queryClientNamseServerHost, 
+                        queryClientNamseServerPort,)
+                uri = ns.lookup(queryClientName)
+                srcQueryId = quilt_data.src_query_spec_get(
+                        sourceQuerySpec,name=True)
+
+                with Pyro4.Proxy(uri) as query:
+                    query.OnSourceQueryError(srcQueryId,error)
+
             except Exception, error2:
                 logging.error("Unable to send source query error to " +
                     "query master")

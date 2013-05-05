@@ -1,11 +1,10 @@
-#FIXME add srcQuerySpecs to querySpec
-
 #!/usr/bin/env python
 import logging
 
-STATE_COMPLETED="COMPLETED"
-STATE_INITIALIZED="INITIALIZED"
 STATE_UNINITIALIZED="UNINITIALIZED"
+STATE_INITIALIZED="INITIALIZED"
+STATE_COMPLETED="COMPLETED"
+STATE_ACTIVE="ACTIVE"
 STATE_ERROR="ERROR"
 
 # Generic spec functions
@@ -283,6 +282,7 @@ def query_spec_set(
     patternName=None,
     notificationEmail=None,
     results=None,
+    sourceQuerySpecs=None,
     variables=None
     ):
     if spec == None: spec = {}
@@ -291,6 +291,7 @@ def query_spec_set(
     if patternName != None: spec['patternName']= patternName
     if notificationEmail != None: spec['notificationEmail']= notificationEmail
     if results != None: spec['results']= results
+    if sourceQuerySpecs != None: spec['sourceQuerySpecs']= sourceQuerySpecs
     if variables != None: spec['variables']= variables
     return spec
 
@@ -300,6 +301,7 @@ def query_spec_create(
     patternName=None,
     notificationEmail=None,
     results=None,
+    sourceQuerySpecs=None,
     variables=None
     ):
     return query_spec_set(
@@ -309,6 +311,7 @@ def query_spec_create(
         patternName=patternName,
         notificationEmail=notificationEmail,
         results=results,
+        sourceQuerySpecs=sourceQuerySpecs,
         variables=variables)
 
     
@@ -319,6 +322,7 @@ def query_spec_get(
     patternName=False,
     notificationEmail=False,
     results=False,
+    sourceQuerySpecs=False,
     variables=False
     ):
     """Accessor for information from the query spec.  Only one parameter should
@@ -329,6 +333,7 @@ def query_spec_get(
     if patternName: return spec['patternName']
     if notificationEmail: return spec['notificationEmail']
     if results: return spec['results']
+    if sourceQuerySpecs: return spec['sourceQuerySpecs']
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
     
@@ -339,6 +344,7 @@ def query_spec_tryget(
     patternName=False,
     notificationEmail=False,
     results=False,
+    sourceQuerySpecs=False,
     variables=False
     ):
     """Accessor for information from the query spec.  Only one parameter should
@@ -349,6 +355,7 @@ def query_spec_tryget(
     if patternName and 'patternName' in spec: return spec['patternName']
     if notificationEmail and 'notificationEmail' in spec: return spec['notificationEmail']
     if results and 'results' in spec: return spec['results']
+    if sourceQuerySpecs and 'sourceQuerySpecs' in spec: return spec['sourceQuerySpecs']
     if variables and 'variables' in spec: return spec['variables']
     return None
     
@@ -439,23 +446,27 @@ def src_pat_specs_get(srcPatSpecs, patName):
 def src_query_spec_create(
     name=None,
     srcPatternName=None,
+    state=None,
     variables=None
     ):
     return src_query_spec_set(
         None,
         name=name,
         srcPatternName=srcPatternName,
+        state=state,
         variables=variables)
 
 def src_query_spec_set(
     spec,
     name=None,
     srcPatternName=None,
+    state=None,
     variables=None
     ):
     if spec == None: spec = {}
     if name != None: spec_name_set(spec, name)
     if srcPatternName != None: spec['srcPatternName']= srcPatternName
+    if state != None: spec['state']= state
     if variables != None: spec['variables']= variables
     return spec
 
@@ -463,20 +474,23 @@ def src_query_spec_get(
     spec,
     name=False,
     srcPatternName=False,
+    state=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned"""
     if name: return spec_name_get(spec)
-    if variables: return spec['variables']
     if srcPatternName: return spec['srcPatternName']
+    if state: return spec['state']
+    if variables: return spec['variables']
     raise Exception("Accessor not properly used")
 
 def src_query_spec_tryget(
     spec,
     name=False,
     srcPatternName=False,
+    state=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
@@ -484,6 +498,7 @@ def src_query_spec_tryget(
     returned.  If value is not present in spec, None is returned"""
     if name: return spec_name_tryget(spec)
     if srcPatternName and 'srcPatternName' in spec: return spec['srcPatternName']
+    if state and 'state' in spec: return spec['state']
     if variables and 'variables' in spec: return spec['variables']
     return None
 

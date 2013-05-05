@@ -192,7 +192,7 @@ Classes:
             """Append the specified results to the specified queryId"""
 
             NOTE: No reason to really lock here because each source will be
-                writing to one designated state field, but it is probably 
+                writing to one designated field, but it is probably 
                 just a safe idea to lock in case of API misuse
             # acquire lock
                 # Get query from Q
@@ -224,7 +224,7 @@ Classes:
             #   return complete history summary
 
         querySpec BeginQuery(
-            string queryID          # the query we are interested in
+            string queryId          # the query we are interested in
             """
             Called by quilt_query to Move a query into the an active state,
             and return a copy of the query

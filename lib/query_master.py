@@ -1,5 +1,3 @@
-#FIXME Add BeginQuery
-
 #!/usr/bin/env python
 import logging
 import Pyro4
@@ -7,14 +5,19 @@ import threading
 import pprint
 import quilt_data
 import quilt_parser
+import quilt_core
+import os
+import subprocess
 
 class QueryMaster:
 
-    clients = {}
-    _queries = quilt_data.query_specs_create()
-    _history = quilt_data.query_specs_create()
-    _patterns = quilt_data.pat_specs_create()
-    lock = threading.Lock()
+    def __init__(self, args):
+        self._args = args
+        self.clients = {}
+        self._queries = quilt_data.query_specs_create()
+        self._history = quilt_data.query_specs_create()
+        self._patterns = quilt_data.pat_specs_create()
+        self.lock = threading.Lock()
 
     def RegisterClient(
         self,
@@ -292,15 +295,13 @@ class QueryMaster:
 
             # logging.debug("query varspecs: " + str(varSpecs))
 
-            srcQuerySpecsDict = {}
+            # initialize list of srcQueries
+            srcQuerySpecs = None
 
             # iterate the collection of sources, and build collection of 
             # srcQuerySpecs for each source
             for source, patDict in srcPatDict.items():
                 
-                # initialize list of srcQueries
-                srcQuerySpecsDict[source] = None
-
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
                 with get_client_proxy_from_type_and_name(
@@ -321,22 +322,26 @@ class QueryMaster:
                         srcPatSpec = srcMgr.GetSourcePattern(patternName)
 
                         # create a query spec objects
-                        srcQuerySpecs = create_src_query_specs(
+                        curSrcQuerySpecs = create_src_query_specs(
                             srcPatSpec, srcPatDict, varSpecs, patVarSpecs, 
                             qid, source, patternName)
 
-                        for srcQuerySpec in srcQuerySpecs.values():
+                        for srcQuerySpec in curSrcQuerySpecs.values():
                             # append completed sourceQuerySpec to querySpec
-                            srcQuerySpecsDict[source] = (
-                                quilt_data.src_query_specs_add(
-                                    srcQuerySpecsDict[source], srcQuerySpec))
+                            srcQuerySpecs = quilt_data.src_query_specs_add(
+                                    srcQuerySpecs, srcQuerySpec)
                         
+            
+            # store sourceQueries in the querySpec
+            if srcQuerySpecs != None:
+                quilt_data.query_spec_set(querySpec,
+                        sourceQuerySpecs=srcQuerySpecs)
+
             # use querySpec and srcQuery list
             # to create a validation string                    
             msg = {}
             msg['Query to run'] = querySpec
-            msg['Sources to be queried'] = srcQuerySpecsDict.keys()
-            msg['Source Queries to run'] = srcQuerySpecsDict
+            msg['Sources to be queried'] = srcPatDict.items()
 
             validStr = pprint.pformat(msg)
             
@@ -373,30 +378,18 @@ class QueryMaster:
                     querySpec)
 
             # Process query...
-            
-#REVIEW
-            # iterate the sourceQuerySpec's in the src queries by source
-            for source, srcQuerySpecs in srcQuerySpecsDict.items():
-                # get proxy to the source manager
-                with get_client_proxy_from_type_and_name( self,
-                    "SourceManager", source) as smgr:
-
-                    # NOTE:
-                    # we possibly make multiple calls to the same source
-                    #   this could be considered inefficient, if this happens
-                    #   a lot because of the overhead with the call.  But we
-                    #   get free parallelism on the client side, so not
-                    #   changing this now.  Otherwise we would send all the
-                    #   queries at once, and then let the client have to worry
-                    #   about how to parrallelize these, but it might help the
-                    #   client if the client is trying to consolidate things
-                    #   to make things efficient
-                    for srcQuerySpec in srcQuerySpecs.values():
-                        logging.debug("Submitting query: " + qid + " to: " + 
-                            source)
-                        # query the source by sending it the source query spec 
-                        #   as asyncronous call
-                        Pyro4.async(smgr).Query(qid, srcQuerySpec)
+            # get the path to the current directory
+            # formulate the command line for quilt_query
+            queryCmd = [
+                    os.path.join(os.path.dirname(__file__),"quilt_query.py"),
+                    qid ]
+            if self._args.log_level != None:
+                queryCmd.append("--log-level")
+                queryCmd.append(self._args.log_level)
+                    
+            # use subprocess module to fork off the process
+            # script, pass the query ID
+            subprocess.Popen(queryCmd)
 
         # catch exception! 
         except Exception, error:
@@ -505,23 +498,18 @@ class QueryMaster:
 
         return querySpec
 
-    def AppendQueryResults(self, queryId, srcQueryId, eventList):
-        """Append the specified eventList to the specified queryId,
-        and mark it complete, and move it to history list"""
-
+    #REVIEW
+    def AppendQueryResults(self, queryId, results):
+        """
+        Append the specified eventList to the specified queryId
+        """
         try:
-            # TODO
-            #TODO use srcQueryId to allow results to know where they came form
-
-            srcQueryId=srcQueryId
             # acquire lock
             with self.lock:
-                querySpec = self._try_move_query_to_hist(
-                        queryId, quilt_data.STATE_COMPLETED)
-
-                if querySpec == None:
-                    raise Exception("Query " + str(queryId) + 
-                        "could not be found for results appending")
+                # Get query from Q
+                querySpec = quilt_data.query_specs_get(self._queries, queryId)
+                # Try to get any existing results then
+                #   append the results into the query spec
 
                 # set the results into the query spec
                 existingEvents = quilt_data.query_spec_tryget(
@@ -532,7 +520,8 @@ class QueryMaster:
 
                 # append the results into the query spec
                 quilt_data.query_spec_set(querySpec, 
-                        results=(existingEvents + eventList))
+                        results=(existingEvents + results))
+
         except Exception, error:
             try:
                 # log exception here, because there is no detail in it once we 
@@ -544,25 +533,97 @@ class QueryMaster:
                 # throw the exception back over to the calling process
                 raise error
 
-    def OnSourceQueryError(self, source, qid, error):
-        """Called when an asyncronys source query produces an exeption"""
+    #REVIEW
+    def OnQueryError(self, qid, error):
+        """Called when an asyncronus query produces an exeption"""
 
         try:
+            # remove query from q and place in history with error state
+            # multiple source errors can trigger this, so it is reasonable to 
+            # expect multiple calls
             with self.lock:
                 # mark the query as completed in state
                 self._try_move_query_to_hist(
                         qid, quilt_data.STATE_ERROR)
 
         except Exception, e:
-            logging.error("Unable to properly process source error")
+            logging.error("Unable to properly process query error")
             logging.exception(e)
             raise
         
         finally:
-            logging.error("Source: " + str(source) + 
-                " was unable to process query: " + str(qid))
-            logging.error(str(type(error)) + " : " + str(error))
+            # log the execption 
+            logging.error("Error occured when processing query: " + str(qid))
+            logging.error(quilt_core.exception_to_string(error))
             
+    def BeginQuery(self, queryId):
+        """
+        string queryID          # the query we are interested in
+        
+        Called by quilt_query to Move a query into the an active state,
+        and return a copy of the query
+        """
+
+        try:
+        
+            # lock self
+            with self.lock:
+
+                # get the query from the Q
+                # if can't get it rasie exception
+                querySpec = quilt_data.query_specs_get(self._queries, queryId)
+
+                queryState = quilt_data.query_spec_get(querySpec, state=True)
+                # if query state is not expected INITIALIZED state
+                if queryState != quilt_data.STATE_INITIALIZED:
+                    # raise exception
+                    raise Exception("Query: " + str(queryId) + 
+                            " is not ready for processing")
+
+                # move query to ACTIVE state
+                quilt_data.query_spec_set(querySpec,
+                        state=quilt_data.STATE_ACTIVE)
+
+                # create a  copy of the query
+                querySpec = querySpec.copy()
+ 
+            # returning copy because we con't want to stay locked when asking
+            #   pyro to marshall across process bounds
+            # return the query spec copy
+            return querySpec
+
+        except Exception, error:
+            try:
+                # log exception here, because there is no detail in it once we 
+                #   pass it across pyro
+                logging.error("Unable begin query: " + str(queryId))
+                logging.exception(error)
+            finally:
+                # throw the exception back over to the calling process
+                raise error
+
+    def CompleteQuery(self, queryId):
+        """
+        Called by quilt_query upon completion of all source queries
+        """
+
+        try:
+            # lock self
+            with self.lock:
+                # delete the query from the Q
+                # set the state to COMPLETED
+                # Add the query to the history
+                self._try_move_query_to_hist(queryId, quilt_data.STATE_COMPLETED)
+        except Exception, error:
+            try:
+                # log exception here, because there is no detail in it once we 
+                #   pass it across pyro
+                logging.error("Unable complete query: " + str(queryId))
+                logging.exception(error)
+            finally:
+                # throw the exception back over to the calling process
+                raise error
+
 def get_client_proxy( clientRec):
     """
     return a pyro proxy object to the specified by the client record
