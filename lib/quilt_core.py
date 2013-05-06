@@ -222,7 +222,13 @@ class QueryMasterClient:
         """
         return True
 
-    
+    def OnFirstEventLoop(self):
+        """
+        virtual function callback for when a client's event loop first begins
+        return false to prevent event loop from running
+        """
+        return True
+
     def OnEventLoopBegin(self):
         """
         funciton called when client's owning daemon begins an event loop
@@ -363,6 +369,8 @@ def query_master_client_main_helper(
 
         # remove objects from object list
         # unregister clients from query master
+        unregister_clients(daemonObjs, delDaemonObjs)
+
         # if all objects have been removed break out
         if len(daemonObjs) == 0:
             break

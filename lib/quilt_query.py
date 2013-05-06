@@ -39,9 +39,12 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         """
         try:
             # use query id passed in arguments
-            qid = self._args.query_id
+            if self._args.query_id != None:
+                qid = self._args.query_id[0]
+            else:
+                raise Exception("Query ID is required")
 
-            # Access the QueryMaster's registrar's host and port from the config
+            # Access the QuiltQuery's registrar's host and port from the config
             config = quilt_core.QuiltConfig()
             rport = config.GetValue("registrar", "port", None)
             if rport != None:
@@ -54,22 +57,31 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
             # get the query spec from query master
             queryState = quilt_data.query_spec_get(self._querySpec,state=True)
-            if queryState is not quilt_data.STATE_ACTIVE:
+            if queryState != quilt_data.STATE_ACTIVE:
                 raise Exception("Query: " + qid + ", must be in " +
-            quilt_data.STATE_ACTIVE + " state.")
+                        quilt_data.STATE_ACTIVE + " state. It is currently in "+
+                        queryState + " state.")
 
-            # iterate the sourceQuerySpec's in srcQueries list by source
-            srcQuerySpecs = quilt_data.query_spec_get(
+            # iterate the sourceQuerySpec's in srcQueries list
+            srcQuerySpecs = quilt_data.query_spec_tryget(
                     self._querySpec,sourceQuerySpecs=True)
+
+            # there are no source query specs specified
+            if srcQuerySpecs == None:
+                # so just don't do anything
+                self._processEvents = False
+                return
+                
             self._srcQuerySpecs = srcQuerySpecs
-            for srcName,srcQuerySpec in srcQuerySpecs.items():
-                # get proxy to the source master
-                smgrRec = self._qm.GetClientRec("SourceManager", srcName)
+            for srcQuerySpec in srcQuerySpecs.values():
                 
                 # mark the sourceQuery ACTIVE
                 quilt_data.src_query_spec_set(srcQuerySpec,
                         state=quilt_data.STATE_ACTIVE)
 
+                # get proxy to the source manager
+                source = quilt_data.src_query_spec_get(srcQuerySpec, source=True)
+                smgrRec = self._qm.GetClientRec("SourceManager", source)
                 # TODO make more efficient by recycling proxys to same source
                 # in the case when making multi source queries to same source
                 with query_master.get_client_proxy(smgrRec) as smgr:
@@ -85,8 +97,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
         except Exception, error:
             try:
-                self._qm.OnQueryError(
-                    self._remotename, qid, error)
+                self._qm.OnQueryError( qid, error)
             except Exception, error2:
                 logging.error("Unable to send query startup error to query master")
                 logging.exception(error2)
@@ -106,7 +117,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             # log the source's exception
             # print out the source query id and the message
             logging.error("Source Query error for: " + str(srcQueryId) + 
-                " : " + str(type(exception)) + " : " + str(exception))
+                    " : " + quilt_core.exception_to_string(exception))
 
             # I guess exception's don't keep their stacktrace over the pyro
             #   boundary
@@ -143,13 +154,15 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         a source query.
         """
 
+        logging.info("Reicived results for query: " + str(srcQueryId))
+
         # acquire lock
         with self._lock:
             # if srcQueryId are not yet in 
             #   the results dictionary, add their keys in
             if srcQueryId not in self._srcResults:
                 results = []
-                self._srcResults = results
+                self._srcResults[srcQueryId] = results
             else:
                 # get any previous results at this key
                 results = self._srcResults[srcQueryId]
@@ -158,18 +171,15 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             results.append(sourceResults)
 
 
-    def CompleteSourceQuery(self, srcQueryId):
+
+    def CompleteSrcQuery(self, srcQueryId):
         """
         string srcQueryId   # id for the source query)
        
         Called by sourceManager when it is done processing the query
         """
-
-
+        logging.info("Completing source query: " + str(srcQueryId))
         try:
-
-
-
             # NOTE: No reason to really lock here because each source will be
             #     writing to one designated state field, but it is probably 
             #     just a safe idea to lock in case of API misuse/murphy's law
@@ -177,7 +187,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             # acquire lock
             with self._lock:
                 # set srcQuerie's state to COMPLETED
-                srcQuerySpec = quilt_data.src_query_spec_get(
+                srcQuerySpec = quilt_data.src_query_specs_get(
                         self._srcQuerySpecs, srcQueryId)
 
                 # If query is progressing through the system properly it
@@ -185,7 +195,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 srcQueryState = quilt_data.src_query_spec_get(srcQuerySpec,
                         state=True)
                 if srcQueryState != quilt_data.STATE_ACTIVE:
-                    raise Exception("Can only complete a query that is" +
+                    raise Exception("Source Query is: " + srcQueryState +
+                    ". Can only complete a query that is " +
                             quilt_data.STATE_ACTIVE)
 
                 quilt_data.src_query_spec_set(srcQuerySpec,
@@ -211,8 +222,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     # Aggregate all the source queries
                     allResults = []
                     for srcResult in self._srcResults.values(): 
-                        allResults.append(srcResult)
-                    qid = quilt_data.query_spec_get(srcQuerySpec, name=True)
+                        allResults += (srcResult)
+                    qid = quilt_data.query_spec_get(self._querySpec, name=True)
                     self._qm.AppendQueryResults(qid, allResults)
                     # call query masters CompleteQuery
                     self._qm.CompleteQuery(qid)
@@ -221,12 +232,13 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         except Exception, error2:
             # log out the exceptions, do not pass along to
             # source as it wasn't his fault
-            logging.error("Unable to send complete query")
+            logging.error(
+                    "Unable to tell query master that the query is complete")
             logging.exception(error2)
 
         finally:
             # set process events flag to false end event loop, allowing
-            # queryter to exit
+            # query client to exit
             self.SetProcesssEvents(False)
 
     def GetType(self):
@@ -270,7 +282,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 def main(argv):
     
     # setup command line interface
-    parser =  quilt_core.main_helper('qsub',
+    parser =  quilt_core.main_helper('qury',
         """ 
         Quilt Query will run a query.  It will communicate 
         with the query master, recieve the specifications for the 
@@ -280,7 +292,7 @@ def main(argv):
         """,
         argv)
 
-    parser.add_argument('queryId',nargs=1,
+    parser.add_argument('query_id',nargs=1,
         help="The specification of which query to process")
 
     # parse command line

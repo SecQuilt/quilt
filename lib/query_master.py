@@ -341,7 +341,7 @@ class QueryMaster:
             # to create a validation string                    
             msg = {}
             msg['Query to run'] = querySpec
-            msg['Sources to be queried'] = srcPatDict.items()
+            msg['Sources to be queried'] = srcPatDict.keys()
 
             validStr = pprint.pformat(msg)
             
@@ -743,7 +743,8 @@ def create_src_query_spec(
     return quilt_data.src_query_spec_create(
         name=srcQueryName,
         srcPatternName=srcPatName,
-        variables=srcQueryVarSpecs)
+        variables=srcQueryVarSpecs,
+        source=source)
 
 
                             

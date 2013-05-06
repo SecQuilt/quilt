@@ -263,7 +263,10 @@ from main and other initializeation"""
         chain return from quilt_ui.inputMsg
 
         
-
+    def exception_to_string(error)
+        """
+        Display a stirng with information about an exeception
+        """
 Schema:
 
     Main Config File

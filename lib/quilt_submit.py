@@ -134,7 +134,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         try:
             # print out the query id and the message
             logging.error("Query submission error for: " + str(queryId) + 
-                " : " + str(type(exception)) + " : " + str(exception))
+                    " : " + quilt_core.exception_to_string(exception))
 
             # I guess exception's don't keep their stacktrace over the pyro boundary
             #            logging.exception(exception)

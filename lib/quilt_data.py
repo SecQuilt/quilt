@@ -447,6 +447,7 @@ def src_query_spec_create(
     name=None,
     srcPatternName=None,
     state=None,
+    source=None,
     variables=None
     ):
     return src_query_spec_set(
@@ -454,6 +455,7 @@ def src_query_spec_create(
         name=name,
         srcPatternName=srcPatternName,
         state=state,
+        source=source,
         variables=variables)
 
 def src_query_spec_set(
@@ -461,12 +463,14 @@ def src_query_spec_set(
     name=None,
     srcPatternName=None,
     state=None,
+    source=None,
     variables=None
     ):
     if spec == None: spec = {}
     if name != None: spec_name_set(spec, name)
     if srcPatternName != None: spec['srcPatternName']= srcPatternName
     if state != None: spec['state']= state
+    if source != None: spec['source']= source
     if variables != None: spec['variables']= variables
     return spec
 
@@ -475,6 +479,7 @@ def src_query_spec_get(
     name=False,
     srcPatternName=False,
     state=False,
+    source=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
@@ -483,6 +488,7 @@ def src_query_spec_get(
     if name: return spec_name_get(spec)
     if srcPatternName: return spec['srcPatternName']
     if state: return spec['state']
+    if source: return spec['source']
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
 
@@ -491,6 +497,7 @@ def src_query_spec_tryget(
     name=False,
     srcPatternName=False,
     state=False,
+    source=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
@@ -499,6 +506,7 @@ def src_query_spec_tryget(
     if name: return spec_name_tryget(spec)
     if srcPatternName and 'srcPatternName' in spec: return spec['srcPatternName']
     if state and 'state' in spec: return spec['state']
+    if source and 'soruce' in spec: return spec['soruce']
     if variables and 'variables' in spec: return spec['variables']
     return None
 
@@ -512,6 +520,9 @@ def src_query_specs_add(srcQuerySpecs, srcQuerySpec):
     name = src_query_spec_get(srcQuerySpec,name=True)
     srcQuerySpecs[name] = srcQuerySpec
     return srcQuerySpecs
+
+def src_query_specs_get(srcQuerySpecs, srcQueryName):
+    return srcQuerySpecs[srcQueryName]
 
 def src_spec_set(spec,
     name=None,
