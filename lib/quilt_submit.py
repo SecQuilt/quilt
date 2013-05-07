@@ -93,7 +93,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         return True
 
     def GetType(self):
-        return "QuiltSubmit"
+        return "qsub"
         
 
 

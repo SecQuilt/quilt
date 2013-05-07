@@ -82,7 +82,7 @@ def get_source_name(partialName):
     return srcName
 
 def sleep_small():
-    time.sleep(0.25)
+    time.sleep(0.5)
 def sleep_medium():
     for i in range(4): 
         i=i

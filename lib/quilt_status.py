@@ -19,7 +19,7 @@ class QuiltStatus(quilt_core.QueryMasterClient):
         
 
     def GetType(self):
-        return "QuiltStatus"
+        return "qstat"
         
 
 

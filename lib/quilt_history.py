@@ -20,7 +20,7 @@ class QuiltHistory(quilt_core.QueryMasterClient):
         return False
 
     def GetType(self):
-        return "QuiltHistory"
+        return "qhist"
         
 
 

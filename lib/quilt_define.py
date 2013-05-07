@@ -103,7 +103,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         return False
 
     def GetType(self):
-        return "QuiltDefine"
+        return "qdef"
 
 
 

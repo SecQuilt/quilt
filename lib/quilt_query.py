@@ -81,7 +81,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
                 # get proxy to the source manager
                 source = quilt_data.src_query_spec_get(srcQuerySpec, source=True)
-                smgrRec = self._qm.GetClientRec("SourceManager", source)
+                smgrRec = self._qm.GetClientRec("smd", source)
                 # TODO make more efficient by recycling proxys to same source
                 # in the case when making multi source queries to same source
                 with query_master.get_client_proxy(smgrRec) as smgr:
@@ -154,7 +154,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         a source query.
         """
 
-        logging.info("Reicived results for query: " + str(srcQueryId))
+        logging.info("Recieved results for query: " + str(srcQueryId))
 
         # acquire lock
         with self._lock:
@@ -202,32 +202,50 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 quilt_data.src_query_spec_set(srcQuerySpec,
                         state=quilt_data.STATE_COMPLETED)
 
+            try:
 
-            # TODO in future we will proabbly syncronusly process semantics
-            #   here, just do the simple thing for now
+                # TODO in future we will proabbly syncronusly process semantics
+                #   here, just do the simple thing for now
 
-            with self._lock:
-                # Detect if all src queries are completed
+                with self._lock:
+                    # Detect if all src queries are completed
+                    completed = True
+                    for srcQuerySpec in self._srcQuerySpecs.values():
+                        srcState = quilt_data.src_query_spec_get(srcQuerySpec,
+                                state=True)
+                        if (srcState != quilt_data.STATE_COMPLETED and 
+                                srcState != quilt_data.STATE_ERROR):
+                            completed = False
+                            logging.debug("At least " + srcQuerySpec['name'] +
+                                    " is still in progress")
+                            break
+
+                    # if this was the last source query, 
+                    if completed:
+                        qid = quilt_data.query_spec_get(self._querySpec, name=True)
+                        logging.info("All source queries completed for: " + str(qid))
+                        # Aggregate all the source queries
+                        allResults = []
+                        for srcResult in self._srcResults.values(): 
+                            allResults += (srcResult)
+                        self._qm.AppendQueryResults(qid, allResults)
+                        # call query masters CompleteQuery
+                        self._qm.CompleteQuery(qid)
+
+            # catch exceptions
+            except Exception, error3:
+                # log out the exceptions, do not pass along to
+                # source as it wasn't his fault
+                logging.error(
+                        "Unable to properly check for last query")
+                logging.exception(error3)
                 completed = True
-                for srcQuerySpec in self._srcQuerySpecs.values():
-                    srcState = quilt_data.src_query_spec_get(srcQuerySpec,
-                            state=True)
-                    if (srcState != quilt_data.STATE_COMPLETED and 
-                            srcState != quilt_data.STATE_ERROR):
-                        completed = False
-                        break
 
-                # if this was the last source query, 
+            finally:
+                # set process events flag to false end event loop, allowing
+                # query client to exit
                 if completed:
-                    # Aggregate all the source queries
-                    allResults = []
-                    for srcResult in self._srcResults.values(): 
-                        allResults += (srcResult)
-                    qid = quilt_data.query_spec_get(self._querySpec, name=True)
-                    self._qm.AppendQueryResults(qid, allResults)
-                    # call query masters CompleteQuery
-                    self._qm.CompleteQuery(qid)
-
+                    self.SetProcesssEvents(False)
         # catch exceptions
         except Exception, error2:
             # log out the exceptions, do not pass along to
@@ -236,10 +254,6 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     "Unable to tell query master that the query is complete")
             logging.exception(error2)
 
-        finally:
-            # set process events flag to false end event loop, allowing
-            # query client to exit
-            self.SetProcesssEvents(False)
 
     def GetType(self):
         return "QuiltQuery"

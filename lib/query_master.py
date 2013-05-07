@@ -93,7 +93,7 @@ class QueryMaster:
         describe all of the source managers, and return as string 
         """
         # Get Clients is thread safe
-        smgrs = self.GetClients("SourceManager")
+        smgrs = self.GetClients("smd")
             
         if smgrs == None:
             return "0 source managers"
@@ -305,7 +305,7 @@ class QueryMaster:
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
                 with get_client_proxy_from_type_and_name(
-                    self, "SourceManager", source) as srcMgr:
+                    self, "smd", source) as srcMgr:
 
                     patterns = srcMgr.GetSourcePatterns()
 
@@ -349,7 +349,7 @@ class QueryMaster:
             # ask submitter to validate the source Queries
             # get_client function is threadsafe, returns with the lock off
             with get_client_proxy_from_type_and_name(
-                self, "QuiltSubmit", submitterNameKey) as submitter:
+                self, "qsub", submitterNameKey) as submitter:
                 
                 # call back to the submitter to get validation
                 validated = submitter.ValidateQuery( validStr, qid)
@@ -402,7 +402,7 @@ class QueryMaster:
                 # call submit's OnSubmitProblem
                 logging.info("Attempting to get proxy for errror report")
                 with get_client_proxy_from_type_and_name(
-                    self, "QuiltSubmit", submitterNameKey) as submitter:
+                    self, "qsub", submitterNameKey) as submitter:
                     logging.info("Attempting to send error to submitter")
                     Pyro4.async(submitter).OnSubmitProblem(qid,error)
 

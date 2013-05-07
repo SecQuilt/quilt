@@ -50,7 +50,7 @@ class BasicSourceTestcase(unittest.TestCase):
         qid = o[a:]
         self.assertTrue(len(qid) > 0)
         # sleep a small ammount
-        quilt_test_core.sleep_small()
+        quilt_test_core.sleep_medium()
         return qid
 
     def check(self,qid):
@@ -87,8 +87,9 @@ class BasicSourceTestcase(unittest.TestCase):
         occurences = (
             len([m.start() for m in re.finditer('Occurs_1_time', o)]))
 
-        # have to +1 because the search variable is also in the stdout
-        self.assertTrue(occurences == 1 + 1)
+        # have to +2 because the search variable is also in the stdout
+        # and src query spec
+        self.assertTrue(occurences == 1 + 2)
         
     def test_valid_query_multi_result(self):
 
@@ -108,8 +109,9 @@ class BasicSourceTestcase(unittest.TestCase):
         #   assure only three results
         occurences = (
             len([m.start() for m in re.finditer('Occurs_3_times', o)]))
-        # have to +1 because the search variable is also in the stdout
-        self.assertTrue(occurences == 3 + 1)
+        # have to +2 because the search variable is also in the stdout
+        # and src query spec
+        self.assertTrue(occurences == 3 + 2)
 
 
     def test_valid_query_no_results(self):
@@ -128,7 +130,9 @@ class BasicSourceTestcase(unittest.TestCase):
         #   assure no results
         occurences = (
             len([m.start() for m in re.finditer('Occurs_no_times', o)]))
-        self.assertTrue(occurences == 0 + 1)
+        # have to +2 because the search variable is also in the stdout
+        # and src query spec
+        self.assertTrue(occurences == 0 + 2)
 
     def test_valid_query_all_results(self):
         # issue a valid query
@@ -145,7 +149,7 @@ class BasicSourceTestcase(unittest.TestCase):
         #   assure there are many results
         occurences = (
             len([m.start() for m in re.finditer('\n', o)]))
-        self.assertTrue(occurences > 4 + 1)
+        self.assertTrue(occurences > 4 + 2)
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(

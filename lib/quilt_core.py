@@ -7,7 +7,6 @@ import Pyro4
 from os import listdir
 from os.path import isfile, join
 import threading
-import getpass
 import lockfile
 from daemon import runner
 import argparse
@@ -179,8 +178,7 @@ class QueryMasterClient:
         use user name and pid in the name of the object
         to generate a unique enough name for this machine
         """
-        self.localname = '_'.join(
-            [basename, getpass.getuser(), str(os.getpid())])
+        self.localname = basename + str(os.getpid())
         self._qm = None
         self._remotename = None
 

@@ -69,7 +69,7 @@ class BasicSourcesTestcase(unittest.TestCase):
             '-v', 'SEARCHSTRING5', "word-regexp"
             ]))
         # sleep a small ammount
-        quilt_test_core.sleep_small()
+        quilt_test_core.sleep_large()
 
         # capture query_id from std out 
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
@@ -79,6 +79,7 @@ class BasicSourcesTestcase(unittest.TestCase):
 
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        print "$$$$$$$$$", o
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
@@ -87,13 +88,14 @@ class BasicSourcesTestcase(unittest.TestCase):
             len([m.start() for m in re.finditer(
                 "Occurs_1_time", o)]))
 
-        # have to +1 because the search variable is also in the stdout
-        self.assertTrue(occurences == 1 + 1)
+        # have to +2 because the search variable 
+        # and src query spec is also in the stdout
+        self.assertTrue(occurences == 1 + 2)
 
         occurences = (
             len([m.start() for m in re.finditer(
                 "Occurs_3_times", o)]))
-        self.assertTrue(occurences == 1 + 3)
+        self.assertTrue(occurences == 1 + 4)
 
 
         # have no + 1, these are defaults set from src pattern
@@ -101,12 +103,12 @@ class BasicSourcesTestcase(unittest.TestCase):
         occurences = (
             len([m.start() for m in re.finditer(
                 "src default for pat2 occurs twice", o)]))
-        self.assertTrue(occurences ==  2)
+        self.assertTrue(occurences ==  3)
 
         occurences = (
             len([m.start() for m in re.finditer(
                 "src default for pat1 occurs once", o)]))
-        self.assertTrue(occurences ==  1)
+        self.assertTrue(occurences ==  2)
 
 
 

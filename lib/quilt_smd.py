@@ -159,7 +159,7 @@ class SourceManager(quilt_core.QueryMasterClient):
         srcRes.append(eval(line))
 
     def GetType(self):
-        return "SourceManager"
+        return "smd"
         
 
     def GetSourcePatterns(self):
