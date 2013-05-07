@@ -4,7 +4,7 @@ import Pyro4
 import threading
 import pprint
 import quilt_data
-import quilt_parser
+import quilt_parse
 import quilt_core
 import os
 import subprocess
@@ -212,7 +212,7 @@ class QueryMaster:
             #   in the pattern code
             codeVars = None
             if code != None:
-                codeVars = quilt_parser.get_pattern_vars(code)
+                codeVars = quilt_parse.get_pattern_vars(code)
 
 
             # using the set of sources described in the query code if

@@ -1,8 +1,8 @@
-quilt 0.1 quilt_parser design
+quilt 0.1 quilt_parse design
 -----------------------------
 
 
-Module: quilt_parser
+Module: quilt_parse
 
 Type: Library
 
