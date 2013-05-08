@@ -71,7 +71,30 @@ c3.Grammar
 
             queries shall be run on these patterns and results checked
 
-c4.Testability
+c4.Query
+    Implement the before operator.  Filter pattern results with a basic
+        temporal constraint.
+
+    Design
+        add new executable script, quilt_query.  Input will be a query id
+
+        quilt_query will be responsible for retrieving source specs and
+        filling them out.  This funcitonality is currently in the query
+        master.  
+
+        After all query Results are returned to quilt_query
+            sourceResults are returned to the quilt_query
+                inside the querySpec add a sourceResults field
+                sourceResults are keyed to the sourcePattern (instance)
+                    they came from
+
+        at result appending time, determine if this is the last piece
+            of data
+        track list of active source queries in the query spec
+        When list is empty we know the query is done.
+        Send final results to the query master, and tell master it si complete
+
+c5.Testability
     Theme: Ensure testing fidelity and coverage
 
     DESIGN
@@ -145,31 +168,8 @@ c4.Testability
 
 
    
-c5.Query
-    Implement the before operator.  Filter pattern results with a basic
-        temporal constraint.
 
-    Design
-        add new executable script, quilt_query.  Input will be a query id
-
-        quilt_query will be responsible for retrieving source specs and
-        filling them out.  This funcitonality is currently in the query
-        master.  
-
-        After all query Results are returned to quilt_query
-            sourceResults are returned to the quilt_query
-                inside the querySpec add a sourceResults field
-                sourceResults are keyed to the sourcePattern (instance)
-                    they came from
-
-        at result appending time, determine if this is the last piece
-            of data
-        track list of active source queries in the query spec
-        When list is empty we know the query is done.
-        Send final results to the query master, and tell master it si complete
-
-
-cX.Semantics
+c6.Semantics
         Iterate the AST of the query code
         push identifiers on stack
         When encountering the "before" function
