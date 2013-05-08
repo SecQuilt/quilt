@@ -90,11 +90,28 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         
         # return True to allow event loop to start running, which
         # should soon recieve a validation callback from query master
+        
+        import time
+        ns = Pyro4.locateNS()
+        uri = ns.lookup(self._remotename)
+
+        for i in range(10):
+            print "loop being"
+            time.sleep(1)
+            with Pyro4.Proxy(uri) as p:
+                print "Sending", i
+                Pyro4.async(p).TestMsg(i)
+                print "sent", i
+            print "loop end"
+
         return True
 
     def GetType(self):
-        return "qsub"
+        return "QuiltSubmit"
         
+
+    def TestMsg(self,x):
+        print "got", x
 
 
     def SetProcesssEvents(self, value):
@@ -134,7 +151,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         try:
             # print out the query id and the message
             logging.error("Query submission error for: " + str(queryId) + 
-                    " : " + quilt_core.exception_to_string(exception))
+                " : " + str(type(exception)) + " : " + str(exception))
 
             # I guess exception's don't keep their stacktrace over the pyro boundary
             #            logging.exception(exception)

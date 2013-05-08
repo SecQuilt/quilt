@@ -1,8 +1,9 @@
 quilt 0.1 design decisions
 --------------------------
 
+----------------------------------------
 Pattern lifecycle for testing (ISSUE007)
-
+----------------------------------------
 Goal priority:
     1.  realistic test coverage
     2.  complete test coverage
@@ -34,3 +35,77 @@ Decision:
     Adding/removign patterns before each group of tests is an effective
         balance between instantly defining and undefining them, and
         letting them accumulate forever.
+
+
+
+-------------------------------------------
+Semantic processing architecture (ISSUE009)
+-------------------------------------------
+
+Goal priority:
+    1.  Scalability
+    2.  Extensibility
+    3.  Complexity
+
+Sensitivity Points:
+    Complexity          :   generating working prototype proof of cocept has 
+                            high value 
+    Scalability         :   Scalaility is the central theme of this project
+    Extensibility       :   Want to swap in differnt processing in the future
+
+    If we do AST dance after last query, we are riding
+    on the last source manager's append results.  This is 
+    not good, because it is called syncronysly.  
+
+    This seems like a good opertunity to enforce semantic parsing
+    abstraction.  The sourceResults are cached in the query master
+
+    Can we push the work over to another process?  
+        Imageine we fire off a quilt_abduct process
+            pass is the query id
+            comes back to the master, requests query spec
+            Creates AST, walks it, for each encountered source
+                Requests those sourceResults
+
+        Good: encapsulation, layering, private data to read.
+            More scalable, can be seperate machine.  Data is being
+            read only, so if a mirrored copy existed...  Preparation
+            for running in condor.  Parrtern exists for seeing status
+            on clients.
+        Bad: Copying possibly large ammount of data across process
+            boundaries.
+
+        Better?:  Launch a query_watcher process, where all results are
+            returned to it, then once complete, semantics process, then
+            only FINAL pattern results are coppied to query master
+
+    Should we let the query master process in another thread?
+        Good: some encapsukation, less data copying
+        Bad: more complex locking shared data.  No previous
+            explicit multi threads.  Less scalable.
+
+
+    Devils Advocate:
+        If we meet extensibility goal, can't we just do the easiest thing now.
+        then fix it later?
+
+        The easiest thing would probably to add a function to the query master
+        call it by sendign a pyro message to ourselves, lock the data,
+        get references to the source results, and do the semantics.
+
+        Good: Meets main goal of moving towards prototype
+        Bad: Low reusability, major refactoring when we move to scalable
+            solution
+
+
+    Distilled Sensitivity Point
+        Do it right
+        Do it fast
+
+
+Decision:
+    Scalability rules the day.  Use seperate process for semantic processing.
+    But we must push work out of the query master.  It is the bottleneck,
+    so lets return the results to a seperate process, the quilt_query process.
+    It will wait for all results then do emsnatics and publish data to master
+

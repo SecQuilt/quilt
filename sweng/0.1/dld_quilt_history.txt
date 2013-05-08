@@ -23,7 +23,6 @@ Classes:
             # store args as member variable
             # chain to super constructor
 
-        # REVIEW
          OnRegisterEnd()
             # print out statistics about the manager's History 
             

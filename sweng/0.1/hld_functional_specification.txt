@@ -108,6 +108,11 @@ Query Master
             expression
         
 
+    quilt_query
+        QUERY_ID    # The specification of which query to process
+
+        Quilt Query should not be called directly by a user
+
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 Source Manager
@@ -124,6 +129,9 @@ Source Manager
         master and return query results to it.
  
     quilt_source_query
+        NOTE: sources are kind of a hack right now, this doesn't exist yet
+            and no major design effort has gone in to the soruces
+
         conditions  # the conditions of the query
 
         quilt_source_query will be invoked by the source manager daemon when a

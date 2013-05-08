@@ -11,6 +11,7 @@ Internal Dependencies:
 External Dependenies:
     python-pyro(4)
     threading
+    subprocess
 
 Prototypes:
     nested.py
@@ -64,7 +65,6 @@ Classes:
             # remove the specified sm from registered list
             # if not found in the list, do nothing
 
-        #REVIEW
         string Query(                       # return the ID of the query
             string submitterNameKey         # key that the submitter recieved
                                             #   when it was registered with this
@@ -108,8 +108,9 @@ Classes:
                     #   name with the source pattern name
 
                     
-            # use querySpec and srcQueries to create a validation  string                    
-            # ask submitter to validate the source Queries
+            # store sourceQueries in the querySpec
+            # use querySpec to create a validation  string                    
+            # ask submitter to validate the query/source Queries
             # if submitter refuses to validate, 
                 # acuire lock remove query id from q
                 # return early
@@ -118,11 +119,13 @@ Classes:
                 #   store querySpec state as INITIALIZED, and place 
                     # validated contnts in member data
 
-            # Process query...
-            # iterate the sourceQuerySpec's in srcQueries list by source
-                # get proxy to the source master
-                # query the source by sending it the source query specs as
-                #   asyncronous call
+            # Process query
+            # get the path to the current directory
+            # formulate the command line for quilt_query
+            # use subprocess module to fork off the process
+
+            # script, pass the query ID
+
 
             #catch exception! 
                 # submit launched this call asyncronysly and must be made
@@ -183,28 +186,29 @@ Classes:
             # return stats
             
         
-        #REVIEW
         void AppendQueryResults(
             string queryId,
-            string sourceQueryId,
-            eventList)
-            """Append the specified eventList to the specified queryId"""
+            results)
+            """Append the specified results to the specified queryId"""
 
+            NOTE: No reason to really lock here because each source will be
+                writing to one designated field, but it is probably 
+                just a safe idea to lock in case of API misuse
             # acquire lock
-                # if queryId is in Q
-                    # mark the query as completed in state
-                    # move query spec from q to history member collection
-                # else find queryId in history
-                # else throw exception
+                # Get query from Q
+                # Try to get any existing results then
+                #   append the results into the query spec
 
-                # append the results into the query spec
+
             
-        void OnSourceQueryError(
+        void OnQueryError(
             queryid, Exception)
-            """Called when an asyncronys source query produces an exeption"""
+            """Called when an asyncronys query produces an exeption"""
 
             # log the execption 
             # remove query from q and place in history with error state
+            # multiple source errors can trigger this, so it is reasonable to 
+            # expect multiple calls
 
         # format a string with information about the specified query
         # from the history, or provide stats for all if no queryID is 
@@ -218,6 +222,38 @@ Classes:
             #   query's record
             # else
             #   return complete history summary
+
+        querySpec BeginQuery(
+            string queryId          # the query we are interested in
+            """
+            Called by quilt_query to Move a query into the an active state,
+            and return a copy of the query
+            """
+
+            # lock self
+                # get the query from the Q
+                # if can't get it rasie exception
+
+                # if query state is not expected INITIALIZED state
+                    # raise exception
+
+                # move query to ACTIVE state
+                # create a  copy of the query
+ 
+            # returning copy because we con't want to stay locked when asking
+            #   pyro to marshall across process bounds
+            # return the query spec copy
+
+        void CompleteQuery(queryId)
+            """
+            Called by quilt_query upon completion of all source queries
+            """
+
+            # lock self
+                # delete the query from the Q
+                # set the state to COMPLETED
+                # Add the query to the history
+
 Functions:
 
     Querymaster helper functions for server side only.  These will not
@@ -238,7 +274,6 @@ Functions:
     def get_client_proxy_from_type_and_name(qm, clientType, name)
         # overload for get_client_proxy
 
-    #REVIEW
     def create_src_query_specs
         # get new sourceQuery specs from the sourcePatternSpec
         

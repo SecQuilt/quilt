@@ -24,7 +24,7 @@ class QuiltQueue(quilt_core.QueryMasterClient):
         return False
 
     def GetType(self):
-        return "QuiltQueue"
+        return "qque"
         
 
 

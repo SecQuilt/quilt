@@ -1,0 +1,138 @@
+quilt 0.1 quilt_query design
+----------------------------
+Module: quilt_query
+
+Type: Executable Script
+
+External Dependencies:
+    python-argparse
+
+Internal Dependencies:
+    quilt_core
+
+Responsibilities:
+    Issue source queries from a partial querySpec, wait for the results,
+    do semantic processing on the results, publish results to the 
+    QueryMaster
+
+Classes:
+    class QuiltQuery : QuiltMasterClient
+
+        __init__(
+            args    # see functional_specification of query_queue
+        )
+            # store args as member variable
+            # chain to super constructor
+
+         OnRegisterEnd()
+            """
+            Retrive the querySpec from the query master and issue the
+            srcQueries to the source
+            """
+
+            # try the following, send error to query master if it occrs
+
+                # use query id passed in arguments
+
+                # get the query spec from query master
+                #   check that the state is INITIALIZED
+                #   set the state to ACTIVE
+                #   by calling BeginQuery
+                
+                # store query as a data memeber
+
+                # iterate the sourceQuerySpec's in srcQueries list by source
+                    # get proxy to the source master
+                    # mark the sourceQuery ACTIVE
+                    # query the source by sending it the source query specs as
+                    # Note: no locking needed 
+                    #   asyncronous call, and returnign messages not processe until
+                    #   this funciton exits
+                
+                # return True so event loop starts running
+
+        OnSourceQueryError( srcQueryId, exception)
+            # log the source's exception
+            # lock self
+                # mark source query state with ERROR
+            # call query Master
+            #   OnQueryError
+
+            # stop processing events
+
+        AppendSourceQueryResults( 
+            string srcQueryId   # id for the source query
+            sourceResults       # results of the source Query)
+            """
+            Called by sourceManager to push results back after running
+            a source query.
+            """
+
+            # acquire lock
+                # if srcQueryId are not yet in 
+                #   the results dictionary, add their keys in
+
+                # try to get any previous results at this key
+
+                # append the sourceResults at this key
+
+
+        CompleteSourceQuery(
+            string srcQueryId   # id for the source query)
+            """
+            Called by sourceManager when it is done processing the query
+            """
+
+            NOTE: No reason to really lock here because each source will be
+                writing to one designated state field, but it is probably 
+                just a safe idea to lock in case of API misuse
+
+            # acquire lock
+                # throw exception if source query is not in active
+                # set srcQuerie's state to COMPLETED
+                # Detect if all src queries are completed
+
+            NOTE:
+                in future we will proabbly syncronusly process semantics
+                here, just do the simple thing for now
+
+            # if this was the last source query, 
+                # try the following
+                    # Aggregate all the source queries
+                    # call query masters CompleteQuery
+                # catch exceptions
+                    # log out the exceptions, do not pass along to
+                    # source as it wasn't his fault
+                # finally
+                    # stop processing events
+
+
+        self.SetProcesssEvents( bool value)
+            # lock the class clock
+            # set _processEvents to the specified value
+
+        void OnEventLoopBegin()
+            # lock the class lock
+            # read and return value of _processEvents
+
+        void OnEventLoopEnd()
+            # lock the class lock
+            # read and return value of _processEvents
+
+
+
+
+Functions:
+
+    # main function of the script, which is passed command line variables
+    def main(argc,argv)
+        # setup argument parser in accordance with funcitonal specification
+        # parse the arguments, exit with error message if unparseable
+        # create the quilt query object
+        # call query_master_client_main_helper
+
+
+
+
+
+

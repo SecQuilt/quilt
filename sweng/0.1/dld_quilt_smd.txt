@@ -29,11 +29,15 @@ Classes:
             # use name to init base class
             # store sourceSpec as a member
             
-        # REVIEW
-        def Query(string queryId, dict sourceQuerySpec)
+        def Query(
+            string queryId, 
+            dict sourceQuerySpec, 
+            string queryClientName,
+            string queryClientNamseServerHost,
+            string queryClientNamseServerPort)
     
-            # ALWAYS catch errors, report them to the query master
-            #   calling OnSourceQueryError()           
+            # ALWAYS catch errors, report them to the queryClient
+            #   calling OnSourceQueryError(), and CompleteSrcQuery()
  
             # lock self
                 # set last query member to queryId
@@ -49,9 +53,11 @@ Classes:
             # use run_process to execute grep, give callback per line
             #   processing function, pass as data the queryId and srcQueryId
 
-            # Append query result events list in query master using query id
+            # Append query result events list in query client using query ids
+
+            # tell the query clinet the srcSquery is complete
+
         
-        # REVIEW
         def OnGrepLine(string line, contextData)
 
 
@@ -69,9 +75,6 @@ Classes:
         def GetType(self):
             return "SourceManager"
 
-        #   def OnRegisterEnd()
-        #       """After basic client registration completes, source manager
-        #       initiates the source pattern registration"""
 
         def GetSourcePatterns()
             """Returns a list of defined source patterns"""

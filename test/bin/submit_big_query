@@ -5,5 +5,5 @@
 source $(dirname ${BASH_SOURCE[0]})/testenv.rc
 
 # start up quilt daemons
-$QUILT_HOME/bin/quilt_submit '-l' 'DEBUG' 'bigpattern' '-v' 'SEARCHSTRING1' 'Occurs_1_time' '-v' 'SEARCHSTRING2' 'Occurs_3_times' '-v' 'SEARCHSTRING3' 'files-with-matches' '-v' 'SEARCHSTRING5' 'word-regexp'
+$QUILT_HOME/bin/quilt_submit '-l' 'DEBUG' 'bigpattern' '-v' 'SEARCHSTRING1' 'Occurs_1_time' '-v' 'SEARCHSTRING2' 'Occurs_3_times' '-v' 'SEARCHSTRING3' 'word-regexp'  '-v' 'SEARCHSTRING5' 'word-regexp'
 

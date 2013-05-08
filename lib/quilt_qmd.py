@@ -8,9 +8,10 @@ import query_master
 # logging.basicConfig(level=logging.DEBUG)
 
 class Qmd(quilt_core.QuiltDaemon):
-    def __init__(self):
+    def __init__(self, args):
         quilt_core.QuiltDaemon.__init__(self)
         self.setup_process("qmd")
+        self.args = args
 
     def run(self):
 
@@ -25,7 +26,7 @@ class Qmd(quilt_core.QuiltDaemon):
             'query_master', 'name', 'QueryMaster')
 
         logging.debug("Creating query master")
-        qm = query_master.QueryMaster()
+        qm = query_master.QueryMaster(self.args)
  
         daemon=Pyro4.Daemon()
         ns=Pyro4.locateNS(registrarHost, registrarPort)   
@@ -46,10 +47,10 @@ def main(argv):
     parser = quilt_core.main_helper("qmd","Query master daemon", argv)
 
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
-    parser.parse_args()
+    args = parser.parse_args()
 
     # start the daemon
-    Qmd().main(argv)
+    Qmd(args).main(argv)
 
 if __name__ == "__main__":        
     main(sys.argv[1:])

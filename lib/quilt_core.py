@@ -7,7 +7,6 @@ import Pyro4
 from os import listdir
 from os.path import isfile, join
 import threading
-import getpass
 import lockfile
 from daemon import runner
 import argparse
@@ -141,6 +140,7 @@ class QuiltDaemon(object):
         self.stderr_path = None
         self.pidfile_path =  None
         self.pidfile_timeout = None
+        self.args = None
 
     name = ''
     def setup_process(self, name):
@@ -178,8 +178,7 @@ class QueryMasterClient:
         use user name and pid in the name of the object
         to generate a unique enough name for this machine
         """
-        self.localname = '_'.join(
-            [basename, getpass.getuser(), str(os.getpid())])
+        self.localname = basename + str(os.getpid())
         self._qm = None
         self._remotename = None
 
@@ -221,7 +220,13 @@ class QueryMasterClient:
         """
         return True
 
-    
+    def OnFirstEventLoop(self):
+        """
+        virtual function callback for when a client's event loop first begins
+        return false to prevent event loop from running
+        """
+        return True
+
     def OnEventLoopBegin(self):
         """
         funciton called when client's owning daemon begins an event loop
@@ -243,6 +248,13 @@ class QueryMasterClient:
         if self._qm != None and self._remotename != None:
             self._qm.UnRegisterClient(self.GetType(), self._remotename)
             logging.info("Unregistration completed for " + self.localname)
+
+def unregister_clients(daemonObjs, delDaemonObjs):
+    # remove objects from object list
+    # unregister clients from query master
+    for name,obj in delDaemonObjs.items():
+        del daemonObjs[name]
+        obj.UnregisterFromQueryMaster()
 
 def query_master_client_main_helper(
         clientObjectDict       # map of instances to names of objects to
@@ -289,9 +301,30 @@ def query_master_client_main_helper(
             
     
     # start the Daemon's event loop
+    firstTime = True
 
     # continue looping while there are daemon objects
     while len(daemonObjs) > 0 :
+
+        #REVIEW
+        if firstTime:
+            firstTime = False
+            delDaemonObjs = {}
+            # iterate the names and objects in clientObjectDic
+            # this funciton will return false if it wants to be
+            # removed
+            for name,obj in daemonObjs.items():
+                if not obj.OnFirstEventLoop():
+                    delDaemonObjs[name] = obj
+
+            # remove objects from object list
+            # unregister clients from query master
+            unregister_clients(daemonObjs, delDaemonObjs)
+
+            # if all objects have been removed break out
+            if len(daemonObjs) == 0:
+                break
+
 
         delDaemonObjs = {}
         # iterate the names and objects in clientObjectDic
@@ -301,12 +334,11 @@ def query_master_client_main_helper(
             if not obj.OnEventLoopBegin():
                 delDaemonObjs[name] = obj
 
+            
         # remove objects from object list
         # unregister clients from query master
-        for name,obj in delDaemonObjs.items():
-            del daemonObjs[name]
-            obj.UnregisterFromQueryMaster()
-            
+        unregister_clients(daemonObjs, delDaemonObjs)
+
         # if all objects have been removed break out
         if len(daemonObjs) == 0:
             break
@@ -335,10 +367,8 @@ def query_master_client_main_helper(
 
         # remove objects from object list
         # unregister clients from query master
-        for name,obj in delDaemonObjs.items():
-            del daemonObjs[name]
-            obj.UnregisterFromQueryMaster()
-            
+        unregister_clients(daemonObjs, delDaemonObjs)
+
         # if all objects have been removed break out
         if len(daemonObjs) == 0:
             break
@@ -377,3 +407,12 @@ def main_helper( name, description, argv ):
 
     return argparser
         
+#REVIEW
+def exception_to_string(error):
+    """
+    Display a stirng with information about an exeception
+    Usefull for logging exceptions that come from other proceses who do not
+    have a stack trace
+    """
+    return (str(type(error)) + " : " + str(error))
+    

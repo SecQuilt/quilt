@@ -23,10 +23,8 @@ Classes:
         def GetType(self):
             return "QuiltDefine"
 
-        # REVIEW
         void OnRegisterEnd()
 
-            #REVIEW
             # parse the input pattern if it is specified
 
             # perform first pass parse on the pattern to ensure syntax
