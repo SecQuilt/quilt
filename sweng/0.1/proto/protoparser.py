@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ast
 import sys
-import pprint
+# import pprint
 
 class v(ast.NodeVisitor):
     def __init__(self):
@@ -69,22 +69,64 @@ def tree_print(node, depth):
     for n in ast.iter_child_nodes(node):
         tree_print(n,depth+1)
 
+def print_stack(s):
+    q = "[ "
+    for i in s:
+        basename = type(i)
+        q += str(basename) + "r, "
+    q += " ["
+    print q
+        
     
+def tree_do(node, depth, stack):
+
+    basename = type(node).__name__
+
+    s = ""
+    for i in range(depth):
+        i = i
+        s += " | "
+
+    s += basename
+
+    for field, value in ast.iter_fields(node):
+        if (field == 'id'):
+            s += "(" + value + ")"
+
+    stack.append(node)
+    #print_stack(stack)
+    for n in ast.iter_child_nodes(node):
+        tree_do(n,depth+1,stack)
+
+    if type(node) == ast.Add:
+        arg1 = stack.pop()
+        arg2 = stack.pop()
+        # print arg1._fields, '+', arg2
+    elif type(node) == ast.Load:
+        lop = stack.pop()
+    elif type(node) == ast.Name:
+        n = stack.pop()
+        print n._fields
+
+
+
 
 def do_parse(codeline):
     print "Parsing->", codeline
     #visitor = v()
     tree = ast.parse(codeline)
 
-    srcs = set()
+#    srcs = set()
 
-    for n in ast.walk(tree):
-        for field, value in ast.iter_fields(n):
-            if (field == 'id'):
-                srcs.add(value)
-    print srcs
+#   for n in ast.walk(tree):
+#       for field, value in ast.iter_fields(n):
+#           if (field == 'id'):
+#               srcs.add(value)
+#   print srcs
         
-    #tree_print(tree,0)
+    stack = []
+    tree_print(tree,0)
+    tree_do(tree,0,stack)
     #newobj = visit(tree,0)
     #pprint.pprint(newobj)
     #visitor.visit(tree)

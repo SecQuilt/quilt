@@ -170,12 +170,55 @@ c5.Testability
    
 
 c6.Semantics
-        Iterate the AST of the query code
-        push identifiers on stack
-        When encountering the "before" function
-            pop off the last two items on the stack
-            Filter results where x < y
-        Save results in the completed query
+    Design
+
+        Capture sources mentioned in the query code
+        Define objects for those sources
+            bridges to source results
+            implement the __getitem__ interface
+                index to appropriate field in the results
+        parser defines the until, concurrent, follows methods
+
+        Sample:
+        quilt_define -n reboot \
+            follows(60,startup_srcq['timestamp'],shutdown_srcq['timestamp'])
+
+        imagine we have one src pattern ('grep')
+            which is grep $WORD /var/log/msgs
+
+        we would map like this
+        
+        -m startup syslog grep WORD startup_srcq
+        -m shutdown syslog grep WORD shutdown_srcq
+
+        In this case startup/shutdown are "variables"
+        startup_srcq, shutdown_srcq are "src qry instances"
+
+        Assume this generated two source queries (to the same source)
+        who ran and have returned their results to quilt_parse
+
+        quiltParser._srcResults[srcQueryId] = 
+            [{ 'timestamp' : '2013/01/01 01:01:01'
+                'content'   : 'rsyslog has shutdown' },
+            { 'timestamp' : '2013/01/02 01:01:01'
+                'content'   : 'rsyslog has shutdown' },
+            { 'timestamp' : '2013/01/03 01:01:01'
+                'content'   : 'rsyslog has shutdown' },
+            ...]
+
+        Now to semantically process:
+            Scan the query and find src query instances "startup_srcq" ...
+            Define a wrapper for startup_srcq
+                wrapper will need to determine src query id
+                We should modify query spec to store a dictionary
+                    of src query instance names to src query ID's
+                Makw wrapper's get_item function index into the 
+                    src query results and return?
+
+                using the pattern spec's mappings
+                determine the 
+            
+        
 
 
     Implement
