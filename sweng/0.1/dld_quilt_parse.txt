@@ -1,7 +1,6 @@
 quilt 0.1 quilt_parse design
 -----------------------------
 
-
 Module: quilt_parse
 
 Type: Library
@@ -20,7 +19,42 @@ Responsibilities:
 
 Classes:
 
+    class SourceVisitor: ast.NodeVisitor
+        """
+        Provide virtual callbacks for each appropriate node of the 
+        AST.  Reposnible for collecting sources referenced in pattern
+        code
+        """
         
+        def __init__(self):
+            # chain call to parent constructor
+            # initialize sourcePattern dictionary member
+
+        def visit_Call(self, node): 
+            # call parent's generic visitor functionality to ensure
+            #   we maintain nested operation
+
+            
+            # AST for a call to a source, looks like this.
+            #   Call
+            #     Name(source)
+            #       Load
+            #     Str
+            #     Str
+            # 
+
+            # we want to test this node to see if it looks like this, and
+            # then extract the source's parameters
+
+            # if first subnode is a name, and == "source"
+            # collect the next "Str" arguments that follow
+            # store these in a sourcePattern Dictionary member
+
+        def __call__(tree):
+            # visit the specified tree
+            # return the sourcePattern dictionary
+ 
+
 Functions:
 
 
@@ -29,34 +63,12 @@ Functions:
         Parse a pattern string, throw exception if syntax is invalid.
         return the set of variables mentioned in the pattern
         """
-        FIXME  see protoparser.py
-        # use the ast module, ast.walk() iterator
-        # parse the pattern string and return set
+        see protoparser.py
 
+        # create a SourceVisitor and get the sourcePattern dict
 
-    def evaluate_query(querySpec, srcResults):
-        """
-        Semantically process the source results according to the pattern
-        code.  Return the results.
-        NOTE: Do not call get_pattern_vars when this is on the callstack
-        """
-
-        # try to evaluate the query
-            # set querySpec and srcResults (as events) into global scope
-
-            # evaluate the pattern code
-
-            # return results
-        # finally
-            # remove querySpec and srcResults from globals scope
-
-
-Notepad:
-
-
-
-
-
+        # TODO Fix ISSUE011
+        # return the sourcePattern dict
 
 
 

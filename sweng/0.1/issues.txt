@@ -53,14 +53,12 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     ISSUE009
     Need a way to process semantics
 
-    ISSUE010
-        Query instance name is currently defaulted to "None".
-        We will make it default now to the pattern name.  This
-        could cause nameing conflicts, so we will need to make
-        pattern names fully addressable by dynamically creating
-        objects so they can be dereferenced with.dot.notation
-        source_name.pattern_name.pattern_instance_name.  This work
-        can be delayed.
+    ISSUE011 sourcePatternDictionary should be incorporated in quilt_data
+
+        Whenever we have a datastructure that is used across module bounds
+        it should be encapsulated in an object or in our quilt_data accessor
+        pattern.
+
 Closed:
 
     ISSUE002 souce manager won't start!

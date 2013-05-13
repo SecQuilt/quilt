@@ -196,14 +196,6 @@ c6.Semantics
         In this case startup/shutdown are "variables"
         startup_srcq, shutdown_srcq are "src qry instances"
 
-        Query instance name is currently defaulted to "None".
-        We will make it default now to the pattern name.  This
-        could cause nameing conflicts, so we will need to make
-        pattern names fully addressable by dynamically creating
-        objects so they can be dereferenced with.dot.notation
-        source_name.pattern_name.pattern_instance_name.  This work
-        can be delayed.
-
         Assume this generated two source queries (to the same source)
         who ran and have returned their results to quilt_parse
 
@@ -217,18 +209,20 @@ c6.Semantics
             ...]
 
 
-        Major Design Ideas done in 'protoeval.py'
-            
+        Major Design Ideas done in 'protoeval.py' and 'protoparser.py'
 
 
     Implement
 
-        Implement source 
-        Implement [' '] operator and 'at' function
-
-        Implement concurrent function
-
-        Implement == operator
+        Implement changes to quilt_parse
+        Implement changes to query_master
+        Regression testing
+        Implement new testing sources/files
+        Implement quilt_interpret
+        Implement changes to quilt_query
+            Implement enough functionality for each new testcase
+            Implement a new test case
+            testing
 
     Test
 

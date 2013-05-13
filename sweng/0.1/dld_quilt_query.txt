@@ -114,7 +114,7 @@ Classes:
         void CompleteQuery
             # try the following
                 # lock self
-                # process the query by calling quilt_parse
+                # evaluate the query by calling quilt_interpret
                 #   pass the query spec, and source Results
                 # append the returned results to the query master's
                 #   results for this query

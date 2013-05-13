@@ -80,12 +80,14 @@ Classes:
                 # store querySpec in Q to reserve query id
 
             # if pattern code specified
-            #   parse the pattern text, and get set of variables mentioned
-            #   in the pattern code
+            # TODO Fix ISSUE011
+            #   parse the pattern text, and get set of
+            #   sources/patterns/instance
+            #   referened in the pattern code
 
             # using the set of sources described in the query code if
             #   they exist, or the ones described by mappings otherwise
-            # group variable mapping's by target source and isource pattern
+            # group variable mapping's by target source and source pattern
             #   store in local collection, if mentioned in the pattern code
             #   map{source:
             #       map{sourcePattern:
@@ -106,9 +108,7 @@ Classes:
                     # append completed sourceQuerySpecs to list of srcQueries
                     #   name sourceQuerySpec uniquely by combining the query
                     #   name with the source pattern instance name
-                    # build up a map of srcQueryId's to instance names
 
-                # set srcQueryIdToInstanceNames in querySpec
 
                     
             # store sourceQueries in the querySpec
