@@ -172,6 +172,8 @@ c5.Testability
 c6.Semantics
     Design
 
+        This will resolive ISSUE009
+
         Capture sources mentioned in the query code
         Define objects for those sources
             bridges to source results
@@ -194,6 +196,14 @@ c6.Semantics
         In this case startup/shutdown are "variables"
         startup_srcq, shutdown_srcq are "src qry instances"
 
+        Query instance name is currently defaulted to "None".
+        We will make it default now to the pattern name.  This
+        could cause nameing conflicts, so we will need to make
+        pattern names fully addressable by dynamically creating
+        objects so they can be dereferenced with.dot.notation
+        source_name.pattern_name.pattern_instance_name.  This work
+        can be delayed.
+
         Assume this generated two source queries (to the same source)
         who ran and have returned their results to quilt_parse
 
@@ -206,31 +216,49 @@ c6.Semantics
                 'content'   : 'rsyslog has shutdown' },
             ...]
 
-        Now to semantically process:
-            Scan the query and find src query instances "startup_srcq" ...
-            Define a wrapper for startup_srcq
-                wrapper will need to determine src query id
-                We should modify query spec to store a dictionary
-                    of src query instance names to src query ID's
-                Makw wrapper's get_item function index into the 
-                    src query results and return?
 
-                using the pattern spec's mappings
-                determine the 
+        Major Design Ideas done in 'protoeval.py'
             
-        
 
 
     Implement
-        
+
+        Implement source 
+        Implement [' '] operator and 'at' function
+
+        Implement concurrent function
+
+        Implement == operator
 
     Test
 
-        Seed log file with specific message at early time
-        Seed log file with specific message at late time
-        Define a pattern to detect this and submit a query, and check results
+        Define two new sources, use grep, 
+            default search variable is for .*
+            one with
+            christian_holidays, and one with
+            secular_holidays.  Have them
+            listed as numeric month then, holiday name,
+            then major [t/f]
+
+        Add semantic testcase
+        add test, 'secular_holidays' variable 'newyears'
+            assure one result is new years in january
+        add test, 'at(christian_holidays) == 12' no variable
+            assure one result is christmass
+
+        add test, 'concurent(at(christian_holidays),
+            at(secular_holidays)) '
             
-            
+            assure no Labor Day, assure Presidents Day and
+                ash wed
+                
+        add test, 'concurrent(at(christian_holidays),
+            at( secular_holidays['major'] == 'True'))
+
+            Assure no November, assure Ash Wed and Valentines,
+            Assure no groundhog day
+
+    
 
 cX.Execution
     Execute query specified from Query Master on the Source Master

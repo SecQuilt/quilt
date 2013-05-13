@@ -53,6 +53,14 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     ISSUE009
     Need a way to process semantics
 
+    ISSUE010
+        Query instance name is currently defaulted to "None".
+        We will make it default now to the pattern name.  This
+        could cause nameing conflicts, so we will need to make
+        pattern names fully addressable by dynamically creating
+        objects so they can be dereferenced with.dot.notation
+        source_name.pattern_name.pattern_instance_name.  This work
+        can be delayed.
 Closed:
 
     ISSUE002 souce manager won't start!

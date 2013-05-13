@@ -105,7 +105,10 @@ Classes:
                     #   by calling create_src_query_specs
                     # append completed sourceQuerySpecs to list of srcQueries
                     #   name sourceQuerySpec uniquely by combining the query
-                    #   name with the source pattern name
+                    #   name with the source pattern instance name
+                    # build up a map of srcQueryId's to instance names
+
+                # set srcQueryIdToInstanceNames in querySpec
 
                     
             # store sourceQueries in the querySpec

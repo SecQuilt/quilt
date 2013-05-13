@@ -12,14 +12,15 @@ External Dependencies:
 Internal Dependencies:
 
 Prototype:
-    protoparser.py
+    protoparser.py 
 
 Responsibilities:
-    Manage the parsing of the pattern string
+    Manage the parsing of quilt pattern code
+
 
 Classes:
 
-    
+        
 Functions:
 
 
@@ -28,34 +29,30 @@ Functions:
         Parse a pattern string, throw exception if syntax is invalid.
         return the set of variables mentioned in the pattern
         """
+        FIXME  see protoparser.py
         # use the ast module, ast.walk() iterator
         # parse the pattern string and return set
 
 
+    def evaluate_query(querySpec, srcResults):
+        """
+        Semantically process the source results according to the pattern
+        code.  Return the results.
+        NOTE: Do not call get_pattern_vars when this is on the callstack
+        """
+
+        # try to evaluate the query
+            # set querySpec and srcResults (as events) into global scope
+
+            # evaluate the pattern code
+
+            # return results
+        # finally
+            # remove querySpec and srcResults from globals scope
+
 
 Notepad:
 
-Recall the port scanning behavior of 3 system logs
-
-secure          : ----+-------------+----+------
-httpd/access_log: ------------+----+--+-+-------
-httpd/error_log : -----------------+-+-+--------
-
-Thought Expirement 1
-concurrent(access_log, error_log)
-
-Traverse the tree
-
-Parsing-> concurrent(access_log, error_log)
-Module
- | Expr
- |  | Call
- |  |  | Name(concurrent)
- |  |  |  | Load
- |  |  | Name(access_log)
- |  |  |  | Load
- |  |  | Name(error_log)
- |  |  |  | Load
 
 
 

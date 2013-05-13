@@ -1,0 +1,149 @@
+quilt 0.1 quilt_interpret design
+--------------------------------
+
+
+Module: quilt_interpret
+
+Type: Library
+
+External Dependencies:
+    ast
+
+Internal Dependencies:
+
+Prototype:
+    protoeval.py, iteration.py
+
+Responsibilities:
+    Manage the interpretation of quilt pattern code
+
+Notes:
+    This module uses global scope, and should not be used in a multithreaded
+    way.  Only evaluate_query should be called publically
+
+Classes:
+
+    class _field:
+        def __init__(self, eventsId, fieldName)      
+            # set id and field name in member data
+
+        def __getitem__(self, index):
+            # get the event list from the global event dict with this id
+            # get the index'd event
+            # return the fieldName from the event
+
+        def __setitem__(self,key,val):
+            # raise unimplemented exception
+
+        def __delitem__(self, key):
+            # raise unimplemented exception
+
+        def __len__(self):
+            # get the event list from the global event dict with this id
+            # return length of event list
+            
+
+        def __eq__(self, value):
+            # construct a new eventID based on the calling context
+            # if if this eventID exist in global event dict
+                # return those events
+            # get the event list from the global event dict with this id
+            # create new event list with events that have this
+            #   field matching the value
+            # set new event list into global events dict
+            # return a new _pattern for the new event list
+        
+    class _pattern:
+        def __init__(self, eventsId, events)      
+            # set events and id in member data
+
+        def __getitem__(self, fieldName):
+            # return a new _field object from this
+            #   eventId, and fieldName
+            
+            return fieldwrapper(self.name, key)
+
+        def __setitem__(self,key,val):
+            # raise unimplemented exception
+
+        def __delitem__(self, key):
+            # raise unimplemented exception
+
+        def __len__(self):
+            # get the event list from the global event dict with this id
+            # return length of event list
+
+Functions:
+
+    def all_equal(iterator:
+        # http://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
+        # See prototype iteration.py
+
+    def join(predicate, *patterns):
+        """Return all patterns that match the predicate"""
+        # See prototype iteration.py
+         
+         
+    def concurrent(*patterns):
+        """return all patterns that occur at the same time"""
+        
+        # generate name based on execution context
+        # if eventlist of generated name exists
+        #   return previously generated event list
+
+        # construct a new empty list of fields
+        # itterate the patterns
+            # call 'at' on the pattern, append to list of fields
+
+        # join all of the field lists using an equality test
+
+        # generate new event list only containing timestamps
+        #   found during the join
+
+        # record new event list in event dict with this name
+        # return a _pattern for the new list
+        
+
+    def at(pattern):
+        # return timestamp field of the pattern
+
+    def source(srcName,patName,patInstanceName=None):
+        """
+        Construct a pattern wrapper from the specified source
+        """
+        # use the global query spec
+        # iterate the srcQueries
+            # if matching (srcName, patName, and patInstanceName)
+            # get the global srcResults for that srcQueryID
+            # return a new _pattern with the srcResults as the events
+
+        # raise exception if mathing srcQuery not found
+
+    def evaluate_query(querySpec, srcResults):
+        """
+        Semantically process the source results according to the pattern
+        code.  Return the results.
+        NOTE: Do not call get_pattern_vars when this is on the callstack
+        """
+
+        # try to evaluate the query
+            # lock a global lock
+            # set querySpec and srcResults (as eventDict) into global scope
+
+            # evaluate the pattern code
+
+            # return results
+        # finally
+            # remove querySpec and eventDict from globals scope
+            # unlock a global lock
+
+
+Notepad:
+
+
+
+
+
+
+
+

@@ -92,24 +92,15 @@ Classes:
                 # set srcQuerie's state to COMPLETED
                 # Detect if all src queries are completed
 
-            NOTE:
-                in future we will proabbly syncronusly process semantics
-                here, just do the simple thing for now
 
             # if this was the last source query, 
-                # try the following
-                    # Aggregate all the source queries
-                    # call query masters CompleteQuery
-                # catch exceptions
-                    # log out the exceptions, do not pass along to
-                    # source as it wasn't his fault
-                # finally
-                    # stop processing events
+                # get proxy to self
+                # asyncronously call self's CompleteQuery
 
 
         self.SetProcesssEvents( bool value)
             # lock the class clock
-            # set _processEvents to the specified value
+# set _processEvents to the specified value
 
         void OnEventLoopBegin()
             # lock the class lock
@@ -120,6 +111,20 @@ Classes:
             # read and return value of _processEvents
 
 
+        void CompleteQuery
+            # try the following
+                # lock self
+                # process the query by calling quilt_parse
+                #   pass the query spec, and source Results
+                # append the returned results to the query master's
+                #   results for this query
+                # call query masters CompleteQuery
+            # catch exceptions
+                # log out the exceptions, 
+                # Call query master's OnQueryError
+            # finally
+                # stop processing events
+            
 
 
 Functions:

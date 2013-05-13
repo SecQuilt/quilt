@@ -31,9 +31,9 @@ def until(a,b):
 def at(x):
     return x['timestamp']
 
-def concurrent(at,bt):
-    a = at[1]
-    b = bt[1]
+def concurrent(af,bf):
+    a = af.items()
+    b = bf.items()
     r = []
     bi = 0
     aadd=[]
@@ -43,21 +43,21 @@ def concurrent(at,bt):
         for cura in a:
             if cura == curb:
                 if ai not in aadd:
-                    r.append(getEvents(at[0])[ai])
+                    r.append(getEvents(af.name)[ai])
                     aadd.append(ai)
                 if bi not in badd:
-                    r.append(getEvents(bt[0])[bi])
+                    r.append(getEvents(bf.name)[bi])
                     badd.append(bi)
                 # print aadd, badd
             ai = ai + 1
         bi = bi + 1
 
-    name = "concurrent(" +  str(at[0]) + "," + str(bt[0]) + ")"
+    name = "concurrent(" +  str(af.name) + "," + str(bf.name) + ")"
     return wrapper(name,r)
 
-def follows(dt,at,bt):
-    a = at[1]
-    b = bt[1]
+def follows(dt,af,bf):
+    a = af.items()
+    b = bf.items()
     r = []
     bi = 0
     aadd=[]
@@ -68,16 +68,16 @@ def follows(dt,at,bt):
             delta = curb-cura
             if delta >= 0 and delta <= dt:
                 if ai not in aadd:
-                    r.append(getEvents(at[0])[ai])
+                    r.append(getEvents(af.name)[ai])
                     aadd.append(ai)
                 if bi not in badd:
-                    r.append(getEvents(bt[0])[bi])
+                    r.append(getEvents(bf.name)[bi])
                     badd.append(bi)
                 # print aadd, badd
             ai = ai + 1
         bi = bi + 1
 
-    name = "follows(" + str(dt) + "," + str(at[0]) + "," + str(bt[0]) + ")"
+    name = "follows(" + str(dt) + "," + str(af.name) + "," + str(bf.name) + ")"
     return wrapper(name,r)
 
 
@@ -125,26 +125,67 @@ bakevents = [
 
 bakflowevents = [
             { 'timestamp' : 151,
-                'sip'   : '10.0.0.4' },
+                'sip'   : '10.0.0.4', 'dip' :   '10.1.0.1' },
             { 'timestamp' : 176,
-                'sip'   : '10.0.0.4' },
+                'sip'   : '10.0.0.4', 'dip' :   '10.1.0.1' },
             { 'timestamp' : 250,
-                'sip'   : '10.0.0.4' },
+                'sip'   : '10.0.0.4', 'dip' :   '10.1.0.1' },
+            { 'timestamp' : 275,
+                'sip'   : '10.0.0.4', 'dip' :   '74.1.0.1' },
             { 'timestamp' : 351,
-                'sip'   : '10.0.0.4' },
+                'sip'   : '10.0.0.4', 'dip' :   '10.1.0.1' },
             { 'timestamp' : 376,
-                'sip'   : '10.0.0.4' }]
+                'sip'   : '10.0.0.4', 'dip' :   '10.1.0.1' },
+            { 'timestamp' : 151,
+                'sip'   : '10.0.0.5', 'dip' :   '10.1.0.1' },
+            { 'timestamp' : 176,
+                'sip'   : '10.0.0.5', 'dip' :   '10.1.0.1' },
+            { 'timestamp' : 250,
+                'sip'   : '10.0.0.5', 'dip' :   '10.1.0.1' },
+            { 'timestamp' : 275,
+                'sip'   : '10.0.0.5', 'dip' :   '74.1.0.1' },
+            { 'timestamp' : 351,
+                'sip'   : '10.0.0.5', 'dip' :   '10.1.0.1' },
+            { 'timestamp' : 376,
+                'sip'   : '10.0.0.5', 'dip' :   '10.1.0.1' }
+            ]
 
 events = {
     'shutdown' : shutdownevents,
     'startup' : startupevents,
     'maint' : maintevents,
-    'bak' : bakevents
+    'bak' : bakevents,
+    'bakflow' : bakflowevents
     }
 
 
 def getEvents(name):
     return events[name]
+
+class fieldwrapper:
+    def __init__(self, name, key):
+        self.name = name
+        self.key = key
+
+    def items(self):
+        myevents = getEvents(self.name)
+        return [i[self.key] for i in myevents]
+
+    def __getitem__(self, key):
+        return self.items()[key]
+
+    def __ne__(self, rhs):
+        myevents = getEvents(self.name)
+        newe = [i for i in myevents if i[self.key] != rhs]
+        name = self.name + "[" + self.key + "]==" + str(rhs)
+        
+        return wrapper(name,newe)
+    def __eq__(self, rhs):
+        myevents = getEvents(self.name)
+        newe = [i for i in myevents if i[self.key] == rhs]
+        name = self.name + "[" + self.key + "]==" + str(rhs)
+        
+        return wrapper(name,newe)
 
 class wrapper:
     def __init__(self, name, eventString=None):
@@ -154,9 +195,15 @@ class wrapper:
 
     def __getitem__(self, key):
         print "Accesing", self.name, "[",key,"]"
-        events = getEvents(self.name)
+        return fieldwrapper(self.name, key)
 
-        return self.name, [i[key] for i in events]
+    def __delitem__(self, key):
+        pass
+
+    def __len__(self):
+        pass
+
+
 
     def __name__(self):
         return self.name
@@ -191,6 +238,7 @@ def do_parse(codeline):
     r = eval( codeline )
 
     print "\n","RESULTS","\n"
+    pprint.pprint(r)
     pprint.pprint(r.name)
     pprint.pprint(getEvents(r.name))
 
