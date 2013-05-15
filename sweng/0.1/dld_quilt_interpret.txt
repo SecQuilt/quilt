@@ -107,19 +107,22 @@ Functions:
     def at(pattern):
         # return timestamp field of the pattern
 
-    def source(srcName,patName,patInstanceName=None):
+    def source(srcName,patName=None,patInstanceName=None):
         """
         Construct a pattern wrapper from the specified source
         """
         # use the global query spec
         # iterate the srcQueries
             # if matching (srcName, patName, and patInstanceName)
+            # if None was supplied as one of the parameter, then there
+            #   must only be one pattern/instance to choose, otherwise
+            #   throw an exception
             # get the global srcResults for that srcQueryID
             # return a new _pattern with the srcResults as the events
 
         # raise exception if mathing srcQuery not found
 
-    def evaluate_query(querySpec, srcResults):
+    def evaluate_query(patternSpec, querySpec, srcResults):
         """
         Semantically process the source results according to the pattern
         code.  Return the results.

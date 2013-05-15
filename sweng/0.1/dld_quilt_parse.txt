@@ -58,10 +58,11 @@ Classes:
 Functions:
 
 
-    def get_pattern_vars(pattern)
+    def get_pattern_src_refs(pattern)
         """
         Parse a pattern string, throw exception if syntax is invalid.
-        return the set of variables mentioned in the pattern
+        return the source to pattern to instance dictionary of the sources
+        referenced in the code
         """
         see protoparser.py
 

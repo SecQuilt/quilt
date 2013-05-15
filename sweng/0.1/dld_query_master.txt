@@ -230,7 +230,7 @@ Classes:
             string queryId          # the query we are interested in
             """
             Called by quilt_query to Move a query into the an active state,
-            and return a copy of the query
+            and return a tuple with a copy of the query and pattern specs
             """
 
             # lock self
@@ -242,10 +242,12 @@ Classes:
 
                 # move query to ACTIVE state
                 # create a  copy of the query
+
+                # get the pattern spec, and make a copy
  
             # returning copy because we con't want to stay locked when asking
             #   pyro to marshall across process bounds
-            # return the query spec copy
+            # return the pattern spec and query spec copies
 
         void CompleteQuery(queryId)
             """

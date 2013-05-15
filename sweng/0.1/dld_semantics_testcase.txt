@@ -34,9 +34,9 @@ Classes:
             # call quilt_define source('secular_holidays_smd1234','grep')
             #   -n secular_holidays
             #   -v WHICH_HOLIDAY
-            #   -m secular_holidays grep GREP_ARGS
+            #   -m WHICH_HOLIDAY secular_holidays_smd1234 grep GREP_ARGS
             #   -v UNUSED
-            #   -m christian_holidays grep GREP_ARGS
+            #   -m UNUSED christian_holidays_smd_1234 grep GREP_ARGS
 
             # call quilt_define 
             #   'at(source('christian_holidays_smd1234','grep') == '12'
@@ -44,16 +44,16 @@ Classes:
             #   -m secular_holidays grep GREP_ARGS
 
             # call quilt_define 
-            #   'concurrent(at(
-            #       source('christian_holidays_smd1234','grep'), at(
+            #   'concurrent(
+            #       source('christian_holidays_smd1234','grep'), 
             #       source('secular_holidays_smd1234','grep'))'
             #   -n concurrent_holidays
                 
 
             # call quilt_define 
             #   'concurrent(
-            #       at( source('christian_holidays_smd1234','grep'),
-            #       at( source('secular_holidays_smd1234','grep')
+            #        source('christian_holidays_smd1234','grep'),
+            #        source('secular_holidays_smd1234','grep')
             #         ['major'] == 'True'))'
             #   -n major_secular_concurrent
                 
@@ -62,7 +62,7 @@ Classes:
             This test assures that a simple case of semantics is tested
             where only one thing is referenced, the results of one source
             query.  Additionally a red herring second varible is specified
-            in the pattern, but is not mentioned in the pattern's code or
+            in the pattern, but is not mentioned in the pattern's code, only 
             in the query's variables.  We want to make sure quilt is smart
             enough not to make a useless source query.  An additional query
             is made on the pattern where the second unused variable is

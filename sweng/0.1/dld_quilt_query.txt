@@ -39,7 +39,7 @@ Classes:
                 #   set the state to ACTIVE
                 #   by calling BeginQuery
                 
-                # store query as a data memeber
+                # store pattern and  query as data memebers
 
                 # iterate the sourceQuerySpec's in srcQueries list by source
                     # get proxy to the source master

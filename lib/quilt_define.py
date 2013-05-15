@@ -33,7 +33,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             # call get_pattern_vars from parser, but ignore the result
             #   this will check the syntax
             codestr = str(self._args.code)
-            quilt_parse.get_pattern_vars(codestr)
+            quilt_parse.get_pattern_src_refs(codestr)
             # store the code in the pattern
             quilt_data.pat_spec_set(patternSpec, code=codestr)
 

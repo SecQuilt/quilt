@@ -207,13 +207,6 @@ class QueryMaster:
 
             code = quilt_data.pat_spec_tryget(
                     patternSpec, code=True)
-            # if pattern code specified
-            #   parse the pattern text, and get set of variables mentioned
-            #   in the pattern code
-            codeVars = None
-            if code != None:
-                codeVars = quilt_parse.get_pattern_vars(code)
-
 
             # using the set of sources described in the query code if
             #   they exist, or the ones described by mappings otherwise
@@ -229,7 +222,15 @@ class QueryMaster:
             #   which provides a direct mapping from srcVariables to 
             #   queryVariables, grouped by sources and patterns and pattern 
             #   instances
-            srcPatDict = {}
+
+            # if pattern code specified
+            #   parse the pattern text, and get set of variables mentioned
+            #   in the pattern code
+            if code != None:
+                srcPatDict = quilt_parse.get_pattern_src_refs(code)
+            else:
+                srcPatDict = {}
+
             patVarSpecs = quilt_data.pat_spec_tryget(
                 patternSpec, variables=True)
                 
@@ -245,8 +246,6 @@ class QueryMaster:
                 #   variables referenced in the code, otherwise use anything
                 #   that was declared in the pattern spec
                 patVars = patVarSpecs.keys()
-                if codeVars != None:
-                    patVars = codeVars
 
                 # logging.debug("Iterating variables: " + str(patVars))
 
@@ -586,11 +585,17 @@ class QueryMaster:
 
                 # create a  copy of the query
                 querySpec = querySpec.copy()
+
+                # get a copy of the patternSpec
+                patternSpec = quilt_data.pat_specs_get(self._patterns, 
+                    quilt_data.query_spec_get(querySpec,patternName=True))
+                patternSpec = patternSpec.copy()
  
-            # returning copy because we con't want to stay locked when asking
-            #   pyro to marshall across process bounds
-            # return the query spec copy
-            return querySpec
+            # returning copy because we don't want to stay locked when asking
+            #   pyro to marshall across process bounds.  Not that I know for
+            #   a fact that that won't work, but it sounds like a bad idea
+            # return the pattern and query spec 
+            return patternSpec, querySpec
 
         except Exception, error:
             try:

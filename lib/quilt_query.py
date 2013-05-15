@@ -26,6 +26,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         # super(QuiltQuery, self).__init__(GetType())
         quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
+        self._patternSpec = None
         self._querySpec = None
         self._srcQuerySpecs = None
         self._processEvents = False
@@ -52,14 +53,15 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             rhost = config.GetValue("registrar", "host", None)
 
             #   set the state to ACTIVE by calling BeginQuery
-            # store query as a data memeber
-            self._querySpec = self._qm.BeginQuery(qid)
+            # store pattern and query as a data memeber
+            self._patternSpec,self._querySpec = self._qm.BeginQuery(qid)
 
             # get the query spec from query master
             queryState = quilt_data.query_spec_get(self._querySpec,state=True)
             if queryState != quilt_data.STATE_ACTIVE:
                 raise Exception("Query: " + qid + ", must be in " +
-                        quilt_data.STATE_ACTIVE + " state. It is currently in "+
+                        quilt_data.STATE_ACTIVE + 
+                        " state. It is currently in " +
                         queryState + " state.")
 
             # iterate the sourceQuerySpec's in srcQueries list
