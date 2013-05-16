@@ -107,7 +107,7 @@ Functions:
     def at(pattern):
         # return timestamp field of the pattern
 
-    def source(srcName,patName=None,patInstanceName=None):
+    def source(srcName,patName,patInstanceName=None):
         """
         Construct a pattern wrapper from the specified source
         """
@@ -115,8 +115,7 @@ Functions:
         # iterate the srcQueries
             # if matching (srcName, patName, and patInstanceName)
             # if None was supplied as one of the parameter, then there
-            #   must only be one pattern/instance to choose, otherwise
-            #   throw an exception
+            #   must only be one instance to choose, keyed by 'None'
             # get the global srcResults for that srcQueryID
             # return a new _pattern with the srcResults as the events
 

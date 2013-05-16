@@ -748,6 +748,7 @@ def create_src_query_spec(
     return quilt_data.src_query_spec_create(
         name=srcQueryName,
         srcPatternName=srcPatName,
+        srcPatternInstance=srcPatInstance,
         variables=srcQueryVarSpecs,
         source=source)
 

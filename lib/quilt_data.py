@@ -446,6 +446,7 @@ def src_pat_specs_get(srcPatSpecs, patName):
 def src_query_spec_create(
     name=None,
     srcPatternName=None,
+    srcPatternInstance=None,
     state=None,
     source=None,
     variables=None
@@ -454,6 +455,7 @@ def src_query_spec_create(
         None,
         name=name,
         srcPatternName=srcPatternName,
+        srcPatternInstance=srcPatternInstance,
         state=state,
         source=source,
         variables=variables)
@@ -462,6 +464,7 @@ def src_query_spec_set(
     spec,
     name=None,
     srcPatternName=None,
+    srcPatternInstance=None,
     state=None,
     source=None,
     variables=None
@@ -469,6 +472,7 @@ def src_query_spec_set(
     if spec == None: spec = {}
     if name != None: spec_name_set(spec, name)
     if srcPatternName != None: spec['srcPatternName']= srcPatternName
+    if srcPatternInstance != None: spec['srcPatternInstance']= srcPatternName
     if state != None: spec['state']= state
     if source != None: spec['source']= source
     if variables != None: spec['variables']= variables
@@ -478,6 +482,7 @@ def src_query_spec_get(
     spec,
     name=False,
     srcPatternName=False,
+    srcPatternInstance=False,
     state=False,
     source=False,
     variables=False
@@ -487,6 +492,7 @@ def src_query_spec_get(
     returned"""
     if name: return spec_name_get(spec)
     if srcPatternName: return spec['srcPatternName']
+    if srcPatternInstance: return spec['srcPatternInstance']
     if state: return spec['state']
     if source: return spec['source']
     if variables: return spec['variables']
@@ -496,6 +502,7 @@ def src_query_spec_tryget(
     spec,
     name=False,
     srcPatternName=False,
+    srcPatternInstance=False,
     state=False,
     source=False,
     variables=False
@@ -505,6 +512,7 @@ def src_query_spec_tryget(
     returned.  If value is not present in spec, None is returned"""
     if name: return spec_name_tryget(spec)
     if srcPatternName and 'srcPatternName' in spec: return spec['srcPatternName']
+    if srcPatternInstance and 'srcPatternInstance' in spec: return spec['srcPatternInstance']
     if state and 'state' in spec: return spec['state']
     if source and 'soruce' in spec: return spec['soruce']
     if variables and 'variables' in spec: return spec['variables']
