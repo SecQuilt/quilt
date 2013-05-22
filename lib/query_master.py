@@ -240,11 +240,11 @@ class QueryMaster:
 
             #logging.info("got patVarSpecs: " + str(patVarSpecs))
             #logging.info("got mappings: " + str(mappings))
+            # if code was specified, only bother making the map for
+            #   sources referenced in the code, otherwise use anything
+            #   that was declared in the pattern spec mappings 
             if patVarSpecs != None and mappings != None:
 
-                # if code was specified, only bother making the map for
-                #   variables referenced in the code, otherwise use anything
-                #   that was declared in the pattern spec
                 patVars = patVarSpecs.keys()
 
                 # logging.debug("Iterating variables: " + str(patVars))
@@ -532,7 +532,6 @@ class QueryMaster:
                 # throw the exception back over to the calling process
                 raise error
 
-    #REVIEW
     def OnQueryError(self, qid, error):
         """Called when an asyncronus query produces an exeption"""
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-#REVIEW
 import sys
 import logging
 import quilt_core
 import Pyro4
 import quilt_data
 import query_master
+import quilt_interpret
 
 class QuiltQuery(quilt_core.QueryMasterClient):
     """
@@ -31,6 +31,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         self._srcQuerySpecs = None
         self._processEvents = False
         self._srcResults = {}
+        self._registrarPort = None
+        self._registrarHost = None
 
         
     def OnRegisterEnd(self):
@@ -51,6 +53,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             if rport != None:
                 rport = int(rport)
             rhost = config.GetValue("registrar", "host", None)
+            self._registrarPort = rport
+            self._registrarHost = rhost
 
             #   set the state to ACTIVE by calling BeginQuery
             # store pattern and query as a data memeber
@@ -82,7 +86,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                         state=quilt_data.STATE_ACTIVE)
 
                 # get proxy to the source manager
-                source = quilt_data.src_query_spec_get(srcQuerySpec, source=True)
+                source = quilt_data.src_query_spec_get(
+                        srcQuerySpec, source=True)
                 smgrRec = self._qm.GetClientRec("smd", source)
                 # TODO make more efficient by recycling proxys to same source
                 # in the case when making multi source queries to same source
@@ -92,8 +97,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     Pyro4.async(smgr).Query(
                             qid, srcQuerySpec, self.localname, rhost, rport)
                     # Note: no locking needed 
-                    #   asyncronous call, and returnign messages not processe until
-                    #   this funciton exits
+                    #   asyncronous call, and returning messages not processe
+                    #   until this funciton exits
 
             self._processEvents = True
 
@@ -101,7 +106,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             try:
                 self._qm.OnQueryError( qid, error)
             except Exception, error2:
-                logging.error("Unable to send query startup error to query master")
+                logging.error(
+                        "Unable to send query startup error to query master")
                 logging.exception(error2)
             finally:
                 logging.error("Failed to start query")
@@ -224,15 +230,17 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
                     # if this was the last source query, 
                     if completed:
-                        qid = quilt_data.query_spec_get(self._querySpec, name=True)
-                        logging.info("All source queries completed for: " + str(qid))
-                        # Aggregate all the source queries
-                        allResults = []
-                        for srcResult in self._srcResults.values(): 
-                            allResults += (srcResult)
-                        self._qm.AppendQueryResults(qid, allResults)
-                        # call query masters CompleteQuery
-                        self._qm.CompleteQuery(qid)
+
+                        # get proxy to self
+                        pyroname = self.localname
+                        nshost = self._registrarHost
+                        nsport = self._registrarPort
+
+                        ns = Pyro4.locateNS(nshost, nsport)
+                        uri = ns.lookup(pyroname)
+                        # asyncronously call self's CompleteQuery
+                        with Pyro4.Proxy(uri) as selfProxy:
+                            selfProxy.async().CompleteQuery()
 
             # catch exceptions
             except Exception, error3:
@@ -292,7 +300,43 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         with self._lock:
             return self._processEvents
 
-        
+    def CompleteQuery(self):
+
+        # try the following
+        try:
+            # lock self
+            with self._lock:
+                qid = quilt_data.query_spec_get(self._querySpec, name=True)
+                logging.info("Interperting query: " + str(qid))
+                # evaluate the query by calling quilt_interpret
+                #   pass the query spec, and source Results
+                result = quilt_interpret.evaluate_query(self._patternSpec,
+                        self._querySpec, self._srcResults)
+                # append the returned results to the query master's
+                #   results for this query
+                logging.info("Posting results for query: " + str(qid))
+                self._qm.AppendQueryResults(qid, result)
+                # call query masters CompleteQuery
+                self._qm.CompleteQuery(qid)
+
+        # catch exceptions
+        except Exception, error:
+            # log out the exceptions, 
+            # Call query master's OnQueryError
+            try:
+                self._qm.OnQueryError( qid, error)
+            except Exception, error2:
+                logging.error(
+                        "Unable to send query interpret error to query master")
+                logging.exception(error2)
+            finally:
+                logging.error("Failed to interpret query")
+                logging.exception(error)
+        finally:
+            # set process events flag to false end event loop, allowing
+            # query client to exit
+            self.SetProcesssEvents(False)
+    
 
 
 def main(argv):

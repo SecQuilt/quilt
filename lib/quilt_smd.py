@@ -71,8 +71,8 @@ class SourceManager(quilt_core.QueryMasterClient):
             # specific to this command line case
             templateCmd = srcPatSpec['template']
             template = Template(templateCmd)
-            #logging.info ("Ready to use : " + templateCmd + 
-            #    " with replacments: " + str(replacments))
+            logging.info ("Ready to use : " + templateCmd + 
+                " with replacments: " + str(replacments))
             cmdline = template.safe_substitute(replacments)
 
             # setup context for the cmdline stdout callback
@@ -205,7 +205,7 @@ class Smd(quilt_core.QuiltDaemon):
         cfg = quilt_core.QuiltConfig()
         smspecs = cfg.GetSourceManagerSpecs()
 
-        #logging.debug("Source manager specs: " + str(smspecs))
+        logging.debug("Source manager specs: " + str(smspecs))
 
         objs = {}
         # iterate through source manager configurations
@@ -215,7 +215,7 @@ class Smd(quilt_core.QuiltDaemon):
             sm = SourceManager(self._args, smname, smspec)
             objs[sm.localname] = sm
         
-        #logging.info("Creating source managers: " + str(objs))
+        logging.info("Creating source managers: " + str(objs))
             
         # start the client with all the source managers
         quilt_core.query_master_client_main_helper(objs)

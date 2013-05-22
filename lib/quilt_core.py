@@ -288,6 +288,8 @@ def query_master_client_main_helper(
         obj.RegisterWithQueryMaster()
  
     
+    logging.debug("Calling OnRegisterEnd()")
+
     daemonObjs = {}
     # iterate the names and objects in clientObjectDic
     for name,obj in clientObjectDict.items():
@@ -305,8 +307,8 @@ def query_master_client_main_helper(
 
     # continue looping while there are daemon objects
     while len(daemonObjs) > 0 :
+        logging.debug("main event loop begin")
 
-        #REVIEW
         if firstTime:
             firstTime = False
             delDaemonObjs = {}

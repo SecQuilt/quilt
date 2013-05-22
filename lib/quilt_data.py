@@ -472,7 +472,7 @@ def src_query_spec_set(
     if spec == None: spec = {}
     if name != None: spec_name_set(spec, name)
     if srcPatternName != None: spec['srcPatternName']= srcPatternName
-    if srcPatternInstance != None: spec['srcPatternInstance']= srcPatternName
+    if srcPatternInstance != None: spec['srcPatternInstance']= srcPatternInstance
     if state != None: spec['state']= state
     if source != None: spec['source']= source
     if variables != None: spec['variables']= variables

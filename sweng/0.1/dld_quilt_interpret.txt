@@ -55,7 +55,9 @@ Classes:
         
     class _pattern:
         def __init__(self, eventsId, events)      
-            # set events and id in member data
+            # if a new list of events is input, store them in
+            #   the global pool
+            # set id in member data
 
         def __getitem__(self, fieldName):
             # return a new _field object from this
@@ -101,7 +103,7 @@ Functions:
         #   found during the join
 
         # record new event list in event dict with this name
-        # return a _pattern for the new list
+        # by returning a _pattern for the new list
         
 
     def at(pattern):
@@ -125,7 +127,8 @@ Functions:
         """
         Semantically process the source results according to the pattern
         code.  Return the results.
-        NOTE: Do not call get_pattern_vars when this is on the callstack
+        NOTE: This funciton is non rentrant.
+            Do not call evaluate_query when this is on the callstack
         """
 
         # try to evaluate the query
