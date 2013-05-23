@@ -58,53 +58,60 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
             #   set the state to ACTIVE by calling BeginQuery
             # store pattern and query as a data memeber
-            self._patternSpec,self._querySpec = self._qm.BeginQuery(qid)
+            logging.info("$$$$$$$$$$$$")
+            with self.GetQueryMasterProxy() as qm:
+                logging.debug(__file__ + "OnRegisterEnd, GetQueryMasterProxy begin")
+                logging.info("@@@@@@@@@@@@")
+                self._patternSpec,self._querySpec = qm.BeginQuery(qid)
 
-            # get the query spec from query master
-            queryState = quilt_data.query_spec_get(self._querySpec,state=True)
-            if queryState != quilt_data.STATE_ACTIVE:
-                raise Exception("Query: " + qid + ", must be in " +
-                        quilt_data.STATE_ACTIVE + 
-                        " state. It is currently in " +
-                        queryState + " state.")
+                # get the query spec from query master
+                queryState = quilt_data.query_spec_get(self._querySpec,state=True)
+                if queryState != quilt_data.STATE_ACTIVE:
+                    raise Exception("Query: " + qid + ", must be in " +
+                            quilt_data.STATE_ACTIVE + 
+                            " state. It is currently in " +
+                            queryState + " state.")
 
-            # iterate the sourceQuerySpec's in srcQueries list
-            srcQuerySpecs = quilt_data.query_spec_tryget(
-                    self._querySpec,sourceQuerySpecs=True)
+                # iterate the sourceQuerySpec's in srcQueries list
+                srcQuerySpecs = quilt_data.query_spec_tryget(
+                        self._querySpec,sourceQuerySpecs=True)
 
-            # there are no source query specs specified
-            if srcQuerySpecs == None:
-                # so just don't do anything
-                self._processEvents = False
-                return
-                
-            self._srcQuerySpecs = srcQuerySpecs
-            for srcQuerySpec in srcQuerySpecs.values():
-                
-                # mark the sourceQuery ACTIVE
-                quilt_data.src_query_spec_set(srcQuerySpec,
-                        state=quilt_data.STATE_ACTIVE)
+                # there are no source query specs specified
+                if srcQuerySpecs == None:
+                    # so just don't do anything
+                    self._processEvents = False
+                    return
+                    
+                self._srcQuerySpecs = srcQuerySpecs
+                for srcQuerySpec in srcQuerySpecs.values():
+                    
+                    # mark the sourceQuery ACTIVE
+                    quilt_data.src_query_spec_set(srcQuerySpec,
+                            state=quilt_data.STATE_ACTIVE)
 
-                # get proxy to the source manager
-                source = quilt_data.src_query_spec_get(
-                        srcQuerySpec, source=True)
-                smgrRec = self._qm.GetClientRec("smd", source)
-                # TODO make more efficient by recycling proxys to same source
-                # in the case when making multi source queries to same source
-                with query_master.get_client_proxy(smgrRec) as smgr:
-                    # query the source by sending it the source query specs as
-                    #   asyncronous call
-                    Pyro4.async(smgr).Query(
-                            qid, srcQuerySpec, self.localname, rhost, rport)
-                    # Note: no locking needed 
-                    #   asyncronous call, and returning messages not processe
-                    #   until this funciton exits
+                    # get proxy to the source manager
+                    source = quilt_data.src_query_spec_get(
+                            srcQuerySpec, source=True)
+                    smgrRec = qm.GetClientRec("smd", source)
+                    # TODO make more efficient by recycling proxys to same source
+                    # in the case when making multi source queries to same source
+                    with query_master.get_client_proxy(smgrRec) as smgr:
+                        # query the source by sending it the source query specs as
+                        #   asyncronous call
+                        Pyro4.async(smgr).Query(
+                                qid, srcQuerySpec, self.localname, rhost, rport)
+                        # Note: no locking needed 
+                        #   asyncronous call, and returning messages not processe
+                        #   until this funciton exits
 
             self._processEvents = True
+            
+            logging.debug(__file__ + "OnRegisterEnd, GetQueryMasterProxy end")
 
         except Exception, error:
             try:
-                self._qm.OnQueryError( qid, error)
+                with self.GetQueryMasterProxy() as qm:
+                    qm.OnQueryError( qid, error)
             except Exception, error2:
                 logging.error(
                         "Unable to send query startup error to query master")
@@ -141,7 +148,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 qid = quilt_data.query_spec_get(srcQuerySpec, name=True)
 
             # call query Master's Error function
-            self._qm.OnQueryError(qid, exception)
+            with self.GetQueryMasterProxy() as qm:
+                qm.OnQueryError(qid, exception)
 
         except Exception, error2:
             logging.error("Unable to send source query error to query master")
@@ -315,16 +323,18 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 # append the returned results to the query master's
                 #   results for this query
                 logging.info("Posting results for query: " + str(qid))
-                self._qm.AppendQueryResults(qid, result)
-                # call query masters CompleteQuery
-                self._qm.CompleteQuery(qid)
+                with self.GetQueryMasterProxy() as qm:
+                    qm.AppendQueryResults(qid, result)
+                    # call query masters CompleteQuery
+                    qm.CompleteQuery(qid)
 
         # catch exceptions
         except Exception, error:
             # log out the exceptions, 
             # Call query master's OnQueryError
             try:
-                self._qm.OnQueryError( qid, error)
+                with self.GetQueryMasterProxy() as qm:
+                    qm.OnQueryError( qid, error)
             except Exception, error2:
                 logging.error(
                         "Unable to send query interpret error to query master")

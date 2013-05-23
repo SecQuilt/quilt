@@ -146,9 +146,13 @@ Functions:
         """Access configuration to find query master, 
         return proxy to it
         """
-        # if config is none, intitalize config
-        # look up name, and name server info for query master
-        # return pyro proxy
+        NOTE: See ISSUE012
+
+        # in a globally thread safe way, initialize a proxy to the query master
+        #   if config is none, intitalize config
+        #   look up name, and name server info for query master
+
+        # return global pyro proxy
 
     # Quilt helper function for main, do common things
     def quilt_main_helper(

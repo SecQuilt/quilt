@@ -116,8 +116,10 @@ class QuiltConfig:
     def GetSourceManagerSpecs(self):
         return self.GetSourceManagersUtil("specs")
 
-def GetQueryMasterProxy(config=None):
+
+def GetQueryMasterProxyDEPRECATED(config=None):
     """Access configuration to find query master, return proxy to it"""
+
     if config is None:
         config = QuiltConfig()
     qmhost = config.GetValue("query_master", "registrar_host", None)
@@ -179,8 +181,9 @@ class QueryMasterClient:
         to generate a unique enough name for this machine
         """
         self.localname = basename + str(os.getpid())
-        self._qm = None
         self._remotename = None
+        self._config = None
+
 
     def GetType(self):
         raise Exception("""Abstract function is rquired to be implemented by
@@ -191,11 +194,7 @@ class QueryMasterClient:
        
  
         # Access the QueryMaster's registrar's host and port from the config
-        config = QuiltConfig()
-        # TODO think about adding cleanup code to client to 
-        #   nicely disconnect
-        # store a reference to the query master as a member variable
-        self._qm = GetQueryMasterProxy(config)
+        config = self.GetConfig()
         
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable
@@ -205,8 +204,11 @@ class QueryMasterClient:
         rhost = config.GetValue("registrar", "host", None)
         logging.debug("Registering " + self.localname + ", to query master" + 
             ", via registrar: " + str(rhost) + ":" + str(rport))
-        self._remotename = self._qm.RegisterClient(
-            rhost, rport, self.localname, self.GetType())
+        with self.GetQueryMasterProxy() as qm:
+            logging.debug(__file__ + "RegisterWithQueryMaster, GetQueryMasterProxy begin")
+            self._remotename = qm.RegisterClient(
+                rhost, rport, self.localname, self.GetType())
+            logging.debug(__file__ + "RegisterWithQueryMaster, GetQueryMasterProxy end")
 
         # connection complete, call our notification function
         logging.info("Connection completed for " + self.localname)
@@ -245,9 +247,24 @@ class QueryMasterClient:
         return True
 
     def UnregisterFromQueryMaster(self):
-        if self._qm != None and self._remotename != None:
-            self._qm.UnRegisterClient(self.GetType(), self._remotename)
+        if self._remotename != None:
+            with self.GetQueryMasterProxy() as qm:
+                logging.debug(__file__ + "UnregisterWithQueryMaster, GetQueryMasterProxy begin")
+                qm.UnRegisterClient(self.GetType(), self._remotename)
+                logging.debug(__file__ + "UnregisterWithQueryMaster, GetQueryMasterProxy end")
+                
             logging.info("Unregistration completed for " + self.localname)
+
+    def GetConfig(self):
+        if self._config == None:
+            with self._lock:
+                if self._config == None:
+                    self._config = QuiltConfig()
+        return self._config
+
+    def GetQueryMasterProxy(self):
+        return GetQueryMasterProxyDEPRECATED(self.GetConfig())
+
 
 def unregister_clients(daemonObjs, delDaemonObjs):
     # remove objects from object list
@@ -307,7 +324,6 @@ def query_master_client_main_helper(
 
     # continue looping while there are daemon objects
     while len(daemonObjs) > 0 :
-        logging.debug("main event loop begin")
 
         if firstTime:
             firstTime = False

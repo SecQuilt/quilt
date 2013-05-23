@@ -84,7 +84,12 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
         logging.info('Submiting query: ' + pprint.pformat(querySpec))
 
         # call remote method asyncronysly, this will return right away
-        Pyro4.async(self._qm).Query( self._remotename, querySpec)
+        with self.GetQueryMasterProxy() as qm:
+            logging.debug(__file__ + "OnRegisterEnd, GetQueryMasterProxy begin")
+            Pyro4.async(qm).Query( self._remotename, querySpec)
+            logging.debug(__file__ + "OnRegisterEnd, GetQueryMasterProxy end")
+
+        logging.info('Query Submitted')
             
         # Validate query will be remote called from query master
         

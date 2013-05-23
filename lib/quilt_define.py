@@ -93,7 +93,8 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             
         # define patternSpec in the query master as a syncronous call
         # return will be the pattern name
-        patName = self._qm.DefinePattern(patternSpec)
+        with self.GetQueryMasterProxy() as qm:
+            patName = qm.DefinePattern(patternSpec)
 
         # print out pattern Name
         print 'Pattern', patName, ' defined'
