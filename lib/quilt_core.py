@@ -183,6 +183,7 @@ class QueryMasterClient:
         self.localname = basename + str(os.getpid())
         self._remotename = None
         self._config = None
+        self._qmuri = None
 
 
     def GetType(self):
@@ -205,10 +206,8 @@ class QueryMasterClient:
         logging.debug("Registering " + self.localname + ", to query master" + 
             ", via registrar: " + str(rhost) + ":" + str(rport))
         with self.GetQueryMasterProxy() as qm:
-            logging.debug(__file__ + "RegisterWithQueryMaster, GetQueryMasterProxy begin")
             self._remotename = qm.RegisterClient(
                 rhost, rport, self.localname, self.GetType())
-            logging.debug(__file__ + "RegisterWithQueryMaster, GetQueryMasterProxy end")
 
         # connection complete, call our notification function
         logging.info("Connection completed for " + self.localname)
@@ -249,21 +248,45 @@ class QueryMasterClient:
     def UnregisterFromQueryMaster(self):
         if self._remotename != None:
             with self.GetQueryMasterProxy() as qm:
-                logging.debug(__file__ + "UnregisterWithQueryMaster, GetQueryMasterProxy begin")
                 qm.UnRegisterClient(self.GetType(), self._remotename)
-                logging.debug(__file__ + "UnregisterWithQueryMaster, GetQueryMasterProxy end")
                 
             logging.info("Unregistration completed for " + self.localname)
 
     def GetConfig(self):
+        """
+        Uses object's lock to safely initialize a config parser and store it
+        as member data
+        """
         if self._config == None:
+            # I may be paranoid, but I am constructing config object outside
+            # of the lock becuse it might take a while
+            c = QuiltConfig()
             with self._lock:
                 if self._config == None:
-                    self._config = QuiltConfig()
+                    self._config = c
         return self._config
 
     def GetQueryMasterProxy(self):
-        return GetQueryMasterProxyDEPRECATED(self.GetConfig())
+        """
+        Return a proxy object to the query master for this client
+        """
+        # see design notes on ISSUE012
+        if self._qmuri == None:
+            config = self.GetConfig()
+            with self._lock:
+                if self._qmuri == None:
+                    qmhost = config.GetValue("query_master", "registrar_host", None)
+                    qmport = config.GetValue("query_master", "registrar_port", None)
+
+                    # access the Query Master's instance name, create a proxy to it
+                    qmname = config.GetValue("query_master", "name", "QueryMaster")
+                    logging.debug("Locating name server for query master: " + str(qmhost) + 
+                        ", " + str(qmport))
+                    ns = Pyro4.locateNS(qmhost, qmport)
+
+                    self._qmuri = ns.lookup(qmname)
+        return Pyro4.Proxy(self._qmuri)
+
 
 
 def unregister_clients(daemonObjs, delDaemonObjs):

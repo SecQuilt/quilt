@@ -1,0 +1,37 @@
+#!/bin/bash
+set -x
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &
+./client.py "$@" &

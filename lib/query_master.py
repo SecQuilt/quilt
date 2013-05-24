@@ -8,6 +8,7 @@ import quilt_parse
 import quilt_core
 import os
 import subprocess
+import sei_core
 
 class QueryMaster:
 
@@ -388,6 +389,7 @@ class QueryMaster:
                     
             # use subprocess module to fork off the process
             # script, pass the query ID
+#           sei_core.run_process("sleep 5 && " + ' '.join(queryCmd) + " &",shell=True)
             subprocess.Popen(queryCmd)
 
         # catch exception! 

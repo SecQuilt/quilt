@@ -59,16 +59,6 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
         it should be encapsulated in an object or in our quilt_data accessor
         pattern.
 
-    ISSUE012 QueryMaster Proxy
-
-        I thought it would be okay to let each client keep an open proxy to
-        the query master for its whole lifetime.  We ran into problems in testing
-        where we ran 4 daemons in one process.  The query master would then stop
-        reponding to messages from another process.  We have worked around the problem
-        for now in quilt_core.GetQueryMasterProxy.  Probaly we need some refactoring
-        so that every time a client accesses _qm we are using a "with" statment so that
-        the resource is open and closed right away.  This might be a concern when 
-        operating at scale.  
 
 Closed:
 
@@ -85,3 +75,24 @@ Closed:
         multiple source patterns in one pattern before we can thing it
         through.
         RESOLVED:   Added optional "instance name" to a variable mapping
+
+
+    ISSUE012 QueryMaster Proxy
+
+        I thought it would be okay to let each client keep an open proxy to
+        the query master for its whole lifetime.  We ran into problems in testing
+        where we ran 4 daemons in one process.  The query master would then stop
+        reponding to messages from another process.  We have worked around the problem
+        for now in quilt_core.GetQueryMasterProxy.  Probaly we need some refactoring
+        so that every time a client accesses _qm we are using a "with" statment so that
+        the resource is open and closed right away.  
+        
+        After this change a lockup was still ocurring.  While the submit proxy
+        acquired a proxy to unregister itself, aquery was acquiring a proxy to
+        register itself.  It was found that the Pyro4.locateNS() function was
+        the guilty party.  To get around this we store the final uri that
+        comes back.  Next time the funciton is called we don't have to call
+        locateNS.
+
+        PARTIALLY RESOLVED:
+            There still may be problems at scale

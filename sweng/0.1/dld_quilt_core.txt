@@ -80,7 +80,7 @@ Classes:
             
 
 
-    class QueryMasterClient : Pyro.core.SynchronizedObjBase
+    class QueryMasterClient 
 
         
         Note: To avoid having to deal with theading and locking, all
@@ -138,6 +138,30 @@ Classes:
 
         string GetRegisteredName()
             # return the name the query manager assigned to this client
+
+        def GetConfig()
+            # if config data is not stored in this client's member data
+                # initialize a config and store it as member data
+
+        def GetQueryMasterProxy()
+            NOTE: In resolution of ISSUE012, it was found that if two
+            processes called "Pyro4.locateNS" at nearly the same time, 
+            that a lockup would occur.  The work around for now is to
+            stash the Query Master's URI, and re use it, rather than
+            recalculate it each time.  This may still cause problems
+            if multiple processes start at the same time.
+
+            # if query master uri is not set
+                # call GetConfig to get configuration
+                # lock self
+                    # if query master uri is still not set
+                        # use configuration to look up the nameserver
+                        #   (registrar) for the query master
+                        # use the query master's name from the config
+                        #   to get the query master uri from the name server
+                        # store the query master uri in member data
+            # return a proxy to the query master using uri
+
 
 
 Functions:
