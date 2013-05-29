@@ -8,6 +8,7 @@ Type: Library
 External Dependencies:
     python-configparser
     python-pyro
+    python-lockfile
 
 Responsibilities:
     utility functions common to all quilt modules
@@ -295,6 +296,9 @@ from main and other initializeation"""
         """
         Display a stirng with information about an exeception
         """
+
+    def get_uri(registrarHost, registrarPort, objName)
+
 Schema:
 
     Main Config File

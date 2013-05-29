@@ -8,7 +8,7 @@ import quilt_parse
 import quilt_core
 import os
 import subprocess
-import sei_core
+import var_dict
 
 class QueryMaster:
 
@@ -219,7 +219,7 @@ class QueryMaster:
             #               map{srcVar:Var}}}}
 
             #   store in local collection.  We later want to iterare the
-            #   source mangers efficiently, so we preprocess a srcPatDict here
+            #   source mangers efficiently, so we preprocess a varDict here
             #   which provides a direct mapping from srcVariables to 
             #   queryVariables, grouped by sources and patterns and pattern 
             #   instances
@@ -228,9 +228,11 @@ class QueryMaster:
             #   parse the pattern text, and get set of variables mentioned
             #   in the pattern code
             if code != None:
-                srcPatDict = quilt_parse.get_pattern_src_refs(code)
+                varDict = quilt_parse.get_pattern_src_refs(code)
+                append = False
             else:
-                srcPatDict = {}
+                varDict = var_dict.create()
+                append = True
 
             patVarSpecs = quilt_data.pat_spec_tryget(
                 patternSpec, variables=True)
@@ -265,30 +267,19 @@ class QueryMaster:
                     ins = quilt_data.src_var_mapping_spec_tryget(
                             m, sourcePatternInstance=True)
 
-                    if src not in srcPatDict:
-                        patDict = {}
-                        srcPatDict[src] = patDict
-                    else:
-                        patDict = srcPatDict[src]
-                    
-                    if pat not in patDict:
-                        insDict = {}
-                        patDict[pat] = insDict
-                    else:
-                        insDict = patDict[pat]
+                    logging.debug("considering: varDict[" + var + "] = " + 
+                            str(varName))
+                    # set append to appropriate value so that the varDict does
+                    # not grow from mappings alone
+                    var_dict.set_var(varDict, src, pat, ins, var, varName,
+                            append=False)
 
-                    if ins not in insDict:
-                        varDict = {}
-                        insDict[ins] = varDict
-                    else:
-                        varDict = insDict[ins]
-
-                    varDict[var] = str(varName)
-                    # logging.debug("Assignig: varDict[" + var + "] = " + str(varName))
+            else:
+                logging.info("No query variables were specified")
+                append = append # prevents pylint warning
 
 
-
-            # logging.info("got srcPatDict:\n " + pprint.pformat(srcPatDict))
+            logging.info("got varDict:\n " + pprint.pformat(varDict))
 
             varSpecs = quilt_data.query_spec_tryget(
                 querySpec, variables=True)
@@ -300,7 +291,7 @@ class QueryMaster:
 
             # iterate the collection of sources, and build collection of 
             # srcQuerySpecs for each source
-            for source, patDict in srcPatDict.items():
+            for source in varDict.keys():
                 
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
@@ -323,7 +314,7 @@ class QueryMaster:
 
                         # create a query spec objects
                         curSrcQuerySpecs = create_src_query_specs(
-                            srcPatSpec, srcPatDict, varSpecs, patVarSpecs, 
+                            srcPatSpec, varDict, varSpecs, patVarSpecs, 
                             qid, source, patternName)
 
                         for srcQuerySpec in curSrcQuerySpecs.values():
@@ -341,7 +332,7 @@ class QueryMaster:
             # to create a validation string                    
             msg = {}
             msg['Query to run'] = querySpec
-            msg['Sources to be queried'] = srcPatDict.keys()
+            msg['Sources to be queried'] = varDict.keys()
 
             validStr = pprint.pformat(msg)
             
@@ -565,6 +556,7 @@ class QueryMaster:
         """
 
         try:
+            logging.info("Beginning query: " + str(queryId))
         
             # lock self
             with self.lock:
@@ -650,22 +642,22 @@ def get_client_proxy_from_type_and_name( qm, clientType, clientName):
     return get_client_proxy(rec)
     
 def create_src_query_specs(
-    srcPatSpec, srcPatDict, varSpecs, patVarSpecs, qid, source, patternName):
+    srcPatSpec, varDict, varSpecs, patVarSpecs, qid, source, patternName):
     """
     get new sourceQuery specs from the sourcePatternSpec and the
-    srcPatDict
+    varDict
     """
 
     srcQuerySpecs = None
 
-    patInstanceDict = srcPatDict[source][patternName]
+    patInstanceDict = varDict[source][patternName]
 
     
     for patInstanceName in patInstanceDict.keys():
 
         curSrcQuerySpec = create_src_query_spec(
                 srcPatSpec, patInstanceName, varSpecs, patVarSpecs, qid, source,
-                patternName, srcPatDict)
+                patternName, varDict)
 
         srcQuerySpecs = quilt_data.src_query_specs_add( srcQuerySpecs,
                 curSrcQuerySpec)
@@ -679,7 +671,7 @@ def create_src_query_specs(
 
 def create_src_query_spec(
     srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source, patternName,
-    srcPatDict):
+    varDict):
     """Helper function for filling out a srcQuerySpec with variable values"""
 
     srcPatVars = quilt_data.src_pat_spec_get(
@@ -687,11 +679,11 @@ def create_src_query_spec(
     if srcPatVars == None:
         return
 
-    srcVarToVarDict = srcPatDict[source][patternName][srcPatInstance]
+    srcVarToVarDict = varDict[source][patternName][srcPatInstance]
 
-    # logging.debug("srcVarToVarDict: " + str(srcVarToVarDict))
+    logging.debug("srcVarToVarDict: " + str(srcVarToVarDict))
+    logging.debug("varDict is " + str(varDict))
 
-    # logging.info("srcPatDict is " + str(srcPatDict))
     srcQueryVarSpecs = None
     # iterate the variables in the "new" 
     #   sourceQuerySpec

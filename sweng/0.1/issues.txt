@@ -53,12 +53,16 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     ISSUE009
     Need a way to process semantics
 
-    ISSUE011 sourcePatternDictionary should be incorporated in quilt_data
 
-        Whenever we have a datastructure that is used across module bounds
-        it should be encapsulated in an object or in our quilt_data accessor
-        pattern.
+    ISSUE013 run_process wonked up
 
+        When testing semantics_testcase, it would lock up.  added mutex for
+        now to work around the issue, for  a while then stopped working again.
+
+        I pasted in some code that iterates stdouput of a subprocess and it
+        seems to be wroking for now.  However the run_process command is still
+        broken, and I am not sure if the new code in smd is really streaming,
+        it could be buffering the whole output before it iterates it
 
 Closed:
 
@@ -96,3 +100,13 @@ Closed:
 
         PARTIALLY RESOLVED:
             There still may be problems at scale
+
+
+    ISSUE011 sourcePatternDictionary should be incorporated in quilt_data
+
+        Whenever we have a datastructure that is used across module bounds
+        it should be encapsulated in an object or in our quilt_data accessor
+        pattern.
+
+        RESOLVED:
+            Added new var_dict paackage

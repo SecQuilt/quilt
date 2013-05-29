@@ -3,6 +3,7 @@ import logging
 import threading
 import quilt_data
 import itertools
+import pprint
 
 
 class _field:
@@ -51,7 +52,7 @@ class _pattern:
         if events != None:
             _set_events(eventsId,events)
 
-        if _has_events(eventsId):
+        if not _has_events(eventsId):
             raise Exception("No event list available for: " + str(eventsId))
 
     def __getitem__(self, fieldName):
@@ -83,23 +84,30 @@ def source(srcName,srcPatName,srcPatInstance=None):
     # use the global query spec
     srcQuerySpecs = quilt_data.query_spec_get(_get_query_spec(), 
             sourceQuerySpecs=True)
+    # logging.debug("srcQuerySpecs:\n" + pprint.pformat(srcQuerySpecs))
+
+    # logging.debug("Looking for Source: " + str(srcName) + ", pattern: " + str(srcPatName) 
+    #         + ". instance: " + str(srcPatInstance) )
+
+
     # iterate the srcQueries
-    for srcQueryId, srcQuerySpec in srcQuerySpecs:
+    for srcQueryId, srcQuerySpec in srcQuerySpecs.items():
         # if matching (srcName, patName, and patInstanceName)
         # if None was supplied as one of the parameter, then there
         #   must only be one instance to choose, keyed by 'None'
-        if (
-                srcName == quilt_data.src_query_spec_get(
-                    srcQuerySpec, name=True) 
-                    and
-
-                srcPatName == quilt_data.src_query_spec_get(
-                    srcQuerySpec, srcPatternName=True) 
-                    and
-
-                srcPatInstance == quilt_data.src_query_spec_tryget(
+        curSrc = quilt_data.src_query_spec_get(srcQuerySpec, 
+                source=True) 
+        curSrcPat = quilt_data.src_query_spec_get( srcQuerySpec, 
+                srcPatternName=True) 
+        curSrcPatInst = quilt_data.src_query_spec_tryget(
                     srcQuerySpec, srcPatternInstance=True) 
-            ):
+
+        # logging.debug("checking " + curSrc + ", " + curSrcPat + 
+        #         ", " + str( curSrcPatInst))
+
+        if (srcName == curSrc and 
+            srcPatName == curSrcPat and 
+            srcPatInstance == curSrcPatInst):
 
             # get the global srcResults for that srcQueryID
             srcResults = _get_events(srcQueryId)
@@ -168,6 +176,7 @@ def _set_events(eventsId,events):
     globals()['_eventPool'][eventsId] = events
 
 def _has_events(eventsId):
+    # logging.debug("Looking for " + str(eventsId) + " in " + str(globals()['_eventPool'].keys()))
     return eventsId in globals()['_eventPool']
 
 def _get_query_spec():
@@ -184,28 +193,34 @@ def evaluate_query(patternSpec, querySpec, srcResults):
     NOTE: The srcResults collection may be modified after calling
     """
     # try to evaluate the query
-    try:
-        # lock a global lock
-        _interpret_lock.lock()
-        # set querySpec and srcResults (as eventDict) into global scope
-        globals()['_querySpec'] = querySpec
-        # we will be adding things to the event pool, this will modify
-        # a colleciton that is named only to have source results, so we
-        # preform a rename here.  The calling context will not use it
-        # anyway. See NOTE in docstring
-        # TODO, figure out if a .copy() would do a deep copy, or think
-        #   manual shallow copy
-        globals()['_eventPool'] = srcResults
+    with _interpret_lock:
+        try:
+            # set querySpec and srcResults (as eventDict) into global scope
+            globals()['_querySpec'] = querySpec
+            # we will be adding things to the event pool, this will modify
+            # a colleciton that is named only to have source results, so we
+            # preform a rename here.  The calling context will not use it
+            # anyway. See NOTE in docstring
+            # TODO, figure out if a .copy() would do a deep copy, or think
+            #   manual shallow 
+            globals()['_eventPool'] = srcResults
 
-        # evaluate the pattern code
-        code = quilt_data.pat_spec_get(patternSpec, code=True)
+            # evaluate the pattern code
+            code = quilt_data.pat_spec_get(patternSpec, code=True)
 
-        # return results
-        return eval(code)
+            retpattern = eval(code)
+            retobj = _get_events(retpattern.eventsId)
 
-    finally:
-        # remove querySpec and eventDict from globals scope
-        del globals()['_eventPool']
-        del globals()['_querySpec']
-        # unlock a global lock
-        _interpret_lock.unlock()
+            # logging.debug ("Rsults of interpret are:\n" + 
+            # str(type(retobj)) + "\n" + str(dir(retobj)) +"\n" + 
+            # pprint.pformat(retobj))
+
+            # return results
+            return retobj
+
+        finally:
+            # remove querySpec and eventDict from globals scope
+            if '_eventPool' in globals():
+                del globals()['_eventPool']
+            if '_querySpec' in globals():
+                del globals()['_querySpec']

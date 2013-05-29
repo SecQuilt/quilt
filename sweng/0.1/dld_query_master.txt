@@ -94,8 +94,10 @@ Classes:
             #           map{sourcePatternInstance:
             #               map{srcVar:Var}}}}
 
-            # ensure that all variables mentioned in the pattern code have
-            #   corresponding variables in the query
+            # ensure that all variables mentioned in the pattern code (or if
+            # no pattern code then variables mentioned in the query) have
+            #   corresponding variables in the query.  Populate the varDict
+            #   collection with this information
         
             # iterate the collection of grouped sources
                 # use variable mapping's source name to get proxy to 
@@ -283,7 +285,7 @@ Functions:
         # get new sourceQuery specs from the sourcePatternSpec
         
         # iterate the number of source queries in the list
-        #   srcPatDict[source][patternName]
+        #   varDict[source][patternName]
         # call create_src_query_spec with  the current pattern
         
     def create_src_query_spec

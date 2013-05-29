@@ -137,7 +137,7 @@ class BasicSourceTestcase(unittest.TestCase):
     def test_valid_query_all_results(self):
         # issue a valid query
         # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_1_time
-        qid = self.query(".*")
+        qid = self.query(".")
 
         # check that the query is in the history showing good state
         self.check(qid)

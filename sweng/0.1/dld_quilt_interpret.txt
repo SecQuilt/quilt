@@ -131,16 +131,17 @@ Functions:
             Do not call evaluate_query when this is on the callstack
         """
 
-        # try to evaluate the query
-            # lock a global lock
-            # set querySpec and srcResults (as eventDict) into global scope
+        # with a global lock
+            # try to evaluate the query
+                # set querySpec and srcResults (as eventDict) into global scope
 
-            # evaluate the pattern code
+                # evaluate the pattern code, returns a _pattern
 
-            # return results
-        # finally
-            # remove querySpec and eventDict from globals scope
-            # unlock a global lock
+                # get the returning events from the returned patten 
+
+                # return result events
+            # finally
+                # remove querySpec and eventDict from globals scope
 
 
 Notepad:

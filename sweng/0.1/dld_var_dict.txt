@@ -1,0 +1,46 @@
+quilt 0.1 quilt_variable dictionary design
+------------------------------------------
+
+Module: var_dict
+
+Type: Library
+
+External Dependencies:
+
+Responsibilities:
+    One data structure that is needed is known in short as a Variable
+    Dictionary.  Actually is is a nested dictionary which maps source
+    variables to variables.  These variable mappings are grouped in the
+    context of a query, by the instance of the source query, the source
+    pattern, and the srouce.
+
+Schema:
+    
+    map{source:
+       map{sourcePattern:
+           map{sourcePatternInstance:
+               map{srcVar:Var}}}}
+
+
+Functions:
+
+     
+def create()
+    # return an empty dictionary
+
+def src(varDict, source,append):
+    # add a source to the varDict
+
+def src_pat(varDict, source, sourcePattern,append ):
+    # add a source pattern to the varDict
+
+def src_pat_inst(varDict, source, sourcePattern, sourcePatternInstance,append):
+    # add a source pattern instance to the varDict
+    
+def set_var(varDict, source, sourcePattern, sourcePatternInstance,
+        sourceVariable, variable,append):
+    # add a complete variable mapping to the varDict
+    # if append is false, do not grow the collection dynamically 
+    # to add the new variable
+
+

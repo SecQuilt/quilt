@@ -171,6 +171,27 @@ class QuiltDaemon(object):
             raise
                 
 
+def GetQueryMasterProxy(config = None):
+    if config == None:
+        config = QuiltConfig()
+
+    qmhost = config.GetValue(
+            "query_master", "registrar_host", None)
+    qmport = config.GetValue(
+            "query_master", "registrar_port", None)
+
+    # access the Query Master's instance name, 
+    #   create a proxy to it
+    qmname = config.GetValue(
+            "query_master", "name", "QueryMaster")
+    logging.debug("Locating name server for query master: " + 
+            str(qmhost) + ", " + str(qmport))
+    ns = Pyro4.locateNS(qmhost, qmport)
+
+    qmuri = ns.lookup(qmname)
+    return Pyro4.Proxy(qmuri)
+
+
 class QueryMasterClient:
     
     _lock = threading.Lock()
@@ -184,6 +205,7 @@ class QueryMasterClient:
         self._remotename = None
         self._config = None
         self._qmuri = None
+        self.uri = None
 
 
     def GetType(self):
@@ -257,6 +279,9 @@ class QueryMasterClient:
         Uses object's lock to safely initialize a config parser and store it
         as member data
         """
+        # see design notes on ISSUE012
+        # note this pattern of access is not completely safe, if reference 
+        #   assignment
         if self._config == None:
             # I may be paranoid, but I am constructing config object outside
             # of the lock becuse it might take a while
@@ -271,17 +296,23 @@ class QueryMasterClient:
         Return a proxy object to the query master for this client
         """
         # see design notes on ISSUE012
+        # note this pattern of access is not completely safe, if string 
+        #   assignment is not atomic
         if self._qmuri == None:
             config = self.GetConfig()
             with self._lock:
                 if self._qmuri == None:
-                    qmhost = config.GetValue("query_master", "registrar_host", None)
-                    qmport = config.GetValue("query_master", "registrar_port", None)
+                    qmhost = config.GetValue(
+                            "query_master", "registrar_host", None)
+                    qmport = config.GetValue(
+                            "query_master", "registrar_port", None)
 
-                    # access the Query Master's instance name, create a proxy to it
-                    qmname = config.GetValue("query_master", "name", "QueryMaster")
-                    logging.debug("Locating name server for query master: " + str(qmhost) + 
-                        ", " + str(qmport))
+                    # access the Query Master's instance name, 
+                    #   create a proxy to it
+                    qmname = config.GetValue(
+                            "query_master", "name", "QueryMaster")
+                    logging.debug("Locating name server for query master: " + 
+                            str(qmhost) + ", " + str(qmport))
                     ns = Pyro4.locateNS(qmhost, qmport)
 
                     self._qmuri = ns.lookup(qmname)
@@ -321,15 +352,12 @@ def query_master_client_main_helper(
     # iterate the names and objects in clientObjectDict
     for name,obj in clientObjectDict.items():
         # register the clientObject with the local PyRo Daemon with
-        uri=daemon.register(obj)
+        obj.uri=daemon.register(obj)
         # use the key name as the object name
-        ns.register(name,uri)
+        ns.register(name,obj.uri)
         # call the ConnectToQueryMaster to complete registration
         obj.RegisterWithQueryMaster()
  
-    
-    logging.debug("Calling OnRegisterEnd()")
-
     daemonObjs = {}
     # iterate the names and objects in clientObjectDic
     for name,obj in clientObjectDict.items():

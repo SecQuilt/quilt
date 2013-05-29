@@ -19,6 +19,7 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._sourceResults = {}
         self._lastQuery = None
 
+
     def Query(self, queryId, sourceQuerySpec,
             queryClientName,
             queryClientNamseServerHost,
@@ -80,8 +81,10 @@ class SourceManager(quilt_core.QueryMasterClient):
                     sourceQuerySpec,name=True)
             context = { 'queryId' : queryId, 'srcQueryId' : srcQueryId  } 
 
-            # use run_process to execute cmd, give callback per line
-            #   processing function
+#           sei_core.run_process_lite(cmdline, shell=True,
+#               outFunc=self.OnGrepLine, outObj=context)
+
+#           I thought run_process apparently has problems
             sei_core.run_process(cmdline, shell=True,
                 whichReturn=sei_core.EXITCODE, 
                 outFunc=self.OnGrepLine, outObj=context, logToPython=False)
