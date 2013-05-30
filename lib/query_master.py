@@ -272,7 +272,7 @@ class QueryMaster:
                     # set append to appropriate value so that the varDict does
                     # not grow from mappings alone
                     var_dict.set_var(varDict, src, pat, ins, var, varName,
-                            append=False)
+                            append=append)
 
             else:
                 logging.info("No query variables were specified")
@@ -630,8 +630,7 @@ def get_client_proxy( clientRec):
     nshost = clientRec["registrarHost"]
     nsport = clientRec["registrarPort"]
     
-    ns = Pyro4.locateNS(nshost, nsport)
-    uri = ns.lookup(pyroname)
+    uri = quilt_core.get_uri(nshost, nsport, pyroname)
 
     return Pyro4.Proxy(uri)
 

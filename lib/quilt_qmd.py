@@ -29,15 +29,15 @@ class Qmd(quilt_core.QuiltDaemon):
         qm = query_master.QueryMaster(self.args)
  
         with Pyro4.Daemon() as daemon:
-            ns=Pyro4.locateNS(registrarHost, registrarPort)   
             # register the query master with the local PyRo Daemon with
             uri=daemon.register(qm)
-
+            
             logging.debug("Registering: " + qmname + ", at: " + str(uri))
-            # use the key name as the object name
-            ns.register(qmname,uri)
-            logging.debug("Done Registering: " + qmname + ", at: " + str(uri))
-                
+
+            with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+                # use the key name as the object name
+                ns.register(qmname,uri)
+
             # start the Daemon's event loop
             daemon.requestLoop() 
 

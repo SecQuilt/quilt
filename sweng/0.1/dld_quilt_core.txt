@@ -297,7 +297,23 @@ from main and other initializeation"""
         Display a stirng with information about an exeception
         """
 
+    
     def get_uri(registrarHost, registrarPort, objName)
+        """
+        Get a string that specifies the absolute location of an object
+        """
+        NOTE: See ISSUE012
+
+        # use a global mutex lock
+        # acquire the lock
+
+        # use a lockfile
+        # acquire the file lock
+        
+            # locate the nameserver at given host and port
+            # lookupt the URI for the given object name
+            # return the uri
+
 
 Schema:
 

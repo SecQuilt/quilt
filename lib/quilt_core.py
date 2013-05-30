@@ -7,12 +7,12 @@ import Pyro4
 from os import listdir
 from os.path import isfile, join
 import threading
-import lockfile
 from daemon import runner
 import argparse
 import select
 import time
 import quilt_data
+import lockfile
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -129,8 +129,8 @@ def GetQueryMasterProxyDEPRECATED(config=None):
     qmname = config.GetValue("query_master", "name", "QueryMaster")
     logging.debug("Locating name server for query master: " + str(qmhost) + 
         ", " + str(qmport))
-    ns = Pyro4.locateNS(qmhost, qmport)
-    uri = ns.lookup(qmname)
+    with Pyro4.locateNS(qmhost, qmport) as ns:
+        uri = ns.lookup(qmname)
 
     return Pyro4.Proxy(uri)
 
@@ -186,9 +186,9 @@ def GetQueryMasterProxy(config = None):
             "query_master", "name", "QueryMaster")
     logging.debug("Locating name server for query master: " + 
             str(qmhost) + ", " + str(qmport))
-    ns = Pyro4.locateNS(qmhost, qmport)
 
-    qmuri = ns.lookup(qmname)
+    qmuri = get_uri(qmhost, qmport, qmname)
+
     return Pyro4.Proxy(qmuri)
 
 
@@ -313,9 +313,8 @@ class QueryMasterClient:
                             "query_master", "name", "QueryMaster")
                     logging.debug("Locating name server for query master: " + 
                             str(qmhost) + ", " + str(qmport))
-                    ns = Pyro4.locateNS(qmhost, qmport)
+                    self._qmuri = get_uri(qmhost, qmport, qmname)
 
-                    self._qmuri = ns.lookup(qmname)
         return Pyro4.Proxy(self._qmuri)
 
 
@@ -344,19 +343,17 @@ def query_master_client_main_helper(
     registrarPort = cfg.GetValue(
         'registrar', 'port', None) 
     
-    daemon=Pyro4.Daemon()
-    ns=Pyro4.locateNS(registrarHost, registrarPort)   
-
     #TODO Hardening, make sure when exceptions are thrown that clients are removed
-
-    # iterate the names and objects in clientObjectDict
-    for name,obj in clientObjectDict.items():
-        # register the clientObject with the local PyRo Daemon with
-        obj.uri=daemon.register(obj)
-        # use the key name as the object name
-        ns.register(name,obj.uri)
-        # call the ConnectToQueryMaster to complete registration
-        obj.RegisterWithQueryMaster()
+    daemon=Pyro4.Daemon()
+    with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+        # iterate the names and objects in clientObjectDict
+        for name,obj in clientObjectDict.items():
+            # register the clientObject with the local PyRo Daemon with
+            obj.uri=daemon.register(obj)
+            # use the key name as the object name
+            ns.register(name,obj.uri)
+            # call the ConnectToQueryMaster to complete registration
+            obj.RegisterWithQueryMaster()
  
     daemonObjs = {}
     # iterate the names and objects in clientObjectDic
@@ -476,7 +473,6 @@ def main_helper( name, description, argv ):
 
     return argparser
         
-#REVIEW
 def exception_to_string(error):
     """
     Display a stirng with information about an exeception
@@ -485,3 +481,40 @@ def exception_to_string(error):
     """
     return (str(type(error)) + " : " + str(error))
     
+
+_get_uri_lock = threading.Lock()
+
+def get_uri_safe(registrarHost, registrarPort, objName):
+    """
+    Get a string that specifies the absolute location of an object
+    """
+    # NOTE: See ISSUE012
+    # use a global mutex lock
+    global _get_uri_lock
+    # acquire the lock
+    with _get_uri_lock:
+
+        # use a lockfile
+        uri_filelock = lockfile.LockFile('/tmp/quiltnameserver.lock')
+        # acquire the file lock
+        with uri_filelock:
+            # locate the nameserver at given host and port
+            with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+                # lookupt the URI for the given object name
+                uri = ns.lookup(objName)
+                # return the uri
+                return uri
+
+def get_uri(registrarHost, registrarPort, objName):
+    """
+    Get a string that specifies the absolute location of an object
+    """
+    # locate the nameserver at given host and port
+    with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+        # lookupt the URI for the given object name
+        uri = ns.lookup(objName)
+        # return the uri
+        return uri
+
+
+

@@ -96,10 +96,9 @@ class SourceManager(quilt_core.QueryMasterClient):
                     if srcQueryId in self._sourceResults[queryId]:
                         results = list(self._sourceResults[queryId][srcQueryId])
 
-            ns = Pyro4.locateNS(
-                    queryClientNamseServerHost, 
-                    queryClientNamseServerPort,)
-            uri = ns.lookup(queryClientName)
+            uri = quilt_core.get_uri(queryClientNamseServerHost,
+                    queryClientNamseServerPort,queryClientName)
+
             with Pyro4.Proxy(uri) as query:
                 query.AppendSourceQueryResults(srcQueryId, results)
                 query.CompleteSrcQuery(srcQueryId)
@@ -109,10 +108,8 @@ class SourceManager(quilt_core.QueryMasterClient):
             try:
 
                 # attempt to report error to the query client
-                ns = Pyro4.locateNS(
-                        queryClientNamseServerHost, 
-                        queryClientNamseServerPort,)
-                uri = ns.lookup(queryClientName)
+                uri = quilt_core.get_uri(queryClientNamseServerHost,
+                        queryClientNamseServerPort,queryClientName)
                 srcQueryId = quilt_data.src_query_spec_get(
                         sourceQuerySpec,name=True)
 

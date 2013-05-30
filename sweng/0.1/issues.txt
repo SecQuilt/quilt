@@ -54,33 +54,6 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Need a way to process semantics
 
 
-    ISSUE013 run_process wonked up
-
-        When testing semantics_testcase, it would lock up.  added mutex for
-        now to work around the issue, for  a while then stopped working again.
-
-        I pasted in some code that iterates stdouput of a subprocess and it
-        seems to be wroking for now.  However the run_process command is still
-        broken, and I am not sure if the new code in smd is really streaming,
-        it could be buffering the whole output before it iterates it
-
-Closed:
-
-    ISSUE002 souce manager won't start!
-
-    ISSUE005
-    Sources are a total hack, most notably not supporting concurent searches
-        at this time
-
-    ISSUE001
-    There are some assumptions in the interface, and query instantiation logic
-        currently that prevent one source from beign used twice in a query.  
-        we can not fix it at this time, we need the power first to specify
-        multiple source patterns in one pattern before we can thing it
-        through.
-        RESOLVED:   Added optional "instance name" to a variable mapping
-
-
     ISSUE012 QueryMaster Proxy
 
         I thought it would be okay to let each client keep an open proxy to
@@ -98,8 +71,30 @@ Closed:
         comes back.  Next time the funciton is called we don't have to call
         locateNS.
 
+        I think I now narrowed it down to the call to locateNS.  This seems to
+        fail when called by two thigns at once or in rapid succession.  For
+        now I have refactored to call a utility function that wraps locateNS
+        and implement a thread and process level lock around its use
+
         PARTIALLY RESOLVED:
             There still may be problems at scale
+Closed:
+
+    ISSUE002 souce manager won't start!
+
+    ISSUE005
+    Sources are a total hack, most notably not supporting concurent searches
+        at this time
+
+    ISSUE001
+    There are some assumptions in the interface, and query instantiation logic
+        currently that prevent one source from beign used twice in a query.  
+        we can not fix it at this time, we need the power first to specify
+        multiple source patterns in one pattern before we can thing it
+        through.
+        RESOLVED:   Added optional "instance name" to a variable mapping
+
+
 
 
     ISSUE011 sourcePatternDictionary should be incorporated in quilt_data
@@ -110,3 +105,20 @@ Closed:
 
         RESOLVED:
             Added new var_dict paackage
+
+
+
+    ISSUE013 run_process wonked up
+
+        When testing semantics_testcase, it would lock up.  added mutex for
+        now to work around the issue, for  a while then stopped working again.
+
+        I pasted in some code that iterates stdouput of a subprocess and it
+        seems to be wroking for now.  However the run_process command is still
+        broken, and I am not sure if the new code in smd is really streaming,
+        it could be buffering the whole output before it iterates it
+
+        RESOLVED:
+            Not an issue, was actually caused by ISSUE012.  But an alternative
+            was developed called run_process_lite, which is not being used
+            currently
