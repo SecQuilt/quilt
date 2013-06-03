@@ -54,30 +54,6 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Need a way to process semantics
 
 
-    ISSUE012 QueryMaster Proxy
-
-        I thought it would be okay to let each client keep an open proxy to
-        the query master for its whole lifetime.  We ran into problems in testing
-        where we ran 4 daemons in one process.  The query master would then stop
-        reponding to messages from another process.  We have worked around the problem
-        for now in quilt_core.GetQueryMasterProxy.  Probaly we need some refactoring
-        so that every time a client accesses _qm we are using a "with" statment so that
-        the resource is open and closed right away.  
-        
-        After this change a lockup was still ocurring.  While the submit proxy
-        acquired a proxy to unregister itself, aquery was acquiring a proxy to
-        register itself.  It was found that the Pyro4.locateNS() function was
-        the guilty party.  To get around this we store the final uri that
-        comes back.  Next time the funciton is called we don't have to call
-        locateNS.
-
-        I think I now narrowed it down to the call to locateNS.  This seems to
-        fail when called by two thigns at once or in rapid succession.  For
-        now I have refactored to call a utility function that wraps locateNS
-        and implement a thread and process level lock around its use
-
-        PARTIALLY RESOLVED:
-            There still may be problems at scale
 Closed:
 
     ISSUE002 souce manager won't start!
@@ -122,3 +98,31 @@ Closed:
             Not an issue, was actually caused by ISSUE012.  But an alternative
             was developed called run_process_lite, which is not being used
             currently
+
+
+    ISSUE012 QueryMaster Proxy
+
+        I thought it would be okay to let each client keep an open proxy to
+        the query master for its whole lifetime.  We ran into problems in testing
+        where we ran 4 daemons in one process.  The query master would then stop
+        reponding to messages from another process.  We have worked around the problem
+        for now in quilt_core.GetQueryMasterProxy.  Probaly we need some refactoring
+        so that every time a client accesses _qm we are using a "with" statment so that
+        the resource is open and closed right away.  
+        
+        After this change a lockup was still ocurring.  While the submit proxy
+        acquired a proxy to unregister itself, aquery was acquiring a proxy to
+        register itself.  It was found that the Pyro4.locateNS() function was
+        the guilty party.  To get around this we store the final uri that
+        comes back.  Next time the funciton is called we don't have to call
+        locateNS.
+
+        I think I now narrowed it down to the call to locateNS.  This seems to
+        fail when called by two thigns at once or in rapid succession.  For
+        now I have refactored to call a utility function that wraps locateNS
+        and implement a thread and process level lock around its use
+
+        RESOLVED:
+            I think I finally fixed it, use a "with Pyro4.locateNS() as ns"
+            statment to ensure that the nameserver (which is actually a pyro
+            proxy object) reference is freed

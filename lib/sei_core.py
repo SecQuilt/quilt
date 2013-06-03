@@ -118,7 +118,11 @@ def log_process(
 def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True, 
     logToPython=True, outFunc=None, outObj=None):
     """run the specified process and wait for completion, throw exception if nonzero exit occurs, log output of process to the logging module, return stdout as string"""
-    logging.debug('run_process {begin}' + str(cmd) + '{end}')
+    if type(cmd) != str:
+        logging.debug("Executing: " + str(cmd)[1:-1].replace(',',''))
+    else:
+        logging.debug("Executing: " + cmd)
+
     p = subprocess.Popen( cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
     o = log_process(p,whichReturn=whichReturn,
         logToPython=logToPython,outFunc=outFunc,outObj=outObj)

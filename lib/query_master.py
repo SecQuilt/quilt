@@ -691,34 +691,37 @@ def create_src_query_spec(
         # find that source variable in the pattern's 
         #   mappings
         # get the name of the query variable that maps to it
-        varName = srcVarToVarDict[srcVarName]
-
-        # get the value of the query variable from the
-        #   querySpec, if it was given in the query spec
         varValue = None
-        varSpec = quilt_data.var_specs_tryget(varSpecs, varName)
-        if varSpec != None:
-            varValue = quilt_data.var_spec_tryget(varSpec, value=True)
+        if srcVarName in srcVarToVarDict:
+            varName = srcVarToVarDict[srcVarName]
+    
+            # get the value of the query variable from the
+            #   querySpec, if it was given in the query spec
+            varSpec = quilt_data.var_specs_tryget(varSpecs, varName)
+            if varSpec != None:
+                varValue = quilt_data.var_spec_tryget(varSpec, value=True)
+
+            if (varValue == None and patVarSpecs != None 
+                and varName in patVarSpecs):
+                # user did not supply value for the variable in the
+                # query, but there is a default set in pattern definition
+                patVarSpec = quilt_data.var_specs_tryget(
+                    patVarSpecs, varName)
+                # use the default in the pattern
+                varValue = quilt_data.var_spec_tryget(
+                    patVarSpec,default=True)
 
         if varValue == None:
-            # user did not supply value for the variable in the
-            # query, use the default in the pattern
-            patVarSpec = quilt_data.var_specs_tryget(
-                patVarSpecs, varName)
+            # pattern definer did not supply a default, check
+            # to see if there is a default in the source pattern
             varValue = quilt_data.var_spec_tryget(
-                patVarSpec,default=True)
+                srcPatVarSpec, default=True)
 
             if varValue == None:
-                # pattern definer did not supply a default, check
-                # to see if there is a default in the source pattern
-                varValue = quilt_data.var_spec_tryget(
-                    srcPatVarSpec, default=True)
-
-                if varValue == None:
-                    # could not determine a value for this variable
-                    # must throw error
-                    raise Exception("""No value set or default found
-                        for the query variable: """ + varName)
+                # could not determine a value for this variable
+                # must throw error
+                raise Exception("""No value set or default found
+                    for the variable: """ + varName)
         
         # create a source query variable value with the determined value
         srcQueryVarSpec = quilt_data.var_spec_create(

@@ -32,7 +32,7 @@ Classes:
             # define query patterns
 
             # call quilt_define source('secular_holidays_smd1234','grep')
-            #   -n secular_holidays
+            #   -n semantics_one_source
             #   -v WHICH_HOLIDAY
             #   -m WHICH_HOLIDAY secular_holidays_smd1234 grep GREP_ARGS
             #   -v UNUSED
@@ -40,14 +40,13 @@ Classes:
 
             # call quilt_define 
             #   'at(source('christian_holidays_smd1234','grep') == '12'
-            #   -n christian_holidays
-            #   -m secular_holidays grep GREP_ARGS
+            #   -n semantics_equals_literal
 
             # call quilt_define 
             #   'concurrent(
             #       source('christian_holidays_smd1234','grep'), 
             #       source('secular_holidays_smd1234','grep'))'
-            #   -n concurrent_holidays
+            #   -n semantics_concurrent
                 
 
             # call quilt_define 
@@ -55,7 +54,7 @@ Classes:
             #        source('christian_holidays_smd1234','grep'),
             #        source('secular_holidays_smd1234','grep')
             #         ['major'] == 'True'))'
-            #   -n major_secular_concurrent
+            #   -n semantics_nested
                 
         def test_one_source():
             """
@@ -70,7 +69,7 @@ Classes:
             this source query because it is not mentioned in the pattern code
             """
             # issue valid query for secular_holidays
-            # call quilt_submit secular_holidays -y 
+            # call quilt_submit semantics_one_source -y 
             #   -v WHICH_HOLIDAY newyears
 
             # sleep small ammount
@@ -97,13 +96,11 @@ Classes:
         def test_equals_literal():
             """
             This test assures a case where a results list is matched against
-            a literal string.  a red herring variable is mapped to
-            secular_holidays in the pattern, and we check that this source
-            does not run, as it is not referenced in the pattern code
+            a literal string. 
             """
             
             # issue valid query for christian_holidays
-            # call quilt_submit christian_holidays -y 
+            # call quilt_submit semantics_equals_literal -y 
 
             # sleep small ammount
 
@@ -122,7 +119,7 @@ Classes:
             """
             
             # issue valid query for concurrent_holidays
-            # call quilt_submit concurrent_holidays -y 
+            # call quilt_submit semantics_concurrent -y 
 
             # sleep small ammount
 
@@ -141,7 +138,7 @@ Classes:
             """
             
             # issue valid query for concurrent_holidays
-            # call quilt_submit major_secular_concurrent -y 
+            # call quilt_submit semantics_nested -y 
 
             # sleep small ammount
 

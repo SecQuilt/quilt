@@ -3,8 +3,6 @@ import logging
 import threading
 import quilt_data
 import itertools
-import pprint
-
 
 class _field:
     def __init__(self, eventsId, fieldName):
@@ -34,14 +32,27 @@ class _field:
         
     def __eq__(self, value):
         # construct a new eventID based on the calling context
-        # if if this eventID exist in global event dict
+        # NOTE, we assume RHS is a literal currently
+        returnEventsId = (self.eventsId + "." + self.fieldName + 
+                "==" + str(value))
+
+        # if if eventID exist in global event dict
+        if _has_events(returnEventsId):
             # return those events
+            return _pattern(returnEventsId)
+
         # get the event list from the global event dict with this id
+        events = _get_events(self.eventsId)
+
+
         # create new event list with events that have this
         #   field matching the value
+        returnEvents = [e for e in events if e[self.fieldName] == value]
+
         # set new event list into global events dict
         # return a new _pattern for the new event list
-        raise Exception("This function is not implemented but will be")
+        return _pattern(returnEventsId, returnEvents)
+
 
 class _pattern:
     def __init__(self, eventsId, events = None):
@@ -133,7 +144,6 @@ def _check_equal(iterator):
 def concurrent(*patterns):
     """return all patterns that occur at the same time"""
 
-    
     # generate name based on execution context
     returnEventsId = "concurrent("
     for curPattern in patterns:
@@ -159,7 +169,7 @@ def concurrent(*patterns):
     for curPattern in patterns:
         curEvents = _get_events(curPattern.eventsId)
         for curEvent in curEvents:
-            if curEvent['timestamp'] in joined:
+            if at(curEvent) in joined:
                 returnEvents.append(curEvent)
 
     # record new event list in event dict with this name
@@ -209,6 +219,7 @@ def evaluate_query(patternSpec, querySpec, srcResults):
             code = quilt_data.pat_spec_get(patternSpec, code=True)
 
             retpattern = eval(code)
+
             retobj = _get_events(retpattern.eventsId)
 
             # logging.debug ("Rsults of interpret are:\n" + 

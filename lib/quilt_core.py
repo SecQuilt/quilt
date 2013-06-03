@@ -13,6 +13,7 @@ import select
 import time
 import quilt_data
 import lockfile
+import pprint
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -280,8 +281,8 @@ class QueryMasterClient:
         as member data
         """
         # see design notes on ISSUE012
-        # note this pattern of access is not completely safe, if reference 
-        #   assignment
+        # NOTE: this pattern of access is not completely safe, if reference 
+        #   assignment is not atomic
         if self._config == None:
             # I may be paranoid, but I am constructing config object outside
             # of the lock becuse it might take a while
@@ -296,7 +297,7 @@ class QueryMasterClient:
         Return a proxy object to the query master for this client
         """
         # see design notes on ISSUE012
-        # note this pattern of access is not completely safe, if string 
+        # NOTE: this pattern of access is not completely safe, if string 
         #   assignment is not atomic
         if self._qmuri == None:
             config = self.GetConfig()
@@ -481,29 +482,30 @@ def exception_to_string(error):
     """
     return (str(type(error)) + " : " + str(error))
     
+#   DHK: Commented out 2013.05.30.  Remove if no one needs it around
+#
+#   get_uri_lock = threading.Lock()
 
-_get_uri_lock = threading.Lock()
+#   def get_uri_safe(registrarHost, registrarPort, objName):
+#       """
+#       Get a string that specifies the absolute location of an object
+#       """
+#       # NOTE: See ISSUE012
+#       # use a global mutex lock
+#       global _get_uri_lock
+#       # acquire the lock
+#       with _get_uri_lock:
 
-def get_uri_safe(registrarHost, registrarPort, objName):
-    """
-    Get a string that specifies the absolute location of an object
-    """
-    # NOTE: See ISSUE012
-    # use a global mutex lock
-    global _get_uri_lock
-    # acquire the lock
-    with _get_uri_lock:
-
-        # use a lockfile
-        uri_filelock = lockfile.LockFile('/tmp/quiltnameserver.lock')
-        # acquire the file lock
-        with uri_filelock:
-            # locate the nameserver at given host and port
-            with Pyro4.locateNS(registrarHost, registrarPort) as ns:
-                # lookupt the URI for the given object name
-                uri = ns.lookup(objName)
-                # return the uri
-                return uri
+#           # use a lockfile
+#           uri_filelock = lockfile.LockFile('/tmp/quiltnameserver.lock')
+#           # acquire the file lock
+#           with uri_filelock:
+#               # locate the nameserver at given host and port
+#               with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+#                   # lookupt the URI for the given object name
+#                   uri = ns.lookup(objName)
+#                   # return the uri
+#                   return uri
 
 def get_uri(registrarHost, registrarPort, objName):
     """
@@ -517,4 +519,10 @@ def get_uri(registrarHost, registrarPort, objName):
         return uri
 
 
-
+def debug_obj(obj, prefix='Object Info'):
+    """
+    Log information about an object for debugging
+    """
+    logging.debug (prefix +":\n" + 
+        str(type(obj)) + "\n" + str(dir(obj)) +"\n" + 
+            pprint.pformat(obj))

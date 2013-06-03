@@ -297,7 +297,6 @@ from main and other initializeation"""
         Display a stirng with information about an exeception
         """
 
-    
     def get_uri(registrarHost, registrarPort, objName)
         """
         Get a string that specifies the absolute location of an object
@@ -313,6 +312,9 @@ from main and other initializeation"""
             # locate the nameserver at given host and port
             # lookupt the URI for the given object name
             # return the uri
+
+        def debug_obj (obj, prefix)
+            # log out debug information about an object
 
 
 Schema:

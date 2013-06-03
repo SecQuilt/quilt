@@ -180,7 +180,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 results = self._srcResults[srcQueryId]
 
             # append the sourceResults at this key
-            results.append(sourceResults)
+            results += sourceResults
 
 
 
