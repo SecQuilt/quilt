@@ -39,7 +39,7 @@ Classes:
             #   -m UNUSED christian_holidays_smd_1234 grep GREP_ARGS
 
             # call quilt_define 
-            #   'at(source('christian_holidays_smd1234','grep') == '12'
+            #   'at(source('christian_holidays_smd1234','grep')) == '12'
             #   -n semantics_equals_literal
 
             # call quilt_define 
@@ -53,7 +53,7 @@ Classes:
             #   'concurrent(
             #        source('christian_holidays_smd1234','grep'),
             #        source('secular_holidays_smd1234','grep')
-            #         ['major'] == 'True'))'
+            #         ['major'] == 'True')'
             #   -n semantics_nested
                 
         def test_one_source():

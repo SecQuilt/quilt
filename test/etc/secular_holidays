@@ -1,4 +1,4 @@
-{'timestamp':1,'holiday':'newyears'}
-{'timestamp':2,'holiday':'valentines'}
-{'timestamp':11,'holiday':'thanksgiving'}
-{'timestamp':12,'holiday':'boxingday'}
+{'timestamp':1,'holiday':'newyears','major':'True'}
+{'timestamp':2,'holiday':'valentines','major':'True'}
+{'timestamp':11,'holiday':'thanksgiving','major':'True'}
+{'timestamp':12,'holiday':'boxingday','major':'False'}

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-import logging
 import threading
 import quilt_data
 import itertools
-import quilt_core
 
 class _field:
     def __init__(self, eventsId, fieldName):
@@ -50,6 +48,7 @@ class _field:
         #   field matching the value
         returnEvents = [e for e in events if e[self.fieldName] == value]
 
+        # logging.debug("RETUR   " + str(returnEvents))
         # set new event list into global events dict
         # return a new _pattern for the new event list
         return _pattern(returnEventsId, returnEvents)
@@ -174,6 +173,9 @@ def concurrent(*patterns):
         # call 'at' on the pattern, append to list of fields
     fields = [at(curPattern) for curPattern in patterns]
 
+    # for f in fields:
+    #     logging.debug("CONCURRR Fields " + str(f))
+
     # join all of the field lists using an equality test
     joined = itertools.ifilter(_check_equal, itertools.product(*fields))
 
@@ -181,13 +183,15 @@ def concurrent(*patterns):
     #   found during the join
     returnEvents = []
     for timestamp in joined:
-        quilt_core.debug_obj(timestamp)
+        # logging.debug("CONCURRR Joined " + str(timestamp))
         for curPattern in patterns:
             curEvents = _get_events(curPattern.eventsId)
             for curEvent in curEvents:
                 if (at(curEvent) == timestamp[0]):
                     returnEvents.append(curEvent)
 
+
+    # logging.debug("CONCURRR " + str(returnEvents))
     # record new event list in event dict with this name
     # by returning a _pattern for the new list
     return _pattern(returnEventsId, returnEvents)

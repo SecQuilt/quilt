@@ -75,7 +75,12 @@ class SemanticsTestcase(unittest.TestCase):
                         "source('" + secular_holidays   + "','grep'))",
                         '-n', 'semantics_concurrent'])
 
-
+        #TODO REad the pattern id from the std output then query that one
+        # See ISSUE007 and ISSUE008
+        quilt_test_core.call_quilt_script('quilt_define.py',[
+            "concurrent( source('" + christian_holidays + "','grep')," +
+                        "source('" + secular_holidays   + "','grep')['major'] == 'True')",
+                        '-n', 'semantics_nested'])
 
             
     def test_one_source(self):
@@ -178,10 +183,7 @@ class SemanticsTestcase(unittest.TestCase):
             'semantics_concurrent', '-y'
             ]))
 
-        # Check results
-        # call quilt_history query_id
-        # capture stdout, assure good exitcode
-        # call quilt_history query_id
+        # Check result, call quilt_history query_id
         # capture stdout, assure good exitcode
         o = self.check_query_and_get_results(o)
 
@@ -199,6 +201,40 @@ class SemanticsTestcase(unittest.TestCase):
             len([m.start() for m in re.finditer(
                 "newyears", o)]))
         self.assertTrue(occurences == 0)
+
+
+    def test_nested_concurrent(self):
+        """
+        This test covers a nested case where operator operates on
+        results of a literal comparison.
+        Also covers case where pattern has no mapped
+        variables, but still references sources
+        """
+
+        # issue valid query for concurrent_holidays
+        # call quilt_submit semantics_concurrent -y 
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+            'semantics_nested', '-y'
+            ]))
+
+        # Check results
+        # call quilt_history query_id
+        # capture stdout, assure good exitcode
+        o = self.check_query_and_get_results(o)
+
+        # assure output contains laborday and ashwednesday
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "ashwednesday", o)]))
+        self.assertTrue(occurences == 1)
+
+        # assure output contains no christmass
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "christmass", o)]))
+        self.assertTrue(occurences == 0)
+
+
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(
