@@ -126,8 +126,8 @@ Classes:
             # Check results
             # call quilt_history query_id
             # capture stdout, assure good exitcode
-            # assure output contains laborday and ashwednesday
-            # assure output contains no christmass
+            # assure output contains no newyears
+            # assure output contains christmass and boxing day
 
         def test_nested_concurrent():
             """

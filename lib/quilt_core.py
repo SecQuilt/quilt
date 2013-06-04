@@ -524,5 +524,5 @@ def debug_obj(obj, prefix='Object Info'):
     Log information about an object for debugging
     """
     logging.debug (prefix +":\n" + 
-        str(type(obj)) + "\n" + str(dir(obj)) +"\n" + 
+        str(type(obj)) + "\n" + 
             pprint.pformat(obj))

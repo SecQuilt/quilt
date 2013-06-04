@@ -53,6 +53,10 @@ Classes:
             # set new event list into global events dict
             # return a new _pattern for the new event list
         
+        def __str__(self)
+            # return a string with patternId, field Name, and then list of
+            # field values
+
     class _pattern:
         def __init__(self, eventsId, events)      
             # if a new list of events is input, store them in
@@ -74,6 +78,9 @@ Classes:
         def __len__(self):
             # get the event list from the global event dict with this id
             # return length of event list
+
+        def __str__(self)
+            # return a string containing  pattern id and list of events
 
 Functions:
 

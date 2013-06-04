@@ -3,6 +3,7 @@ import logging
 import threading
 import quilt_data
 import itertools
+import quilt_core
 
 class _field:
     def __init__(self, eventsId, fieldName):
@@ -53,6 +54,12 @@ class _field:
         # return a new _pattern for the new event list
         return _pattern(returnEventsId, returnEvents)
 
+    def __str__(self):
+        s = self.eventsId + '.' + self.fieldName + ' ['
+        for i in self:
+            s += str(i) + ','
+        return s.rstrip(',') + ']'
+
 
 class _pattern:
     def __init__(self, eventsId, events = None):
@@ -83,6 +90,13 @@ class _pattern:
         # get the event list from the global event dict with this id
         # return length of event list
         return len(_get_events(self.eventsId))
+
+    def __str__(self):
+        s = self.eventsId + ":\n"
+        for e in self:
+            s += "\t" + str(e) + "\n"
+        return s
+            
 
 def at(pattern):
     # return timestamp field of the pattern
@@ -148,7 +162,7 @@ def concurrent(*patterns):
     returnEventsId = "concurrent("
     for curPattern in patterns:
         returnEventsId += curPattern.eventsId + ","
-    returnEventsId[-1] = ')'
+    returnEventsId = returnEventsId.rstrip(',') +')'
 
     # if eventlist of generated name exists
     if _has_events(returnEventsId):
@@ -166,11 +180,13 @@ def concurrent(*patterns):
     # generate new event list only containing events with timestamps
     #   found during the join
     returnEvents = []
-    for curPattern in patterns:
-        curEvents = _get_events(curPattern.eventsId)
-        for curEvent in curEvents:
-            if at(curEvent) in joined:
-                returnEvents.append(curEvent)
+    for timestamp in joined:
+        quilt_core.debug_obj(timestamp)
+        for curPattern in patterns:
+            curEvents = _get_events(curPattern.eventsId)
+            for curEvent in curEvents:
+                if (at(curEvent) == timestamp[0]):
+                    returnEvents.append(curEvent)
 
     # record new event list in event dict with this name
     # by returning a _pattern for the new list
@@ -179,7 +195,7 @@ def concurrent(*patterns):
     
 
 def _get_events(eventsId):
-    logging.debug("accessing " + str(eventsId))
+#   logging.debug("accessing " + str(eventsId))
     return globals()['_eventPool'][eventsId]
 
 def _set_events(eventsId,events):

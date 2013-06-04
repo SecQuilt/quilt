@@ -71,9 +71,9 @@ class SemanticsTestcase(unittest.TestCase):
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
         quilt_test_core.call_quilt_script('quilt_define.py',[
-            "concurrent( source(" + christian_holidays + "',grep')," +
-                        "source(" + secular_holidays + "',grep'))",
-                        '-n semantics_concurrent'])
+            "concurrent( source('" + christian_holidays + "','grep')," +
+                        "source('" + secular_holidays   + "','grep'))",
+                        '-n', 'semantics_concurrent'])
 
 
 
@@ -189,15 +189,15 @@ class SemanticsTestcase(unittest.TestCase):
         # assure output contains no christmass
         occurences = (
             len([m.start() for m in re.finditer(
-                "laborday", o)]))
-        self.assertTrue(occurences == 1)
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "ashwednesday", o)]))
+                "boxingday", o)]))
         self.assertTrue(occurences == 1)
         occurences = (
             len([m.start() for m in re.finditer(
                 "christmass", o)]))
+        self.assertTrue(occurences == 1)
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "newyears", o)]))
         self.assertTrue(occurences == 0)
 
 if __name__ == "__main__":

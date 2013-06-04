@@ -243,8 +243,8 @@ c6.Semantics
         add test, 'concurent(at(christian_holidays),
             at(secular_holidays)) '
             
-            assure no Labor Day, assure Presidents Day and
-                ash wed
+            assure christmass and boxingfay, no new years
+               
                 
         add test, 'concurrent(at(christian_holidays),
             at( secular_holidays['major'] == 'True'))
