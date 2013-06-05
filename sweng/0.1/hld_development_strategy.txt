@@ -94,82 +94,7 @@ c4.Query
         When list is empty we know the query is done.
         Send final results to the query master, and tell master it si complete
 
-c5.Testability
-    Theme: Ensure testing fidelity and coverage
-
-    DESIGN
-
-    Design scheme for testing patterns, using rational from
-        design decision for  (ISSUE007)
-
-        Patterns added before, multiple tests run, patterns removed
-
-        The goal is to have all tests in a file run against a set of
-            patterns that only stay defined for the time it takes to run
-            those tests.
-
-        Prototype is needed to explore pyunit API and see if such
-            functionality exists.  Currently it is known that setUp and
-            tearDown methods are called before and after each test.
-
-        So far pyunit API in (python 2.6) does not look like it directly
-            supports this.  Early prototyping has not shown an easy way to
-            get testcase class level cleanup code to run.  We don't want to
-            do unneccessary work, particularly if this is fixed in a later
-            version of pyunit.
-
-        Possibly we should just improve the current hack for a class level
-            initialization code, and just ignore the cleanup of the
-            patterns
-
-
-    Design test for pattern/source pattern defaults (ISSUE006)
-        According to the rules in the requirements, implment
-            automated test to ensure this functionality does not 
-            regress.
-        This functionality was verified by hand once in 0.1.c2 and
-            it should work
-
-    Design old testing hook in source Manager (ISSUE004)
-        a "lastQuery" attribute is in the Source Manager and called
-            from "basic_testcase".
-        This was only present to ensure the call was happening
-        This attribute should be removed and the calling test should be
-            refactored to more betterly test the desired functionality
-
-    Design Testability (new feature/refactoring) (ISSUE008)
-        currently the test's scrape the stdoutput and search for
-            strings of interest in each executable's output
-        Upgrade this functionality so that it is more scalable and
-            modifiable.
-        Provide (an overridable) output formatter 
-            Default formatter will be a balance between human and machine
-                reability.
-            Default formatter will output pretty print of python dictionary
-                objects.
-    
-    IMPLEMENT
-
-    Implement all of the designed functionality in c3 in the most logical
-        order.  Logical order may become more apparent after completion of
-        detailed design.  At this time logical order is thought to be:
-   
-    ISSUE007 : With the wdesign decsion made, more should be apparant
-    ISSUE008 : Refactor all axisting tests with new output checking scheme
-        Modify tests as well as outputting code
-    ISSUE004 : Fix existing tests before improving testing infrastructure
-    ISSUE006 : Implement the new test for unconvered functionality
-
-    TEST
-
-    We are improving the testing infrastructure, so all of this testing will
-    basically be already setup, all we have to do is run it.  When possible
-    We will use the iterative appraoch and test as functionality is delivered 
-
-
-   
-
-c6.Semantics
+c5.Semantics
     Design
 
         This will resolive ISSUE009
@@ -251,6 +176,82 @@ c6.Semantics
 
             Assure no November, assure Ash Wed and Valentines,
             Assure no groundhog day
+
+cX.Testability
+    Theme: Ensure testing fidelity and coverage
+
+    DESIGN
+
+    Design scheme for testing patterns, using rational from
+        design decision for  (ISSUE007)
+
+        Patterns added before, multiple tests run, patterns removed
+
+        The goal is to have all tests in a file run against a set of
+            patterns that only stay defined for the time it takes to run
+            those tests.
+
+        Prototype is needed to explore pyunit API and see if such
+            functionality exists.  Currently it is known that setUp and
+            tearDown methods are called before and after each test.
+
+        So far pyunit API in (python 2.6) does not look like it directly
+            supports this.  Early prototyping has not shown an easy way to
+            get testcase class level cleanup code to run.  We don't want to
+            do unneccessary work, particularly if this is fixed in a later
+            version of pyunit.
+
+        Possibly we should just improve the current hack for a class level
+            initialization code, and just ignore the cleanup of the
+            patterns
+
+
+    Design test for pattern/source pattern defaults (ISSUE006)
+        According to the rules in the requirements, implment
+            automated test to ensure this functionality does not 
+            regress.
+        This functionality was verified by hand once in 0.1.c2 and
+            it should work
+
+    Design old testing hook in source Manager (ISSUE004)
+        a "lastQuery" attribute is in the Source Manager and called
+            from "basic_testcase".
+        This was only present to ensure the call was happening
+        This attribute should be removed and the calling test should be
+            refactored to more betterly test the desired functionality
+
+    Design Testability (new feature/refactoring) (ISSUE008)
+        currently the test's scrape the stdoutput and search for
+            strings of interest in each executable's output
+        Upgrade this functionality so that it is more scalable and
+            modifiable.
+        Provide (an overridable) output formatter 
+            Default formatter will be a balance between human and machine
+                reability.
+            Default formatter will output pretty print of python dictionary
+                objects.
+    
+    IMPLEMENT
+
+    Implement all of the designed functionality in c3 in the most logical
+        order.  Logical order may become more apparent after completion of
+        detailed design.  At this time logical order is thought to be:
+   
+    ISSUE007 : With the wdesign decsion made, more should be apparant
+    ISSUE008 : Refactor all axisting tests with new output checking scheme
+        Modify tests as well as outputting code
+    ISSUE004 : Fix existing tests before improving testing infrastructure
+    ISSUE006 : Implement the new test for unconvered functionality
+
+    TEST
+
+    We are improving the testing infrastructure, so all of this testing will
+    basically be already setup, all we have to do is run it.  When possible
+    We will use the iterative appraoch and test as functionality is delivered 
+
+
+   
+
 
     
 

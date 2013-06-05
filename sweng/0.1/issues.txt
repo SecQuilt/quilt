@@ -50,8 +50,6 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Need standard way of output to stdout so that automated tests can be
     more reliable and check results more betterly
 
-    ISSUE009
-    Need a way to process semantics
 
 
 Closed:
@@ -126,3 +124,8 @@ Closed:
             I think I finally fixed it, use a "with Pyro4.locateNS() as ns"
             statment to ensure that the nameserver (which is actually a pyro
             proxy object) reference is freed
+
+    ISSUE009
+    Need a way to process semantics
+    RESOLVED
+        See quilt_interpret.py
