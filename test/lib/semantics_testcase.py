@@ -83,6 +83,15 @@ class SemanticsTestcase(unittest.TestCase):
                         '-n', 'semantics_nested'])
 
             
+        #TODO REad the pattern id from the std output then query that one
+        # See ISSUE007 and ISSUE008
+        quilt_test_core.call_quilt_script('quilt_define.py',[
+            'follows(2,',
+                "source('" + secular_holidays   + "','grep'),"
+                "source('" + christian_holidays   + "','grep'))"
+            '-n', 'semantics_follows'
+            ])
+
     def test_one_source(self):
         """
         This test assures that a simple case of semantics is tested
@@ -234,6 +243,23 @@ class SemanticsTestcase(unittest.TestCase):
                 "christmass", o)]))
         self.assertTrue(occurences == 0)
 
+    def test_follows(self):
+        """
+        blah
+        """
+
+        # issue valid query for concurrent_holidays
+        # call quilt_submit semantics_concurrent -y 
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+            'semantics_follows', '-y'
+            ]))
+
+        # Check results
+        # call quilt_history query_id
+        # capture stdout, assure good exitcode
+        o = self.check_query_and_get_results(o)
+
+        print(o)
 
 
 if __name__ == "__main__":

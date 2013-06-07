@@ -177,6 +177,27 @@ c5.Semantics
             Assure no November, assure Ash Wed and Valentines,
             Assure no groundhog day
 
+c6.Language
+    Theme: full quilt language support
+
+    Design
+        complete prototype protoeval, with new functions
+        Utilize python itertools library
+
+    Implement
+        Translate prototype into actual codebase
+
+    Test
+        append semantics testcase with new tests
+            find christian holidays that follow major secular holidays within
+            3 months
+
+            find secular holidays until a major christian holiday
+
+
+            
+        
+        
 cX.Testability
     Theme: Ensure testing fidelity and coverage
 

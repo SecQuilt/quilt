@@ -2,84 +2,7 @@
 import ast
 import sys
 import pprint
-
-def tree_print(node, depth):
-
-    basename = type(node).__name__
-
-    if basename != "Load":
-
-        s = ""
-        for i in range(depth):
-            i = i
-            s += " | "
-
-        s += basename
-
-        for field, value in ast.iter_fields(node):
-            if (field == 'id'):
-                s += "(" + value + ")"
-
-        print s
-
-    for n in ast.iter_child_nodes(node):
-        tree_print(n,depth+1)
-
-def until(a,b):
-    return a < b
-
-def at(x):
-    return x['timestamp']
-
-def concurrent(af,bf):
-    a = af.items()
-    b = bf.items()
-    r = []
-    bi = 0
-    aadd=[]
-    badd=[]
-    for curb in b:
-        ai = 0
-        for cura in a:
-            if cura == curb:
-                if ai not in aadd:
-                    r.append(getEvents(af.name)[ai])
-                    aadd.append(ai)
-                if bi not in badd:
-                    r.append(getEvents(bf.name)[bi])
-                    badd.append(bi)
-                # print aadd, badd
-            ai = ai + 1
-        bi = bi + 1
-
-    name = "concurrent(" +  str(af.name) + "," + str(bf.name) + ")"
-    return wrapper(name,r)
-
-def follows(dt,af,bf):
-    a = af.items()
-    b = bf.items()
-    r = []
-    bi = 0
-    aadd=[]
-    badd=[]
-    for curb in b:
-        ai = 0
-        for cura in a:
-            delta = curb-cura
-            if delta >= 0 and delta <= dt:
-                if ai not in aadd:
-                    r.append(getEvents(af.name)[ai])
-                    aadd.append(ai)
-                if bi not in badd:
-                    r.append(getEvents(bf.name)[bi])
-                    badd.append(bi)
-                # print aadd, badd
-            ai = ai + 1
-        bi = bi + 1
-
-    name = "follows(" + str(dt) + "," + str(af.name) + "," + str(bf.name) + ")"
-    return wrapper(name,r)
-
+import itertools
 
 shutdownevents = [
             { 'timestamp' : 100,
@@ -159,8 +82,122 @@ events = {
     }
 
 
+def tree_print(node, depth):
+
+    basename = type(node).__name__
+
+    if basename != "Load":
+
+        s = ""
+        for i in range(depth):
+            i = i
+            s += " | "
+
+        s += basename
+
+        for field, value in ast.iter_fields(node):
+            if (field == 'id'):
+                s += "(" + value + ")"
+
+        print s
+
+    for n in ast.iter_child_nodes(node):
+        tree_print(n,depth+1)
+
+def until(a,b):
+    return a < b
+
+def at(x):
+    return x['timestamp']
+
+def concurrent(af,bf):
+    a = af.items()
+    b = bf.items()
+    r = []
+    bi = 0
+    aadd=[]
+    badd=[]
+    for curb in b:
+        ai = 0        
+        for cura in a:
+            if cura == curb:
+                if ai not in aadd:
+                    r.append(getEvents(af.name)[ai])
+                    aadd.append(ai)
+                if bi not in badd:
+                    r.append(getEvents(bf.name)[bi])
+                    badd.append(bi)
+                # print aadd, badd
+            ai = ai + 1
+        bi = bi + 1
+
+    name = "concurrent(" +  str(af.name) + "," + str(bf.name) + ")"
+    return wrapper(name,r)
+
+def follows_(dt,af,bf):
+    a = af.items()
+    b = bf.items()
+    r = []
+    bi = 0
+    aadd=[]
+    badd=[]
+    for curb in b:
+        ai = 0
+        for cura in a:
+            delta = curb-cura
+            if delta >= 0 and delta <= dt:
+                if ai not in aadd:
+                    r.append(getEvents(af.name)[ai])
+                    aadd.append(ai)
+                if bi not in badd:
+                    r.append(getEvents(bf.name)[bi])
+                    badd.append(bi)
+                # print aadd, badd
+            ai = ai + 1
+        bi = bi + 1
+
+    name = "follows(" + str(dt) + "," + str(af.name) + "," + str(bf.name) + ")"
+    return wrapper(name,r)
+
+class deltacheck:
+    def __init__(self,delta):
+        self.delta = delta
+    def check(self,iterator):
+        #print 'checking'
+        iterator = iter(iterator)
+        a = next(iterator)
+        #print 'got a', a
+        b = next(iterator)
+        # print 'got b', b
+        delta = b.get()-a.get()
+        return delta >= 0 and delta <= self.delta
+
+def follows(dq,af,bf):
+    dc = deltacheck(dq)
+    joined = itertools.ifilter(dc.check, itertools.izip(af,bf))
+    retlist = []
+    for j in joined:
+        print 'start'
+        # print 'j[0]', j[0], 'j[0].field.name', j[0].field.name, 'j[0].index', j[0].index
+        # print 'events\n', getEvents(j[0].field.name)
+        retlist.append(getEvents(j[0].field.name)[j[0].index])
+        retlist.append(getEvents(j[1].field.name)[j[1].index])
+        print 'stop'
+
+    return retlist
+    
+
 def getEvents(name):
     return events[name]
+
+class recwrapper:
+    def __init__(self, field, index ):
+        self.field = field
+        self.index = index
+    def get(self):
+        return self.field.items()[self.index]
+    def __str__(self):
+        return "<"+str(self())+">"
 
 class fieldwrapper:
     def __init__(self, name, key):
@@ -172,7 +209,8 @@ class fieldwrapper:
         return [i[self.key] for i in myevents]
 
     def __getitem__(self, key):
-        return self.items()[key]
+        # return self.items()[key]
+        return recwrapper(self,key)
 
     def __ne__(self, rhs):
         myevents = getEvents(self.name)
@@ -238,9 +276,9 @@ def do_parse(codeline):
     r = eval( codeline )
 
     print "\n","RESULTS","\n"
-    pprint.pprint(r)
-    pprint.pprint(r.name)
-    pprint.pprint(getEvents(r.name))
+    # pprint.pprint(r)
+    # pprint.pprint(r.name)
+    # pprint.pprint(getEvents(r.name))
 
         
 
