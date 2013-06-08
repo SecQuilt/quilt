@@ -188,6 +188,27 @@ c6.WrapRecords
     Test
         rerun existing tests
 
+cX.Language
+    Theme: full quilt language support
+
+    Design
+        complete prototype protoeval, with new functions
+        Utilize python itertools library
+
+    Implement
+        Translate prototype into actual codebase
+
+    Test
+        append semantics testcase with new tests
+            find christian holidays that follow major secular holidays within
+            3 months
+
+            find secular holidays until a major christian holiday
+
+
+            
+        
+        
 cX.Testability
     Theme: Ensure testing fidelity and coverage
 
