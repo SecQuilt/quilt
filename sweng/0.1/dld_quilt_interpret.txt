@@ -23,14 +23,30 @@ Notes:
 
 Classes:
 
+    class _rec:
+        def __init__(self, eventsId, fieldName, index):
+            # set member variables for eventsId, field and index
+
+        def GetRec(self):
+            """
+            retrieve the wrapped record
+            """
+            # get the event list from the global event dict with this eventsId
+            # get the index'd event
+            # return the value keyed by fieldName from the event
+
+        def __str__(self):
+            """
+            return wrapped record string
+            """
+
+
     class _field:
         def __init__(self, eventsId, fieldName)      
             # set id and field name in member data
 
         def __getitem__(self, index):
-            # get the event list from the global event dict with this id
-            # get the index'd event
-            # return the fieldName from the event
+            return a _rec object for this eventsId, field and index
 
         def __setitem__(self,key,val):
             # raise unimplemented exception
@@ -41,7 +57,6 @@ Classes:
         def __len__(self):
             # get the event list from the global event dict with this id
             # return length of event list
-            
 
         def __eq__(self, value):
             # construct a new eventID based on the calling context
@@ -49,7 +64,8 @@ Classes:
                 # return those events
             # get the event list from the global event dict with this id
             # create new event list with events that have this
-            #   field matching the value
+            #   field matching the value, dereferncing from the record
+            #   wrapper to get the actual record
             # set new event list into global events dict
             # return a new _pattern for the new event list
         
@@ -87,6 +103,7 @@ Functions:
     def all_equal(iterator:
         # http://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
         # See prototype iteration.py
+        # dereference values wrapped in _rec
 
     def join(predicate, *patterns):
         """Return all patterns that match the predicate"""
@@ -107,10 +124,14 @@ Functions:
         # join all of the field lists using an equality test
 
         # generate new event list only containing timestamps
-        #   found during the join
+        #   found during the join, iterate over the join results
+            # get each _rec's index and eventsId
+            # get the append the referenced event to a new list
+
 
         # record new event list in event dict with this name
         # by returning a _pattern for the new list
+          
         
 
     def at(pattern):

@@ -177,6 +177,17 @@ c5.Semantics
             Assure no November, assure Ash Wed and Valentines,
             Assure no groundhog day
 
+c6.WrapRecords
+
+    Design
+        See partial modifications to protoeval.py
+
+    Implement
+        Refactor to wrap records
+
+    Test
+        rerun existing tests
+
 cX.Testability
     Theme: Ensure testing fidelity and coverage
 
