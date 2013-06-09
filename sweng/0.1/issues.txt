@@ -50,6 +50,10 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Need standard way of output to stdout so that automated tests can be
     more reliable and check results more betterly
 
+    ISSUE014
+    When a record wrapper was added into quilt_interpret, an infinate loop
+    occured for no aparent reason.  It went away then I actually dereferenced
+    the collections in the wrapper's constructor
 
 
 Closed:

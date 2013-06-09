@@ -3,6 +3,41 @@ import threading
 import quilt_data
 import itertools
 
+
+class _rec:
+    def __init__(self, eventsId, index, fieldName):
+
+        # set id and field name in member data
+        self.eventsId = eventsId
+        # if not _has_events(eventsId):
+        #     raise Exception("Record has no parent event list")
+        self.fieldName = fieldName
+        self.index = index
+        # logging.debug('accessing:' + str(self.eventsId) +":"+ str(self.index) +":"+ str(self.fieldName))
+
+        # ISSUE014:  Big mystery here.  If I don't call GetRec or dereference
+        #   the event list then an
+        #   infinate loop shows up, I can't figure it out
+        eventSpecs = _get_events(self.eventsId)
+        eventSpecs[self.index]
+
+
+    def GetRec(self):
+        """
+        retrieve the wrapped record
+        """
+        # get the event list from the global event dict with this id
+        eventSpecs = _get_events(self.eventsId)
+        # get the n'th event from the list
+        eventSpec = eventSpecs[self.index]
+        # return the event at the appropriate field
+
+        return eventSpec[self.fieldName]
+
+    def __str__(self):
+        return "<"+str(self.GetRec())+">"
+
+   
 class _field:
     def __init__(self, eventsId, fieldName):
         # set id and field name in member data
@@ -10,10 +45,8 @@ class _field:
         self.fieldName = fieldName
 
     def __getitem__(self, index): 
-        # get the event list from the global event dict with this id
-        eventSpecs = _get_events(self.eventsId)
-        eventSpec = eventSpecs[index]
-        return eventSpec[self.fieldName]
+        # create and return a wrapper for this record
+        return _rec(self.eventsId, index, self.fieldName)
 
     def __setitem__(self,key,val):
         # raise unimplemented exception
@@ -150,7 +183,8 @@ def _check_equal(iterator):
     try:
         iterator = iter(iterator)
         first = next(iterator)
-        return all(first == rest for rest in iterator)
+        first = first.GetRec()
+        return all(first == rest.GetRec() for rest in iterator)
     except StopIteration:
         return True
 
@@ -182,14 +216,15 @@ def concurrent(*patterns):
     # generate new event list only containing events with timestamps
     #   found during the join
     returnEvents = []
-    for timestamp in joined:
-        # logging.debug("CONCURRR Joined " + str(timestamp))
-        for curPattern in patterns:
-            curEvents = _get_events(curPattern.eventsId)
-            for curEvent in curEvents:
-                if (at(curEvent) == timestamp[0]):
-                    returnEvents.append(curEvent)
+    for joinedTuple in joined:
+        # logging.debug("CONCURRR Joined  " + str(type(timestampRecord)))
+        # logging.debug("CONCURRR Joined0 " + str(timestampRecord[0]))
+        # logging.debug("CONCURRR Joined1 " + str(timestampRecord[1]))
 
+        for timestampRecord in joinedTuple:
+            index = timestampRecord.index
+            eventsId = timestampRecord.eventsId
+            returnEvents.append(_get_events(eventsId)[index])
 
     # logging.debug("CONCURRR " + str(returnEvents))
     # record new event list in event dict with this name

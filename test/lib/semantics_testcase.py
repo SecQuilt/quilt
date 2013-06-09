@@ -85,12 +85,12 @@ class SemanticsTestcase(unittest.TestCase):
             
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
-            'follows(2,',
-                "source('" + secular_holidays   + "','grep'),"
-                "source('" + christian_holidays   + "','grep'))"
-            '-n', 'semantics_follows'
-            ])
+#       quilt_test_core.call_quilt_script('quilt_define.py',[
+#           'follows(2,',
+#               "source('" + secular_holidays   + "','grep')," +
+#               "source('" + christian_holidays   + "','grep'))",
+#           '-n', 'semantics_follows'
+#           ])
 
     def test_one_source(self):
         """
@@ -248,6 +248,7 @@ class SemanticsTestcase(unittest.TestCase):
         blah
         """
 
+        return
         # issue valid query for concurrent_holidays
         # call quilt_submit semantics_concurrent -y 
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[

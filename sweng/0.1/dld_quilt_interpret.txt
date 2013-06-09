@@ -64,8 +64,7 @@ Classes:
                 # return those events
             # get the event list from the global event dict with this id
             # create new event list with events that have this
-            #   field matching the value, dereferncing from the record
-            #   wrapper to get the actual record
+            #   field matching the value
             # set new event list into global events dict
             # return a new _pattern for the new event list
         
