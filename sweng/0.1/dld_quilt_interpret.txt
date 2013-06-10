@@ -131,7 +131,43 @@ Functions:
         # record new event list in event dict with this name
         # by returning a _pattern for the new list
           
+    class _check_follows:
+        """
+        Object represents a functor.  In the class constructor the delta time
+        ammount is passed.  In the class's check funciton this time value is
+        used to determine if one object in the iterator follows the next
+        object
+        """
+        def __init__(self, howlong):
+            # set how long into member data
+
+        def check(self, iterator):
+            """
+            called to check each tuple created from the cartesian product of
+            before and after events given to the follows function.  Return
+            true if the 
+
+    def follows(howlong, before, after):
+        """
+        Determine and return the events in after that occur within howlong of
+        before.  This does not include events in before and after that occur
+        at the same time.
+        howlong : time delta
+        before : pattern
+        after: pattern
+        """
+
+        # generate a name for a new pattern like:
+        #   follows( howlong, name of before patter, name of after pattern)
         
+        # if events can be found with the generated name
+            # return previously generated event list
+
+        # get fields of before, after by calling at() method
+
+        # use itertools iproduct on the fields, and pass them to an ifilter
+        #   use _check_follows(howlong) functor for filter predicate
+
 
     def at(pattern):
         # return timestamp field of the pattern
