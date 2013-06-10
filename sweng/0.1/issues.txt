@@ -55,6 +55,10 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     occured for no aparent reason.  It went away then I actually dereferenced
     the collections in the wrapper's constructor
 
+    ISSUE015
+    Why are we returning true if StopIteration exception comes?
+    quilt_interpret::_check_equal
+
 
 Closed:
 

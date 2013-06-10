@@ -134,9 +134,8 @@ Functions:
     class _check_follows:
         """
         Object represents a functor.  In the class constructor the delta time
-        ammount is passed.  In the class's check funciton this time value is
-        used to determine if one object in the iterator follows the next
-        object
+        ammount is passed.  In the class's check funciton is used as a
+        callback for pairs of timestamps. 
         """
         def __init__(self, howlong):
             # set how long into member data
@@ -144,8 +143,17 @@ Functions:
         def check(self, iterator):
             """
             called to check each tuple created from the cartesian product of
-            before and after events given to the follows function.  Return
-            true if the 
+            before and after events given to the follows function.  
+            iterator operates over a two element tuple. Returns
+            True if second element occurs within howlong of the first element.
+            """
+            # set before record to next value of the iterator
+            # set after record to next value of the iterator
+            # set before and after to the value wraped in the record wrapper
+            # return true if before is within howlong of after and is not zero
+            #   otherwise return False 
+
+            
 
     def follows(howlong, before, after):
         """
@@ -165,9 +173,23 @@ Functions:
 
         # get fields of before, after by calling at() method
 
-        # use itertools iproduct on the fields, and pass them to an ifilter
-        #   use _check_follows(howlong) functor for filter predicate
+        # create a _check_follows functor object
+        #   initialize with howlong
 
+        # use itertools iproduct on the fields, and pass them to an ifilter
+        #   use _check_follows.check() for filter predicate
+
+        # create an empty list for returning events
+        # use returned iterator from ifilter, for each of the tuples remaining
+        # in the filtered product
+            # for each timestampRecord element in the tuple
+                # get the index of the timestampRecord event
+                # get the name of the events list
+                # get the event in the named list ad the specified index
+                # append the event to a returning list of events 
+                
+        # return a new pattern wrapper with the generated name and the
+        #   newly determined events
 
     def at(pattern):
         # return timestamp field of the pattern

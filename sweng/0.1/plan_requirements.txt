@@ -9,8 +9,8 @@ Queries:
 * Queries reference multiple types of data and cross refer attributes of that
     data
 * Queries should support specification based on temporal order of events
-* Pattern matching of events supports temporal operators (BEFORE, CONCURRENT, 
-        UNTIL)
+* Pattern matching of events supports temporal operators ("UNTIL, CONCURRENT, 
+        FOLLOWS)
 * Default values for query parameters can be provided in a source pattern or
     in the quilt pattern
 * A default value specified in a quilt pattern will overide a default value
