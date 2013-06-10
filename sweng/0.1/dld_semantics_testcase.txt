@@ -56,6 +56,13 @@ Classes:
             #         ['major'] == 'True')'
             #   -n semantics_nested
                 
+            # call quilt_define 
+            #   follows(
+            #        1,
+            #        source('secular_holidays_smd1234','grep'),
+            #        source('christian_holidays_smd1234','grep') )
+            #   -n semantics_follows
+
         def test_one_source():
             """
             This test assures that a simple case of semantics is tested
@@ -146,7 +153,22 @@ Classes:
             # call quilt_history query_id
             # capture stdout, assure good exitcode
             # assure output contains Ash Wed and Valentines,
-            # assure output contains no ground hog
+            # asure no christmass
+
+        def test_follows():
+            """
+            This test assures the operation of the 'follows' quilt language
+            function.  It uses a pattern which selects christian holidays that
+            follow secular holidays within 1 month.  We expect to see
+            ashwednesday as it follows newyears by one month, but we expect
+            not to see christmass and boxing day as they occur on the same
+            month.  (we do not support month wrap around)
+            """
+
+            # issue the query using the follows pattern
+
+            # assure the query is successfull, and get results
+
 
 
 

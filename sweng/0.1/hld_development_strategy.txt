@@ -188,6 +188,18 @@ c6.WrapRecords
     Test
         rerun existing tests
 
+c7.Follows
+
+    Design
+        See partial modifications to protoeval.py
+
+    Implement
+        Implement the Follows Function
+
+    Test
+        Add a test, find which christian holidays follow a secular holiday
+        within 1 month
+
 cX.Language
     Theme: full quilt language support
 

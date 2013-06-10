@@ -13,4 +13,7 @@ Existing:
 
 New:
 
-L   2
+Follows Function: L
+Follows functor: S
+Follows Test: L
+
