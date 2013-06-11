@@ -13,7 +13,7 @@ Existing:
 
 New:
 
-Follows Function: L
-Follows functor: S
-Follows Test: L
+Until Function: L
+Until functor: M
+Until Test: L
 
