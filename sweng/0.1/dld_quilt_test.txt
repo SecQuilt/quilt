@@ -62,12 +62,23 @@ smd.d/syslog.conf
 # see QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
 
 
+smd.d/multipattern.conf
 [multipattern]
 # make two patterns similar to QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
 # but in one source
 # named pat1, pat1srcvar and pat2, pat2srcvar
 
-
+smd.d/holidays.conf
+# make two patterns similar to QUILT_HOME/test/etc/quilt/smd.d/syslog.conf
+# but make one point to data file s
+# $QUILT_HOME/test/etc/{secular_holidays,christian_holidays}
+# each with one variable defaulted to ".*" named GREP_ARGS
+# named as follows
+srcname: secular_holidays
+    patternname: grep
+    
+srcname: christian_holidays
+    patternname: grep
 
 Scripts:
     Prototpe:

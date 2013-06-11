@@ -19,6 +19,7 @@ class SourceManager(quilt_core.QueryMasterClient):
         self._sourceResults = {}
         self._lastQuery = None
 
+
     def Query(self, queryId, sourceQuerySpec,
             queryClientName,
             queryClientNamseServerHost,
@@ -71,8 +72,8 @@ class SourceManager(quilt_core.QueryMasterClient):
             # specific to this command line case
             templateCmd = srcPatSpec['template']
             template = Template(templateCmd)
-            #logging.info ("Ready to use : " + templateCmd + 
-            #    " with replacments: " + str(replacments))
+            logging.info ("Ready to use : " + templateCmd + 
+                " with replacments: " + str(replacments))
             cmdline = template.safe_substitute(replacments)
 
             # setup context for the cmdline stdout callback
@@ -80,8 +81,10 @@ class SourceManager(quilt_core.QueryMasterClient):
                     sourceQuerySpec,name=True)
             context = { 'queryId' : queryId, 'srcQueryId' : srcQueryId  } 
 
-            # use run_process to execute cmd, give callback per line
-            #   processing function
+#           sei_core.run_process_lite(cmdline, shell=True,
+#               outFunc=self.OnGrepLine, outObj=context)
+
+#           I thought run_process apparently has problems
             sei_core.run_process(cmdline, shell=True,
                 whichReturn=sei_core.EXITCODE, 
                 outFunc=self.OnGrepLine, outObj=context, logToPython=False)
@@ -93,10 +96,9 @@ class SourceManager(quilt_core.QueryMasterClient):
                     if srcQueryId in self._sourceResults[queryId]:
                         results = list(self._sourceResults[queryId][srcQueryId])
 
-            ns = Pyro4.locateNS(
-                    queryClientNamseServerHost, 
-                    queryClientNamseServerPort,)
-            uri = ns.lookup(queryClientName)
+            uri = quilt_core.get_uri(queryClientNamseServerHost,
+                    queryClientNamseServerPort,queryClientName)
+
             with Pyro4.Proxy(uri) as query:
                 query.AppendSourceQueryResults(srcQueryId, results)
                 query.CompleteSrcQuery(srcQueryId)
@@ -106,10 +108,8 @@ class SourceManager(quilt_core.QueryMasterClient):
             try:
 
                 # attempt to report error to the query client
-                ns = Pyro4.locateNS(
-                        queryClientNamseServerHost, 
-                        queryClientNamseServerPort,)
-                uri = ns.lookup(queryClientName)
+                uri = quilt_core.get_uri(queryClientNamseServerHost,
+                        queryClientNamseServerPort,queryClientName)
                 srcQueryId = quilt_data.src_query_spec_get(
                         sourceQuerySpec,name=True)
 
@@ -205,7 +205,7 @@ class Smd(quilt_core.QuiltDaemon):
         cfg = quilt_core.QuiltConfig()
         smspecs = cfg.GetSourceManagerSpecs()
 
-        #logging.debug("Source manager specs: " + str(smspecs))
+        # logging.debug("Source manager specs: " + str(smspecs))
 
         objs = {}
         # iterate through source manager configurations
@@ -215,7 +215,7 @@ class Smd(quilt_core.QuiltDaemon):
             sm = SourceManager(self._args, smname, smspec)
             objs[sm.localname] = sm
         
-        #logging.info("Creating source managers: " + str(objs))
+        # logging.info("Creating source managers: " + str(objs))
             
         # start the client with all the source managers
         quilt_core.query_master_client_main_helper(objs)

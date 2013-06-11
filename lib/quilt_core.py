@@ -7,12 +7,13 @@ import Pyro4
 from os import listdir
 from os.path import isfile, join
 import threading
-import lockfile
 from daemon import runner
 import argparse
 import select
 import time
 import quilt_data
+import lockfile
+import pprint
 
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
@@ -116,8 +117,10 @@ class QuiltConfig:
     def GetSourceManagerSpecs(self):
         return self.GetSourceManagersUtil("specs")
 
-def GetQueryMasterProxy(config=None):
+
+def GetQueryMasterProxyDEPRECATED(config=None):
     """Access configuration to find query master, return proxy to it"""
+
     if config is None:
         config = QuiltConfig()
     qmhost = config.GetValue("query_master", "registrar_host", None)
@@ -127,8 +130,8 @@ def GetQueryMasterProxy(config=None):
     qmname = config.GetValue("query_master", "name", "QueryMaster")
     logging.debug("Locating name server for query master: " + str(qmhost) + 
         ", " + str(qmport))
-    ns = Pyro4.locateNS(qmhost, qmport)
-    uri = ns.lookup(qmname)
+    with Pyro4.locateNS(qmhost, qmport) as ns:
+        uri = ns.lookup(qmname)
 
     return Pyro4.Proxy(uri)
 
@@ -169,6 +172,27 @@ class QuiltDaemon(object):
             raise
                 
 
+def GetQueryMasterProxy(config = None):
+    if config == None:
+        config = QuiltConfig()
+
+    qmhost = config.GetValue(
+            "query_master", "registrar_host", None)
+    qmport = config.GetValue(
+            "query_master", "registrar_port", None)
+
+    # access the Query Master's instance name, 
+    #   create a proxy to it
+    qmname = config.GetValue(
+            "query_master", "name", "QueryMaster")
+    logging.debug("Locating name server for query master: " + 
+            str(qmhost) + ", " + str(qmport))
+
+    qmuri = get_uri(qmhost, qmport, qmname)
+
+    return Pyro4.Proxy(qmuri)
+
+
 class QueryMasterClient:
     
     _lock = threading.Lock()
@@ -179,8 +203,11 @@ class QueryMasterClient:
         to generate a unique enough name for this machine
         """
         self.localname = basename + str(os.getpid())
-        self._qm = None
         self._remotename = None
+        self._config = None
+        self._qmuri = None
+        self.uri = None
+
 
     def GetType(self):
         raise Exception("""Abstract function is rquired to be implemented by
@@ -191,11 +218,7 @@ class QueryMasterClient:
        
  
         # Access the QueryMaster's registrar's host and port from the config
-        config = QuiltConfig()
-        # TODO think about adding cleanup code to client to 
-        #   nicely disconnect
-        # store a reference to the query master as a member variable
-        self._qm = GetQueryMasterProxy(config)
+        config = self.GetConfig()
         
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable
@@ -205,8 +228,9 @@ class QueryMasterClient:
         rhost = config.GetValue("registrar", "host", None)
         logging.debug("Registering " + self.localname + ", to query master" + 
             ", via registrar: " + str(rhost) + ":" + str(rport))
-        self._remotename = self._qm.RegisterClient(
-            rhost, rport, self.localname, self.GetType())
+        with self.GetQueryMasterProxy() as qm:
+            self._remotename = qm.RegisterClient(
+                rhost, rport, self.localname, self.GetType())
 
         # connection complete, call our notification function
         logging.info("Connection completed for " + self.localname)
@@ -245,9 +269,56 @@ class QueryMasterClient:
         return True
 
     def UnregisterFromQueryMaster(self):
-        if self._qm != None and self._remotename != None:
-            self._qm.UnRegisterClient(self.GetType(), self._remotename)
+        if self._remotename != None:
+            with self.GetQueryMasterProxy() as qm:
+                qm.UnRegisterClient(self.GetType(), self._remotename)
+                
             logging.info("Unregistration completed for " + self.localname)
+
+    def GetConfig(self):
+        """
+        Uses object's lock to safely initialize a config parser and store it
+        as member data
+        """
+        # see design notes on ISSUE012
+        # NOTE: this pattern of access is not completely safe, if reference 
+        #   assignment is not atomic
+        if self._config == None:
+            # I may be paranoid, but I am constructing config object outside
+            # of the lock becuse it might take a while
+            c = QuiltConfig()
+            with self._lock:
+                if self._config == None:
+                    self._config = c
+        return self._config
+
+    def GetQueryMasterProxy(self):
+        """
+        Return a proxy object to the query master for this client
+        """
+        # see design notes on ISSUE012
+        # NOTE: this pattern of access is not completely safe, if string 
+        #   assignment is not atomic
+        if self._qmuri == None:
+            config = self.GetConfig()
+            with self._lock:
+                if self._qmuri == None:
+                    qmhost = config.GetValue(
+                            "query_master", "registrar_host", None)
+                    qmport = config.GetValue(
+                            "query_master", "registrar_port", None)
+
+                    # access the Query Master's instance name, 
+                    #   create a proxy to it
+                    qmname = config.GetValue(
+                            "query_master", "name", "QueryMaster")
+                    logging.debug("Locating name server for query master: " + 
+                            str(qmhost) + ", " + str(qmport))
+                    self._qmuri = get_uri(qmhost, qmport, qmname)
+
+        return Pyro4.Proxy(self._qmuri)
+
+
 
 def unregister_clients(daemonObjs, delDaemonObjs):
     # remove objects from object list
@@ -273,21 +344,18 @@ def query_master_client_main_helper(
     registrarPort = cfg.GetValue(
         'registrar', 'port', None) 
     
-    daemon=Pyro4.Daemon()
-    ns=Pyro4.locateNS(registrarHost, registrarPort)   
-
     #TODO Hardening, make sure when exceptions are thrown that clients are removed
-
-    # iterate the names and objects in clientObjectDict
-    for name,obj in clientObjectDict.items():
-        # register the clientObject with the local PyRo Daemon with
-        uri=daemon.register(obj)
-        # use the key name as the object name
-        ns.register(name,uri)
-        # call the ConnectToQueryMaster to complete registration
-        obj.RegisterWithQueryMaster()
+    daemon=Pyro4.Daemon()
+    with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+        # iterate the names and objects in clientObjectDict
+        for name,obj in clientObjectDict.items():
+            # register the clientObject with the local PyRo Daemon with
+            obj.uri=daemon.register(obj)
+            # use the key name as the object name
+            ns.register(name,obj.uri)
+            # call the ConnectToQueryMaster to complete registration
+            obj.RegisterWithQueryMaster()
  
-    
     daemonObjs = {}
     # iterate the names and objects in clientObjectDic
     for name,obj in clientObjectDict.items():
@@ -306,7 +374,6 @@ def query_master_client_main_helper(
     # continue looping while there are daemon objects
     while len(daemonObjs) > 0 :
 
-        #REVIEW
         if firstTime:
             firstTime = False
             delDaemonObjs = {}
@@ -420,7 +487,6 @@ def main_helper( name, description, argv ):
 
     return argparser
         
-#REVIEW
 def exception_to_string(error):
     """
     Display a stirng with information about an exeception
@@ -429,3 +495,47 @@ def exception_to_string(error):
     """
     return (str(type(error)) + " : " + str(error))
     
+#   DHK: Commented out 2013.05.30.  Remove if no one needs it around
+#
+#   get_uri_lock = threading.Lock()
+
+#   def get_uri_safe(registrarHost, registrarPort, objName):
+#       """
+#       Get a string that specifies the absolute location of an object
+#       """
+#       # NOTE: See ISSUE012
+#       # use a global mutex lock
+#       global _get_uri_lock
+#       # acquire the lock
+#       with _get_uri_lock:
+
+#           # use a lockfile
+#           uri_filelock = lockfile.LockFile('/tmp/quiltnameserver.lock')
+#           # acquire the file lock
+#           with uri_filelock:
+#               # locate the nameserver at given host and port
+#               with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+#                   # lookupt the URI for the given object name
+#                   uri = ns.lookup(objName)
+#                   # return the uri
+#                   return uri
+
+def get_uri(registrarHost, registrarPort, objName):
+    """
+    Get a string that specifies the absolute location of an object
+    """
+    # locate the nameserver at given host and port
+    with Pyro4.locateNS(registrarHost, registrarPort) as ns:
+        # lookupt the URI for the given object name
+        uri = ns.lookup(objName)
+        # return the uri
+        return uri
+
+
+def debug_obj(obj, prefix='Object Info'):
+    """
+    Log information about an object for debugging
+    """
+    logging.debug (prefix +":\n" + 
+        str(type(obj)) + "\n" + 
+            pprint.pformat(obj))

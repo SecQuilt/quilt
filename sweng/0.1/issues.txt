@@ -50,8 +50,20 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Need standard way of output to stdout so that automated tests can be
     more reliable and check results more betterly
 
-    ISSUE009
-    Need a way to process semantics
+    ISSUE014
+    When a record wrapper was added into quilt_interpret, an infinate loop
+    occured for no aparent reason.  It went away then I actually dereferenced
+    the collections in the wrapper's constructor
+
+    ISSUE015
+    Why are we returning true if StopIteration exception comes?
+    quilt_interpret::_check_equal
+
+    ISSUE016
+    Duplicate events allowed.  If you have a three element concurrent call, or
+    a high delta time in a follows statment and the right input data the
+    results will contain duplicate events.  some mechanism is needed for
+    duplicate events prevention.
 
 Closed:
 
@@ -68,3 +80,65 @@ Closed:
         multiple source patterns in one pattern before we can thing it
         through.
         RESOLVED:   Added optional "instance name" to a variable mapping
+
+
+
+
+    ISSUE011 sourcePatternDictionary should be incorporated in quilt_data
+
+        Whenever we have a datastructure that is used across module bounds
+        it should be encapsulated in an object or in our quilt_data accessor
+        pattern.
+
+        RESOLVED:
+            Added new var_dict paackage
+
+
+
+    ISSUE013 run_process wonked up
+
+        When testing semantics_testcase, it would lock up.  added mutex for
+        now to work around the issue, for  a while then stopped working again.
+
+        I pasted in some code that iterates stdouput of a subprocess and it
+        seems to be wroking for now.  However the run_process command is still
+        broken, and I am not sure if the new code in smd is really streaming,
+        it could be buffering the whole output before it iterates it
+
+        RESOLVED:
+            Not an issue, was actually caused by ISSUE012.  But an alternative
+            was developed called run_process_lite, which is not being used
+            currently
+
+
+    ISSUE012 QueryMaster Proxy
+
+        I thought it would be okay to let each client keep an open proxy to
+        the query master for its whole lifetime.  We ran into problems in testing
+        where we ran 4 daemons in one process.  The query master would then stop
+        reponding to messages from another process.  We have worked around the problem
+        for now in quilt_core.GetQueryMasterProxy.  Probaly we need some refactoring
+        so that every time a client accesses _qm we are using a "with" statment so that
+        the resource is open and closed right away.  
+        
+        After this change a lockup was still ocurring.  While the submit proxy
+        acquired a proxy to unregister itself, aquery was acquiring a proxy to
+        register itself.  It was found that the Pyro4.locateNS() function was
+        the guilty party.  To get around this we store the final uri that
+        comes back.  Next time the funciton is called we don't have to call
+        locateNS.
+
+        I think I now narrowed it down to the call to locateNS.  This seems to
+        fail when called by two thigns at once or in rapid succession.  For
+        now I have refactored to call a utility function that wraps locateNS
+        and implement a thread and process level lock around its use
+
+        RESOLVED:
+            I think I finally fixed it, use a "with Pyro4.locateNS() as ns"
+            statment to ensure that the nameserver (which is actually a pyro
+            proxy object) reference is freed
+
+    ISSUE009
+    Need a way to process semantics
+    RESOLVED
+        See quilt_interpret.py

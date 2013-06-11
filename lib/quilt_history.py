@@ -11,7 +11,8 @@ class QuiltHistory(quilt_core.QueryMasterClient):
 
     def OnRegisterEnd(self):
         
-        o = self._qm.GetQueryHistoryStats(self._args.query_id)
+        with self.GetQueryMasterProxy() as qm:
+            o = qm.GetQueryHistoryStats(self._args.query_id)
             
         if o != None:
             print o

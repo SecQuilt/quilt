@@ -94,7 +94,134 @@ c4.Query
         When list is empty we know the query is done.
         Send final results to the query master, and tell master it si complete
 
-c5.Testability
+c5.Semantics
+    Design
+
+        This will resolive ISSUE009
+
+        Capture sources mentioned in the query code
+        Define objects for those sources
+            bridges to source results
+            implement the __getitem__ interface
+                index to appropriate field in the results
+        parser defines the until, concurrent, follows methods
+
+        Sample:
+        quilt_define -n reboot \
+            follows(60,startup_srcq['timestamp'],shutdown_srcq['timestamp'])
+
+        imagine we have one src pattern ('grep')
+            which is grep $WORD /var/log/msgs
+
+        we would map like this
+        
+        -m startup syslog grep WORD startup_srcq
+        -m shutdown syslog grep WORD shutdown_srcq
+
+        In this case startup/shutdown are "variables"
+        startup_srcq, shutdown_srcq are "src qry instances"
+
+        Assume this generated two source queries (to the same source)
+        who ran and have returned their results to quilt_parse
+
+        quiltParser._srcResults[srcQueryId] = 
+            [{ 'timestamp' : '2013/01/01 01:01:01'
+                'content'   : 'rsyslog has shutdown' },
+            { 'timestamp' : '2013/01/02 01:01:01'
+                'content'   : 'rsyslog has shutdown' },
+            { 'timestamp' : '2013/01/03 01:01:01'
+                'content'   : 'rsyslog has shutdown' },
+            ...]
+
+
+        Major Design Ideas done in 'protoeval.py' and 'protoparser.py'
+
+
+    Implement
+
+        Implement changes to quilt_parse
+        Implement changes to query_master
+        Regression testing
+        Implement new testing sources/files
+        Implement quilt_interpret
+        Implement changes to quilt_query
+            Implement enough functionality for each new testcase
+            Implement a new test case
+            testing
+
+    Test
+
+        Define two new sources, use grep, 
+            default search variable is for .*
+            one with
+            christian_holidays, and one with
+            secular_holidays.  Have them
+            listed as numeric month then, holiday name,
+            then major [t/f]
+
+        Add semantic testcase
+        add test, 'secular_holidays' variable 'newyears'
+            assure one result is new years in january
+        add test, 'at(christian_holidays) == 12' no variable
+            assure one result is christmass
+
+        add test, 'concurent(at(christian_holidays),
+            at(secular_holidays)) '
+            
+            assure christmass and boxingfay, no new years
+               
+                
+        add test, 'concurrent(at(christian_holidays),
+            at( secular_holidays['major'] == 'True'))
+
+            Assure no November, assure Ash Wed and Valentines,
+            Assure no groundhog day
+
+c6.WrapRecords
+
+    Design
+        See partial modifications to protoeval.py
+
+    Implement
+        Refactor to wrap records
+
+    Test
+        rerun existing tests
+
+c7.Follows
+
+    Design
+        See partial modifications to protoeval.py
+
+    Implement
+        Implement the Follows Function
+
+    Test
+        Add a test, find which christian holidays follow a secular holiday
+        within 1 month
+
+cX.Language
+    Theme: full quilt language support
+
+    Design
+        complete prototype protoeval, with new functions
+        Utilize python itertools library
+
+    Implement
+        Translate prototype into actual codebase
+
+    Test
+        append semantics testcase with new tests
+            find christian holidays that follow major secular holidays within
+            3 months
+
+            find secular holidays until a major christian holiday
+
+
+            
+        
+        
+cX.Testability
     Theme: Ensure testing fidelity and coverage
 
     DESIGN
@@ -169,25 +296,8 @@ c5.Testability
 
    
 
-c6.Semantics
-        Iterate the AST of the query code
-        push identifiers on stack
-        When encountering the "before" function
-            pop off the last two items on the stack
-            Filter results where x < y
-        Save results in the completed query
 
-
-    Implement
-        
-
-    Test
-
-        Seed log file with specific message at early time
-        Seed log file with specific message at late time
-        Define a pattern to detect this and submit a query, and check results
-            
-            
+    
 
 cX.Execution
     Execute query specified from Query Master on the Source Master

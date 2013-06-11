@@ -81,8 +81,7 @@ def log_process(
 
                 somethingHappened = True
 
-        except Exception, e:
-            #TODO Only catch the IO exception
+        except IOError, e:
             e = e
 
         try:
@@ -97,8 +96,7 @@ def log_process(
                 somethingHappened = True
 
 
-        except Exception, e:
-            #TODO Only catch the IO exception
+        except IOError, e:
             e = e
 
         exitCode = process.poll()
@@ -116,11 +114,15 @@ def log_process(
 
     return exitCode
         
-    
+   
 def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True, 
     logToPython=True, outFunc=None, outObj=None):
     """run the specified process and wait for completion, throw exception if nonzero exit occurs, log output of process to the logging module, return stdout as string"""
-    logging.debug('run_process {begin}' + str(cmd) + '{end}')
+    if type(cmd) != str:
+        logging.debug("Executing: " + str(cmd)[1:-1].replace(',',''))
+    else:
+        logging.debug("Executing: " + cmd)
+
     p = subprocess.Popen( cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
     o = log_process(p,whichReturn=whichReturn,
         logToPython=logToPython,outFunc=outFunc,outObj=outObj)
@@ -129,3 +131,33 @@ def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True,
         raise RuntimeError('cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(exitCode))
 #TODO when we run out of memory, make it optional to return a giant std out
     return o
+
+
+def run_process_lite(cmd, shell=False, checkCall=True, 
+        outFunc=None, outObj=None):
+    logging.debug('run_process {begin}' + str(cmd) + '{end}')
+    p = subprocess.Popen( cmd, shell=shell, stdout=subprocess.PIPE )
+    
+    while True:
+        exitCode = p.poll()
+        p.stdout.flush()
+        oline = p.stdout.readline()
+
+        if outFunc != None and oline != None and oline != '':
+            outFunc(oline[:-1],outObj)
+        if exitCode != None:
+            break
+
+        
+    if checkCall and exitCode != 0:
+        raise RuntimeError('cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(exitCode))
+    return exitCode
+
+    
+
+def shell_cmd_output_iter(command):
+    p = subprocess.Popen(command,shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT)
+    for line in iter(proc.stdout.readline,''):
+        return iter(p.stdout.readline, b'')

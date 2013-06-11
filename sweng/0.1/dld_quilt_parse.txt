@@ -1,7 +1,6 @@
 quilt 0.1 quilt_parse design
 -----------------------------
 
-
 Module: quilt_parse
 
 Type: Library
@@ -12,54 +11,65 @@ External Dependencies:
 Internal Dependencies:
 
 Prototype:
-    protoparser.py
+    protoparser.py 
 
 Responsibilities:
-    Manage the parsing of the pattern string
+    Manage the parsing of quilt pattern code
+
 
 Classes:
 
-    
+    class SourceVisitor: ast.NodeVisitor
+        """
+        Provide virtual callbacks for each appropriate node of the 
+        AST.  Reposnible for collecting sources referenced in pattern
+        code
+        """
+        
+        def __init__(self):
+            # chain call to parent constructor
+            # initialize sourcePattern dictionary member
+
+        def visit_Call(self, node): 
+            # call parent's generic visitor functionality to ensure
+            #   we maintain nested operation
+
+            
+            # AST for a call to a source, looks like this.
+            #   Call
+            #     Name(source)
+            #       Load
+            #     Str
+            #     Str
+            # 
+
+            # we want to test this node to see if it looks like this, and
+            # then extract the source's parameters
+
+            # if first subnode is a name, and == "source"
+            # collect the next "Str" arguments that follow
+            # store these in a sourcePattern Dictionary member
+
+        def __call__(tree):
+            # visit the specified tree
+            # return the sourcePattern dictionary
+ 
+
 Functions:
 
 
-    def get_pattern_vars(pattern)
+    def get_pattern_src_refs(pattern)
         """
         Parse a pattern string, throw exception if syntax is invalid.
-        return the set of variables mentioned in the pattern
+        return the source to pattern to instance dictionary of the sources
+        referenced in the code
         """
-        # use the ast module, ast.walk() iterator
-        # parse the pattern string and return set
+        see protoparser.py
 
+        # create a SourceVisitor and get the sourcePattern dict
 
-
-Notepad:
-
-Recall the port scanning behavior of 3 system logs
-
-secure          : ----+-------------+----+------
-httpd/access_log: ------------+----+--+-+-------
-httpd/error_log : -----------------+-+-+--------
-
-Thought Expirement 1
-concurrent(access_log, error_log)
-
-Traverse the tree
-
-Parsing-> concurrent(access_log, error_log)
-Module
- | Expr
- |  | Call
- |  |  | Name(concurrent)
- |  |  |  | Load
- |  |  | Name(access_log)
- |  |  |  | Load
- |  |  | Name(error_log)
- |  |  |  | Load
-
-
-
-
+        # TODO Fix ISSUE011
+        # return the sourcePattern dict
 
 
 

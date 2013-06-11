@@ -1,0 +1,185 @@
+quilt 0.1 semantics tests
+-------------------------
+
+
+Module: semantics_testcase
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test
+    seeded values in holiday calandar sources 
+
+External Dependencies:
+    python-unittest
+
+Prototype:
+    None
+
+Responsibilities:
+    Perform a simple semantic queries to excersize semantic evaluation code
+
+Classes:
+
+    class SemanticsTestcase()
+
+        NOTE   : Depend on seed values from BasicSourceTestcase plus
+            
+        def setUp():
+            """Setup the query master with some patterns used by the tests"""
+
+            # define query patterns
+
+            # call quilt_define source('secular_holidays_smd1234','grep')
+            #   -n semantics_one_source
+            #   -v WHICH_HOLIDAY
+            #   -m WHICH_HOLIDAY secular_holidays_smd1234 grep GREP_ARGS
+            #   -v UNUSED
+            #   -m UNUSED christian_holidays_smd_1234 grep GREP_ARGS
+
+            # call quilt_define 
+            #   'at(source('christian_holidays_smd1234','grep')) == '12'
+            #   -n semantics_equals_literal
+
+            # call quilt_define 
+            #   'concurrent(
+            #       source('christian_holidays_smd1234','grep'), 
+            #       source('secular_holidays_smd1234','grep'))'
+            #   -n semantics_concurrent
+                
+
+            # call quilt_define 
+            #   'concurrent(
+            #        source('christian_holidays_smd1234','grep'),
+            #        source('secular_holidays_smd1234','grep')
+            #         ['major'] == 'True')'
+            #   -n semantics_nested
+                
+            # call quilt_define 
+            #   follows(
+            #        1,
+            #        source('secular_holidays_smd1234','grep'),
+            #        source('christian_holidays_smd1234','grep') )
+            #   -n semantics_follows
+
+        def test_one_source():
+            """
+            This test assures that a simple case of semantics is tested
+            where only one thing is referenced, the results of one source
+            query.  Additionally a red herring second varible is specified
+            in the pattern, but is not mentioned in the pattern's code, only 
+            in the query's variables.  We want to make sure quilt is smart
+            enough not to make a useless source query.  An additional query
+            is made on the pattern where the second unused variable is
+            given a value.  Quilt should still be smart enough not to run
+            this source query because it is not mentioned in the pattern code
+            """
+            # issue valid query for secular_holidays
+            # call quilt_submit semantics_one_source -y 
+            #   -v WHICH_HOLIDAY newyears
+
+            # sleep small ammount
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            #   assure no error state
+            #   assure results contain newyears
+            #   assure no results from christian_holidays
+
+            # call quilt_submit secular_holidays -y 
+            #   -v UNUSED valentines
+
+            # sleep small ammount
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            #   assure no error state
+            #   assure results contain multiple secular holidays
+            #   assure no results from christian_holidays
+
+        def test_equals_literal():
+            """
+            This test assures a case where a results list is matched against
+            a literal string. 
+            """
+            
+            # issue valid query for christian_holidays
+            # call quilt_submit semantics_equals_literal -y 
+
+            # sleep small ammount
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            # assure output contains "christmass"
+            # assure output contains no secular_holidays
+
+            
+        def test_concurrent():
+            """
+            This test covers the simplest case for a temporal operator
+            function call.  Also covers case where pattern has no mapped
+            variables, but still references sources
+            """
+            
+            # issue valid query for concurrent_holidays
+            # call quilt_submit semantics_concurrent -y 
+
+            # sleep small ammount
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            # assure output contains no newyears
+            # assure output contains christmass and boxing day
+
+        def test_nested_concurrent():
+            """
+            This test covers a nested case where operator operates on
+            results of a literal comparison.
+            Also covers case where pattern has no mapped
+            variables, but still references sources
+            """
+            
+            # issue valid query for concurrent_holidays
+            # call quilt_submit semantics_nested -y 
+
+            # sleep small ammount
+
+            # Check results
+            # call quilt_history query_id
+            # capture stdout, assure good exitcode
+            # assure output contains Ash Wed and Valentines,
+            # asure no christmass
+
+        def test_follows():
+            """
+            This test assures the operation of the 'follows' quilt language
+            function.  It uses a pattern which selects christian holidays that
+            follow secular holidays within 1 month.  We expect to see
+            ashwednesday as it follows newyears by one month, 
+            """
+
+            # issue the query using the follows pattern
+
+            # assure the query is successfull, and get results
+
+            # check that results contain no easter, valentines day,
+            #   or boxingday
+            # check that results contain ashwednesday, christmass
+
+
+
+
+
+
+        
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

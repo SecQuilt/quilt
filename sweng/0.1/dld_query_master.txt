@@ -80,20 +80,24 @@ Classes:
                 # store querySpec in Q to reserve query id
 
             # if pattern code specified
-            #   parse the pattern text, and get set of variables mentioned
-            #   in the pattern code
+            # TODO Fix ISSUE011
+            #   parse the pattern text, and get set of
+            #   sources/patterns/instance
+            #   referened in the pattern code
 
             # using the set of sources described in the query code if
             #   they exist, or the ones described by mappings otherwise
-            # group variable mapping's by target source and isource pattern
+            # group variable mapping's by target source and source pattern
             #   store in local collection, if mentioned in the pattern code
             #   map{source:
             #       map{sourcePattern:
             #           map{sourcePatternInstance:
             #               map{srcVar:Var}}}}
 
-            # ensure that all variables mentioned in the pattern code have
-            #   corresponding variables in the query
+            # ensure that all variables mentioned in the pattern code (or if
+            # no pattern code then variables mentioned in the query) have
+            #   corresponding variables in the query.  Populate the varDict
+            #   collection with this information
         
             # iterate the collection of grouped sources
                 # use variable mapping's source name to get proxy to 
@@ -105,7 +109,8 @@ Classes:
                     #   by calling create_src_query_specs
                     # append completed sourceQuerySpecs to list of srcQueries
                     #   name sourceQuerySpec uniquely by combining the query
-                    #   name with the source pattern name
+                    #   name with the source pattern instance name
+
 
                     
             # store sourceQueries in the querySpec
@@ -227,7 +232,7 @@ Classes:
             string queryId          # the query we are interested in
             """
             Called by quilt_query to Move a query into the an active state,
-            and return a copy of the query
+            and return a tuple with a copy of the query and pattern specs
             """
 
             # lock self
@@ -239,10 +244,12 @@ Classes:
 
                 # move query to ACTIVE state
                 # create a  copy of the query
+
+                # get the pattern spec, and make a copy
  
             # returning copy because we con't want to stay locked when asking
             #   pyro to marshall across process bounds
-            # return the query spec copy
+            # return the pattern spec and query spec copies
 
         void CompleteQuery(queryId)
             """
@@ -278,7 +285,7 @@ Functions:
         # get new sourceQuery specs from the sourcePatternSpec
         
         # iterate the number of source queries in the list
-        #   srcPatDict[source][patternName]
+        #   varDict[source][patternName]
         # call create_src_query_spec with  the current pattern
         
     def create_src_query_spec

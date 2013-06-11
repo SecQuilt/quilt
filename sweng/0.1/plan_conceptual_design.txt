@@ -13,15 +13,7 @@ Existing:
 
 New:
 
-Semantic Parser
-    Tree Traverser          (VL)
-    Traverser Interface     (L)
-    Execution               (M)
+Follows Function: L
+Follows functor: S
+Follows Test: L
 
-Results Gatherer
-    Waiter          (L)
-    Invoker         (S)
-    
-Tests
-    Pass    (L)
-    Fail    (K)

@@ -38,7 +38,7 @@ Classes:
             # call quilt_define 
             #   Define a pattern using 6 variables, the 4 in multisource
             #   from two patterns, and then 2 from ss=yslog including the
-            #   same pattern twice.  Reference all 6 in  the code
+            #   same pattern twice.  Provide no query code
             #
 
 

@@ -34,8 +34,6 @@ class BasicSourcesTestcase(unittest.TestCase):
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
         quilt_test_core.call_quilt_script('quilt_define.py',[
-            "(SEARCHSTRING6/SEARCHSTRING5)-(SEARCHSTRING4^SEARCHSTRING3)*" + 
-                "((SEARCHSTRING2+SEARCHSTRING1))",
             '-n', 'bigpattern',
             '-v', 'SEARCHSTRING1', 'the Search string1',
             '-v', 'SEARCHSTRING2', 'the Search string2',
@@ -79,7 +77,6 @@ class BasicSourcesTestcase(unittest.TestCase):
 
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
-        print "$$$$$$$$$", o
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
