@@ -388,9 +388,16 @@ def common_init(name,strlevel):
     # common init stuff together
     Pyro4.config.HMAC_KEY="Itsnotmuchofacheeshopisit"
 
-def contains(l, p):
-    for i in l:
-        if i == p:
+def contains_this(looked_in, looked_for):
+    for item in looked_in:
+        print item, looked_for
+        if item == looked_for:
+            return True
+    return False
+
+def contains_any(looked_in, looked_for):
+    for item in looked_for:
+        if contains_this(looked_in, item):
             return True
     return False
 
@@ -406,7 +413,7 @@ def main_helper( name, description, argv ):
     argparser.add_argument('-l','--log-level',nargs='?',
         help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
 
-    if contains(argv, '-h') == False: # if -h present, no other args honored
+    if contains_any(argv, ['-h','--help']) == False: 
         args, unknownArgs = argparser.parse_known_args(argv)
         unknownArgs = unknownArgs # its a pylint thing
         common_init(name, args.log_level)
