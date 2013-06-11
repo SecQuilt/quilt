@@ -5,6 +5,7 @@ import argparse
 import quilt_core
 import sei_core
 import time
+import logging
 
 def get_quilt_test_lib_dir():
     """grab the location of quilt test scritps"""
@@ -65,6 +66,7 @@ def call_quilt_script( scriptName, args = None, checkCall=True):
 
     # call quilt_status (check return code, capture output)
     args = [script_file, '-l', 'DEBUG'] + args
+    # print("Executing under test: " + str(args))
     out = sei_core.run_process(args,
         whichReturn=sei_core.STDOUT, logToPython=False,
         checkCall=checkCall)

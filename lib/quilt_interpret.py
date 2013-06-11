@@ -187,6 +187,7 @@ def _check_equal(iterator):
         return all(first == rest.GetRec() for rest in iterator)
     except StopIteration:
         return True
+    #TODO ISSUE 015 ISSUE016
 
 def concurrent(*patterns):
     """return all patterns that occur at the same time"""
@@ -232,6 +233,94 @@ def concurrent(*patterns):
     return _pattern(returnEventsId, returnEvents)
 
     
+class _check_follows:
+    """
+    Object represents a functor.  In the class constructor the delta time
+    ammount is passed.  In the class's check funciton is used as a
+    callback for pairs of timestamps. 
+    """
+    def __init__(self, howlong):
+        # set how long into member data
+        self.howlong = howlong
+
+
+    def check(self, pair):
+        """
+        called to check each tuple created from the cartesian product of
+        before and after events given to the follows function.  
+        pair is a two element tuple (before record, after record). Returns
+        True if second element occurs within howlong of the first element.
+        """
+        # set before record to first value of tuple
+        before = pair[0]
+        # set after record to second value of tuple
+        after = pair[1]
+        # set before and after to the value wraped in the record wrapper
+        before = before.GetRec()
+        after = after.GetRec()
+        # return true if before is within howlong of after and is not zero
+        #   otherwise return False 
+        delta = after - before
+        return delta > 0 and delta <= self.howlong
+        
+        #TODO ISSUE016
+
+
+        
+
+def follows(howlong, before, after):
+    """
+    Determine and return the events in after that occur within howlong of
+    before.  This does not include events in before and after that occur
+    at the same time.
+    howlong : time delta
+    before : pattern
+    after: pattern
+    """
+
+    # generate a name for a new pattern like:
+    #   follows( howlong, name of before patter, name of after pattern)
+    returnEventsId = ("follows(" + str(howlong) + "," + before.eventsId + 
+        "," + after.eventsId + ')')
+    
+    # if events can be found with the generated name
+    if _has_events(returnEventsId):
+        # return previously generated event list
+        return _pattern(returnEventsId)
+
+    # get time fields of before, after by calling at() method
+    beforeFields = at(before)
+    afterFields = at(after)
+
+    # create a _check_follows functor object
+    #   initialize with howlong
+    checkFollows = _check_follows(howlong)
+
+    # use itertools iproduct on the fields, and pass them to an ifilter
+    #   use _check_follows.check() for filter predicate
+    sequenced = itertools.ifilter(checkFollows.check, itertools.product(
+        beforeFields, afterFields))
+
+    # create an empty list for returning events
+    returnEvents = []
+    # use returned iterator from ifilter, for each of the tuples remaining
+    #   in the filtered product
+    for sequencePair in sequenced:
+        # get the second (After) element of the tuple
+        afterRecord = sequencePair[1]
+        # get the index of the timestampRecord 
+        index = afterRecord.index
+        # get the name of the events list
+        eventsId = afterRecord.eventsId
+        # get the event in the named list at the specified index
+        event = _get_events(eventsId)[index]
+        # append the event to a returning list of events 
+        returnEvents.append(event)
+            
+    # return a new pattern wrapper with the generated name and the
+    #   newly determined events
+    return _pattern(returnEventsId, returnEvents)
+
 
 def _get_events(eventsId):
 #   logging.debug("accessing " + str(eventsId))

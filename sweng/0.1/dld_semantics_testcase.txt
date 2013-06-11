@@ -160,18 +160,16 @@ Classes:
             This test assures the operation of the 'follows' quilt language
             function.  It uses a pattern which selects christian holidays that
             follow secular holidays within 1 month.  We expect to see
-            ashwednesday as it follows newyears by one month, but we expect
-            not to see christmass and boxing day as they occur on the same
-            month.  (we do not support month wrap around)
+            ashwednesday as it follows newyears by one month, 
             """
 
             # issue the query using the follows pattern
 
             # assure the query is successfull, and get results
 
-            # check that results contain no christmass, valentines day,
+            # check that results contain no easter, valentines day,
             #   or boxingday
-            # check that results contain ashwednesday
+            # check that results contain ashwednesday, christmass
 
 
 

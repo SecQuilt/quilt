@@ -140,11 +140,11 @@ Functions:
         def __init__(self, howlong):
             # set how long into member data
 
-        def check(self, iterator):
+        def check(self, pair):
             """
             called to check each tuple created from the cartesian product of
             before and after events given to the follows function.  
-            iterator operates over a two element tuple. Returns
+            pair is a two element tuple (before record, after record). Returns
             True if second element occurs within howlong of the first element.
             """
             # set before record to next value of the iterator
@@ -182,11 +182,11 @@ Functions:
         # create an empty list for returning events
         # use returned iterator from ifilter, for each of the tuples remaining
         # in the filtered product
-            # for each timestampRecord element in the tuple
-                # get the index of the timestampRecord event
-                # get the name of the events list
-                # get the event in the named list ad the specified index
-                # append the event to a returning list of events 
+            # get the second (After) element of the tuple
+            # get the index of the timestampRecord event
+            # get the name of the events list
+            # get the event in the named list at the specified index
+            # append the event to a returning list of events 
                 
         # return a new pattern wrapper with the generated name and the
         #   newly determined events

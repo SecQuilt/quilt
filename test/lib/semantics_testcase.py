@@ -71,26 +71,26 @@ class SemanticsTestcase(unittest.TestCase):
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
         quilt_test_core.call_quilt_script('quilt_define.py',[
-            "concurrent( source('" + christian_holidays + "','grep')," +
+            "concurrent(source('" + christian_holidays + "','grep')," +
                         "source('" + secular_holidays   + "','grep'))",
                         '-n', 'semantics_concurrent'])
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
         quilt_test_core.call_quilt_script('quilt_define.py',[
-            "concurrent( source('" + christian_holidays + "','grep')," +
-                        "source('" + secular_holidays   + "','grep')['major'] == 'True')",
+            "concurrent(source('" + christian_holidays + "','grep')," +
+                        "source('" + secular_holidays   + "','grep')['major']=='True')",
                         '-n', 'semantics_nested'])
 
             
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-#       quilt_test_core.call_quilt_script('quilt_define.py',[
-#           'follows(2,',
-#               "source('" + secular_holidays   + "','grep')," +
-#               "source('" + christian_holidays   + "','grep'))",
-#           '-n', 'semantics_follows'
-#           ])
+        quilt_test_core.call_quilt_script('quilt_define.py',[
+            'follows(1,' +
+                "source('" + secular_holidays   + "','grep')," +
+                "source('" + christian_holidays   + "','grep'))",
+            '-n', 'semantics_follows'
+            ])
 
     def test_one_source(self):
         """
@@ -245,10 +245,11 @@ class SemanticsTestcase(unittest.TestCase):
 
     def test_follows(self):
         """
-        blah
+        This test assures the operation of the 'follows' quilt language
+        function.  It uses a pattern which selects christian holidays that
+        follow secular holidays within 1 month.  We expect to see
+        ashwednesday as it follows newyears by one month, 
         """
-
-        return
         # issue valid query for concurrent_holidays
         # call quilt_submit semantics_concurrent -y 
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
@@ -260,8 +261,36 @@ class SemanticsTestcase(unittest.TestCase):
         # capture stdout, assure good exitcode
         o = self.check_query_and_get_results(o)
 
+        # assure output contains ashednesday
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "ashwednesday", o)]))
+        self.assertTrue(occurences == 1)
         print(o)
+        # assure output contains no christmass
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "christmass", o)]))
+        self.assertTrue(occurences == 1)
 
+
+        # assure output contains no valentines
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "valentines", o)]))
+        self.assertTrue(occurences == 0)
+
+        # assure output contains no easter
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "easter", o)]))
+        self.assertTrue(occurences == 0)
+
+        # assure output contains no boxingday
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "boxingday", o)]))
+        self.assertTrue(occurences == 0)
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(
