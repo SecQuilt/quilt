@@ -153,8 +153,6 @@ Functions:
             # return true if before is within howlong of after and is not zero
             #   otherwise return False 
 
-            
-
     def follows(howlong, before, after):
         """
         Determine and return the events in after that occur within howlong of
@@ -188,6 +186,38 @@ Functions:
             # get the event in the named list at the specified index
             # append the event to a returning list of events 
                 
+        # return a new pattern wrapper with the generated name and the
+        #   newly determined events
+
+
+    def until(before, after);
+        """
+        Determine all of the events in before that occured prior to any event
+        in after.  This includes an event in before that occurs at the same
+        time as the first event in after
+        """
+
+        # generate a name for a new pattern like:
+        #   until( name of before pattern, name of after pattern)
+        
+        # if events can be found with the generated name
+            # return previously generated event list
+
+        # get fields of before, after by calling at() method
+
+        # iterate the after timestamp fields
+            # find the earliest occuring time
+
+        # create empty list for returning events
+
+        # get the name of the before events list
+        # iterate the before timestamp fields
+            # if current timestamp if before or equal to earliest after
+            #   timestamp
+                # get the index of the timestampRecord event
+                # get the event in the named list at the specified index
+                # append the event to a returning list of events 
+
         # return a new pattern wrapper with the generated name and the
         #   newly determined events
 

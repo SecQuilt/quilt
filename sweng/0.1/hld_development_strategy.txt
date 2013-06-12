@@ -200,6 +200,22 @@ c7.Follows
         Add a test, find which christian holidays follow a secular holiday
         within 1 month
 
+c8.Until
+
+    Design
+        Add until(a,b) function.
+
+        Scan through b to find the earliest
+        Scan through a to find to find everything before the earliest
+
+    Implement
+        ...
+
+    Test Add a test, find which secular holidays occur until christian
+        holidays
+
+
+
 cX.Language
     Theme: full quilt language support
 

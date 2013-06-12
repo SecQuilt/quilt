@@ -2,6 +2,7 @@
 import threading
 import quilt_data
 import itertools
+import logging
 
 
 class _rec:
@@ -321,6 +322,59 @@ def follows(howlong, before, after):
     #   newly determined events
     return _pattern(returnEventsId, returnEvents)
 
+
+def until(before, after):
+    """
+    Determine all of the events in before that occured prior to any event
+    in after.  This includes an event in before that occurs at the same
+    time as the first event in after
+    """
+
+    # generate a name for a new pattern like:
+    #   until( name of before pattern, name of after pattern)
+    
+    returnEventsId = "until(" + before.eventsId + "," + after.eventsId + ')'
+    
+    # if events can be found with the generated name
+    if _has_events(returnEventsId):
+        # return previously generated event list
+        return _pattern(returnEventsId)
+
+    # get fields of before, after by calling at() method
+    beforeFields = at(before)
+    afterFields = at(after)
+
+    # iterate the after timestamp fields
+    t = None
+    tv = None
+    for f in afterFields:
+        # find the earliest occuring time
+        if t == None or f.GetRec() < tv:
+            t = f
+            tv = t.GetRec()
+
+    # logging.debug("%%%%%% Earlies time in " + after.eventsId + " is " + str(tv))
+
+    #  empty list for returning events
+    returnEvents = []
+
+    if t != None:
+        eventsId = before.eventsId
+        # iterate the before timestamp fields
+        for b in beforeFields:
+            # if current timestamp if before or equal to earliest after
+            #   timestamp
+            if b.GetRec() <= tv:
+                # get the index of the timestampRecord event
+                index = b.index
+                # get the event in the named list at the specified index
+                e = _get_events(eventsId)[index]
+                # append the event to a returning list of events 
+                returnEvents.append(e)
+
+    # return a new pattern wrapper with the generated name and the
+    #   newly determined events
+    return _pattern(returnEventsId, returnEvents)
 
 def _get_events(eventsId):
 #   logging.debug("accessing " + str(eventsId))

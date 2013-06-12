@@ -104,6 +104,9 @@ def tree_print(node, depth):
     for n in ast.iter_child_nodes(node):
         tree_print(n,depth+1)
 
+#A: ------------+------+---++----------------+---+-----------+
+#B: -+--------+---++------+--------+----+--------+---+--------
+
 def until(a,b):
     return a < b
 
@@ -276,9 +279,9 @@ def do_parse(codeline):
     r = eval( codeline )
 
     print "\n","RESULTS","\n"
-    # pprint.pprint(r)
-    # pprint.pprint(r.name)
-    # pprint.pprint(getEvents(r.name))
+    pprint.pprint(r)
+    pprint.pprint(r.name)
+    pprint.pprint(getEvents(r.name))
 
         
 

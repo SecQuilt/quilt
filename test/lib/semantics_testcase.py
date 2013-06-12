@@ -92,6 +92,14 @@ class SemanticsTestcase(unittest.TestCase):
             '-n', 'semantics_follows'
             ])
 
+        #TODO REad the pattern id from the std output then query that one
+        # See ISSUE007 and ISSUE008
+        quilt_test_core.call_quilt_script('quilt_define.py',[
+            'until(' +
+                "source('" + secular_holidays   + "','grep')," +
+                "source('" + christian_holidays   + "','grep'))",
+            '-n', 'semantics_until'
+            ])
     def test_one_source(self):
         """
         This test assures that a simple case of semantics is tested
@@ -266,7 +274,6 @@ class SemanticsTestcase(unittest.TestCase):
             len([m.start() for m in re.finditer(
                 "ashwednesday", o)]))
         self.assertTrue(occurences == 1)
-        print(o)
         # assure output contains no christmass
         occurences = (
             len([m.start() for m in re.finditer(
@@ -281,6 +288,48 @@ class SemanticsTestcase(unittest.TestCase):
         self.assertTrue(occurences == 0)
 
         # assure output contains no easter
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "easter", o)]))
+        self.assertTrue(occurences == 0)
+
+        # assure output contains no boxingday
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "boxingday", o)]))
+        self.assertTrue(occurences == 0)
+
+    def test_until(self):
+        """
+        This test assures the operation of the 'until' quilt language
+        function.  It uses a pattern which selects secular holidays 
+        until a christian holiday occurs.  We expect to see newyears, 
+        and valentines
+        """
+        # issue valid query for concurrent_holidays
+        # call quilt_submit semantics_concurrent -y 
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+            'semantics_until', '-y'
+            ]))
+
+        # Check results
+        # call quilt_history query_id
+        # capture stdout, assure good exitcode
+        o = self.check_query_and_get_results(o)
+
+        # assure output contains ashednesday
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "valentines", o)]))
+        self.assertTrue(occurences == 1)
+        # assure output contains no christmass
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "newyears", o)]))
+        self.assertTrue(occurences == 1)
+
+
+        # assure output contains no valentines
         occurences = (
             len([m.start() for m in re.finditer(
                 "easter", o)]))

@@ -63,6 +63,12 @@ Classes:
             #        source('christian_holidays_smd1234','grep') )
             #   -n semantics_follows
 
+            # call quilt_define 
+            #   until(
+            #        source('secular_holidays_smd1234','grep'),
+            #        source('christian_holidays_smd1234','grep') )
+            #   -n semantics_until
+
         def test_one_source():
             """
             This test assures that a simple case of semantics is tested
@@ -172,6 +178,20 @@ Classes:
             # check that results contain ashwednesday, christmass
 
 
+        def test_until():
+            """
+            This test assures the operation of the 'until' quilt language
+            function.  It uses a pattern which selects secular holidays 
+            until a christian holiday occurs.  We expect to see newyears, 
+            and valentines
+            """
+
+            # issue the query using the until pattern
+
+            # assure the query is successfull, and get results
+
+            # check that results contain no easter, boxingday
+            # check that results contain valentines, newwyears
 
 
 
