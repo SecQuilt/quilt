@@ -40,8 +40,8 @@ Queries:
 
 
 Results:
-* results of query will be presented to the user as a collection of temporal
-    sequences of events.
+* results of query will be presented to the user as a collection of unique 
+    temporal sequences of events.
 
 Data:
 * Differnt types of data can be housed at together, or at differnt locations,

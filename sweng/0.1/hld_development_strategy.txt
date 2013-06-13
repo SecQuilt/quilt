@@ -216,30 +216,36 @@ c8.Until
 
 
 
-cX.Language
-    Theme: full quilt language support
+c9.NoDups
+    
+    DESIGN
+        come up with queries that reveal duplicate events
 
-    Design
-        complete prototype protoeval, with new functions
-        Utilize python itertools library
+        design solution
 
-    Implement
-        Translate prototype into actual codebase
+    IMPLEMENT
 
-    Test
-        append semantics testcase with new tests
-            find christian holidays that follow major secular holidays within
-            3 months
+    TEST
+        Create two new sources even and odd numbers, enter even/odd numbers
+        from [1-10] in the data file.  Copy what was done in _holidays data
+        files and source
 
-            find secular holidays until a major christian holiday
+        Create query for each function which would potentially reveal
+        duplicates:
 
+        follows(5, source('even_numbers','grep'),source('odd_numbers','grep'))"
+        concurrent(source('even_numbers','grep'),source('even_numbers,'grep'),
+            source('even_numbers','grep'))
 
+        until implmementation is such that duplicates are not a problem
+        
+        Run the queries, check results have no duplicate events, and have good
+        results
             
         
         
 cX.Testability
     Theme: Ensure testing fidelity and coverage
-
     DESIGN
 
     Design scheme for testing patterns, using rational from

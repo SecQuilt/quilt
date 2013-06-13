@@ -13,7 +13,6 @@ Existing:
 
 New:
 
-Until Function: L
-Until functor: M
-Until Test: L
+Duplicate Checker 3 (m)
+Tests             4 (l)
 
