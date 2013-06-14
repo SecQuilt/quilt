@@ -109,3 +109,18 @@ Decision:
     so lets return the results to a seperate process, the quilt_query process.
     It will wait for all results then do emsnatics and publish data to master
 
+
+
+--------------------------------
+Duplicates in queries (ISSUE016)
+--------------------------------
+
+Full run time analysis needs to be made to determine how to most efficiently
+remove duplicate events from the returned results of semantic queries.
+
+Adding a visited flag to the dataset, or maintaining a side band map of
+visited may have interesting time/space tradeoffs
+
+For now, to avoid premature optimization, the final returned list is simply
+rescaned for duplicates as it grows
+

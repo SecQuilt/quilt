@@ -9,6 +9,8 @@ firstTime=True
 
 class SemanticsTestcase(unittest.TestCase):
 
+    # TODO see ISSUE008  We want to move this to test_core when there is a
+    # less hacky way to do it
     def check_query_and_get_results(self, submitStdout):
         # sleep a small ammount
         quilt_test_core.sleep_small()

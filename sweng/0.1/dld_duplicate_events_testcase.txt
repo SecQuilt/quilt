@@ -1,0 +1,109 @@
+quilt 0.1 duplicate events tests
+--------------------------------
+
+
+Module: duplicate_events_testcase
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test
+    seeded values in *_number sources 
+
+External Dependencies:
+    python-unittest
+
+Prototype:
+    Adhoc prototyping of queries, see hld_development_strategy.txt
+
+Responsibilities:
+    Perform quilt queries that have the potential to return duplicate events.
+    Assure that quilt will not return duplicate events
+
+Classes:
+
+    class DuplicateEventsTestcase()
+
+            
+        def setUp():
+            """Setup the query master with some patterns used by the tests"""
+
+            # get the sull source name for even and odd sources
+
+            # define template pattern code string
+            followsTemplate = 
+                "follows(5, source('$EVEN','grep'),source('$ODD','grep'))"
+            
+            # replace EVEN and ODD variables in the template
+
+            # call quilt_define with the pattern code and name query
+            #   dups_follows
+
+            # define template pattern code string
+            concurrentTemplate =
+                "concurrent(source('$EVEN','grep'),source('$EVEN,'grep'),
+                    source('$EVEN','grep'))
+
+            # replace EVEN variable in the template
+
+            # call quilt_define with the pattern code and name query
+            #   dups_concurrent
+
+        def contains_once(
+            # string text_body
+            # string search_string )
+            """
+            Assert a test failure if search_string iff does not occur one time
+in the text_body
+            """
+
+            # use regular expression to count the number of occurences
+            # assert an error if it did not occur once
+
+        
+        # TODO see ISSUE008  We want to move this to test_core when there is a
+        # less hacky way to do it, for now copy this function from
+        # semantics_testcase.py
+        def check_query_and_get_results(self, submitStdout):
+
+        def test_follows():
+            """
+            submits the dups_follows pattern and assures that no duplicates
+            are reported.  Also assures that correct values are placed in
+            results
+            """
+
+            # call quilt submit -n dups_follows
+            # Assure proper execution, and get results from quilt_history
+            
+            # check results contain one copy of "{'timestamp': 3}"
+            # check results contain one copy of "{'timestamp': 5}"
+            # check results contain one copy of "{'timestamp': 7}"
+            # check results contain one copy of "{'timestamp': 9}"
+
+            
+
+        def test_concurrent():
+            """
+            submits the dups_concurrent pattern and assures that no duplicates
+            are reported.  Also assures that correct values are placed in
+            results
+            """
+            
+            # call quilt submit -n dups_follows
+            # Assure proper execution, and get results from quilt_history
+            
+            # check results contain one copy of "{'timestamp': 2}"
+            # check results contain one copy of "{'timestamp': 4}"
+            # check results contain one copy of "{'timestamp': 6}"
+            # check results contain one copy of "{'timestamp': 8}"
+            # check results contain one copy of "{'timestamp': 10}"
+            
+        
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

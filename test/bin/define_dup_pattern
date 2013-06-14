@@ -1,0 +1,11 @@
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/testenv.rc
+even="'"$($QUILT_HOME/bin/quilt_status | grep even_numbers | head -n 1 | awk '{print $1}' | sed  -e "s/{'//" -e "s/'://" -e "s/'//g")"'"
+odd="'"$($QUILT_HOME/bin/quilt_status | grep odd_numbers | head -n 1 | awk '{print $1}' | sed  -e "s/{'//" -e "s/'://" -e "s/'//g")"'"
+
+$QUILT_HOME/lib/quilt_define.py '-l' 'DEBUG' '-n' 'dup_follows' \
+    "follows(5, source($even,'grep'),source($odd,'grep'))"
+
+$QUILT_HOME/lib/quilt_define.py '-l' 'DEBUG' '-n' 'dup_concurrent' \
+    "concurrent(source($even,'grep'),source($even,'grep'), source($even,'grep'))"
+

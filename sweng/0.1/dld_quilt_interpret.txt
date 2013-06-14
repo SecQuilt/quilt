@@ -125,7 +125,8 @@ Functions:
         # generate new event list only containing timestamps
         #   found during the join, iterate over the join results
             # get each _rec's index and eventsId
-            # get the append the referenced event to a new list
+            # if event is not already in the list
+            #   append the event to a returning list of events 
 
 
         # record new event list in event dict with this name
@@ -184,7 +185,8 @@ Functions:
             # get the index of the timestampRecord event
             # get the name of the events list
             # get the event in the named list at the specified index
-            # append the event to a returning list of events 
+            # if event is not already in the list
+            #   append the event to a returning list of events 
                 
         # return a new pattern wrapper with the generated name and the
         #   newly determined events

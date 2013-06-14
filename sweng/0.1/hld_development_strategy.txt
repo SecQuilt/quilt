@@ -217,6 +217,8 @@ c8.Until
 
 
 c9.NoDups
+
+    Fixes ISSUE016
     
     DESIGN
         come up with queries that reveal duplicate events
@@ -241,6 +243,38 @@ c9.NoDups
         
         Run the queries, check results have no duplicate events, and have good
         results
+
+        Before development, results look like this:
+{'qsub25566_dup_follows': {'name': 'qsub25566_dup_follows',
+                           'patternName': 'dup_follows',
+                           'results': [{'timestamp': 3},
+                                       {'timestamp': 5},
+                                       {'timestamp': 7},
+                                       {'timestamp': 5},
+                                       {'timestamp': 7},
+                                       {'timestamp': 9},
+                                       {'timestamp': 7},
+                                       {'timestamp': 9},
+                                       {'timestamp': 9}],
+ 'qsub25589_dup_concurrent': {'name': 'qsub25589_dup_concurrent',
+                              'patternName': 'dup_concurrent',
+                              'results': [{'timestamp': 2},
+                                          {'timestamp': 2},
+                                          {'timestamp': 2},
+                                          {'timestamp': 4},
+                                          {'timestamp': 4},
+                                          {'timestamp': 4},
+                                          {'timestamp': 6},
+                                          {'timestamp': 6},
+                                          {'timestamp': 6},
+                                          {'timestamp': 8},
+                                          {'timestamp': 8},
+                                          {'timestamp': 8},
+                                          {'timestamp': 10},
+                                          {'timestamp': 10},
+                                          {'timestamp': 10}],
+
+
             
         
         

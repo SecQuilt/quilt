@@ -24,7 +24,6 @@ Classes:
 
     class SemanticsTestcase()
 
-        NOTE   : Depend on seed values from BasicSourceTestcase plus
             
         def setUp():
             """Setup the query master with some patterns used by the tests"""
