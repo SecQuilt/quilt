@@ -59,11 +59,6 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Why are we returning true if StopIteration exception comes?
     quilt_interpret::_check_equal
 
-    ISSUE016
-    Duplicate events allowed.  If you have a three element concurrent call, or
-    a high delta time in a follows statment and the right input data the
-    results will contain duplicate events.  some mechanism is needed for
-    duplicate events prevention.
 
 Closed:
 
@@ -142,3 +137,15 @@ Closed:
     Need a way to process semantics
     RESOLVED
         See quilt_interpret.py
+
+
+    ISSUE016
+    Duplicate events allowed.  If you have a three element concurrent call, or
+    a high delta time in a follows statment and the right input data the
+    results will contain duplicate events.  some mechanism is needed for
+    duplicate events prevention.
+
+    RESOLVED
+    Resolution was just researching the list as we add new elements.  In the
+    future we might make some spce/time/complexity tradeoffs and have a
+    differnt solution

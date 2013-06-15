@@ -29,13 +29,13 @@ Classes:
         def setUp():
             """Setup the query master with some patterns used by the tests"""
 
-            # get the sull source name for even and odd sources
+            # get the full source name for even and odd sources
 
             # define template pattern code string
             followsTemplate = 
                 "follows(5, source('$EVEN','grep'),source('$ODD','grep'))"
             
-            # replace EVEN and ODD variables in the template
+            # replace EVEN and ODD variables in the template with full names
 
             # call quilt_define with the pattern code and name query
             #   dups_follows
@@ -45,7 +45,7 @@ Classes:
                 "concurrent(source('$EVEN','grep'),source('$EVEN,'grep'),
                     source('$EVEN','grep'))
 
-            # replace EVEN variable in the template
+            # replace EVEN variable in the template with full source name
 
             # call quilt_define with the pattern code and name query
             #   dups_concurrent
@@ -55,7 +55,7 @@ Classes:
             # string search_string )
             """
             Assert a test failure if search_string iff does not occur one time
-in the text_body
+            in the text_body
             """
 
             # use regular expression to count the number of occurences
@@ -70,11 +70,11 @@ in the text_body
         def test_follows():
             """
             submits the dups_follows pattern and assures that no duplicates
-            are reported.  Also assures that correct values are placed in
+            are reported Also assures that correct values are placed in
             results
             """
 
-            # call quilt submit -n dups_follows
+            # call quilt submit -y dups_follows
             # Assure proper execution, and get results from quilt_history
             
             # check results contain one copy of "{'timestamp': 3}"
@@ -91,7 +91,7 @@ in the text_body
             results
             """
             
-            # call quilt submit -n dups_follows
+            # call quilt submit -y dups_follows
             # Assure proper execution, and get results from quilt_history
             
             # check results contain one copy of "{'timestamp': 2}"

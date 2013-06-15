@@ -4,6 +4,7 @@ import unittest
 import quilt_data
 import quilt_test_core
 import re
+from string import Template
 
 firstTime=True
 
@@ -345,5 +346,5 @@ class SemanticsTestcase(unittest.TestCase):
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(
-        "Run integration test for multiple basic source",sys.argv)
+        "Run integration test for semantic processing",sys.argv)
     unittest.main()

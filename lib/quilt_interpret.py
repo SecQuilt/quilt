@@ -2,7 +2,7 @@
 import threading
 import quilt_data
 import itertools
-import logging
+# import logging
 
 
 class _rec:
@@ -188,7 +188,7 @@ def _check_equal(iterator):
         return all(first == rest.GetRec() for rest in iterator)
     except StopIteration:
         return True
-    #TODO ISSUE 015 ISSUE016
+    #TODO ISSUE015 ISSUE016
 
 def concurrent(*patterns):
     """return all patterns that occur at the same time"""
@@ -226,7 +226,9 @@ def concurrent(*patterns):
         for timestampRecord in joinedTuple:
             index = timestampRecord.index
             eventsId = timestampRecord.eventsId
-            returnEvents.append(_get_events(eventsId)[index])
+            event = _get_events(eventsId)[index] 
+            if not event in returnEvents:
+                returnEvents.append(event)
 
     # logging.debug("CONCURRR " + str(returnEvents))
     # record new event list in event dict with this name
@@ -315,8 +317,10 @@ def follows(howlong, before, after):
         eventsId = afterRecord.eventsId
         # get the event in the named list at the specified index
         event = _get_events(eventsId)[index]
-        # append the event to a returning list of events 
-        returnEvents.append(event)
+        # if event is not already in the list
+        if not event in returnEvents:
+            # append the event to a returning list of events 
+            returnEvents.append(event)
             
     # return a new pattern wrapper with the generated name and the
     #   newly determined events
