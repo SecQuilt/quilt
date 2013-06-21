@@ -13,6 +13,6 @@ Existing:
 
 New:
 
-Duplicate Checker 3 (m)
-Tests             4 (l)
-
+Less Than Handler M
+Functor           VS
+2 Tests           S
