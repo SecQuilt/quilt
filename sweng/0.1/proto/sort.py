@@ -75,10 +75,12 @@ events = [
 def at(x):
     return x['timestamp']
 
+def at2(x):
+    return x['timestamp']
 #events2 = sorted(events, key=lambda record: record['timestamp'])
 #events2 = sorted(events, key=lambda record: at(record))
 #pprint.pprint(events2)
-events.sort(key=lambda record: at(record))
+events.sort(at2)
 
 pprint.pprint(events)
 

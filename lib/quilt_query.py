@@ -7,6 +7,9 @@ import quilt_data
 import query_master
 import quilt_interpret
 
+def at(x):
+    return quilt_interpret.at(x)
+
 class QuiltQuery(quilt_core.QueryMasterClient):
     """
     Issue source queries from a partial querySpec, wait for the results,
@@ -192,15 +195,37 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         """
         logging.info("Completing source query: " + str(srcQueryId))
         try:
-            # NOTE: No reason to really lock here because each source will be
-            #     writing to one designated state field, but it is probably 
-            #     just a safe idea to lock in case of API misuse/murphy's law
+            # NOTE:
+            #   Because the member data query specs are not entries are not
+            #   modified (Except during intialization) we do not have to lock
+            #   before reading from the list.  Also we assume no results
+            #   should be appended after a call to complete query so that we
+            #   can sort the list of data outside of a lock.  Also see note 
+            #   in AppendSourceQueryResults which could change the logic here
+
+
+            # get the source query from the member data collection of src 
+            #   queries using the srcQueryId
+            srcQuerySpec = quilt_data.src_query_specs_get(
+                    self._srcQuerySpecs, srcQueryId)
+
+
+            # if src query specifies that source returns out of order results
+            if not quilt_data.src_query_spec_get(srcQuerySpec, ordered=True):
+                results = None
+                with self._lock:
+                    if srcQueryId in self._srcResults:
+                        results = self._srcResults[srcQueryId]
+
+                if results != None:
+                    # sort results  by timestamp using interpret's 'at' 
+                    #   function
+                    results.sort(key=lambda rec: at(rec))
+
 
             # acquire lock
             with self._lock:
                 # set srcQuerie's state to COMPLETED
-                srcQuerySpec = quilt_data.src_query_specs_get(
-                        self._srcQuerySpecs, srcQueryId)
 
                 # If query is progressing through the system properly it
                 # should be an active state when it gets here

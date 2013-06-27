@@ -394,44 +394,52 @@ def query_specs_trydel(querySpecs, querySpecName):
 def src_pat_spec_set(
     spec,
     name=None,
+    ordered=None,
     variables=None
     ):
     if spec == None: spec = {}
     if name != None: spec_name_set(spec, name)
+    if ordered != None: spec['ordered']= ordered
     if variables != None: spec['variables']= variables
     return spec
 
 def src_pat_spec_create(
     name=None,
+    ordered=None,
     variables=None
     ):
     return src_pat_spec_set(
         None,
         name=name,
+        ordered=ordered,
         variables=variables)
 
 
 def src_pat_spec_get(
     spec,
     name=False,
+    ordered=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned"""
     if name: return spec_name_get(spec)
+    if ordered: return spec['ordered']
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
 
 def src_pat_spec_tryget(
     spec,
     name=False,
+    ordered=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If value is not present in spec, None is returned"""
     if name: return spec_name_tryget(spec)
+    if ordered and 'ordered' in spec: return spec['ordered']
     if variables and 'variables' in spec: return spec['variables']
     return None
 
@@ -449,6 +457,7 @@ def src_query_spec_create(
     srcPatternInstance=None,
     state=None,
     source=None,
+    ordered=None,
     variables=None
     ):
     return src_query_spec_set(
@@ -458,6 +467,7 @@ def src_query_spec_create(
         srcPatternInstance=srcPatternInstance,
         state=state,
         source=source,
+        ordered=ordered,
         variables=variables)
 
 def src_query_spec_set(
@@ -467,6 +477,7 @@ def src_query_spec_set(
     srcPatternInstance=None,
     state=None,
     source=None,
+    ordered=None,
     variables=None
     ):
     if spec == None: spec = {}
@@ -475,6 +486,7 @@ def src_query_spec_set(
     if srcPatternInstance != None: spec['srcPatternInstance']= srcPatternInstance
     if state != None: spec['state']= state
     if source != None: spec['source']= source
+    if ordered != None: spec['ordered']= ordered
     if variables != None: spec['variables']= variables
     return spec
 
@@ -485,6 +497,7 @@ def src_query_spec_get(
     srcPatternInstance=False,
     state=False,
     source=False,
+    ordered=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
@@ -495,6 +508,7 @@ def src_query_spec_get(
     if srcPatternInstance: return spec['srcPatternInstance']
     if state: return spec['state']
     if source: return spec['source']
+    if ordered: return spec['ordered']
     if variables: return spec['variables']
     raise Exception("Accessor not properly used")
 
@@ -505,6 +519,7 @@ def src_query_spec_tryget(
     srcPatternInstance=False,
     state=False,
     source=False,
+    ordered=False,
     variables=False
     ):
     """Accessor for information from the spec.  Only one parameter should
@@ -515,6 +530,7 @@ def src_query_spec_tryget(
     if srcPatternInstance and 'srcPatternInstance' in spec: return spec['srcPatternInstance']
     if state and 'state' in spec: return spec['state']
     if source and 'soruce' in spec: return spec['soruce']
+    if ordered and 'ordered' in spec: return spec['ordered']
     if variables and 'variables' in spec: return spec['variables']
     return None
 
@@ -590,6 +606,16 @@ def src_spec_create(cfgStr=None, cfgSection=None):
                 raise Exception("Inconsitant names specified for source" +
                     " pattern ( " + srcPatName + ", " + srcPatSpecName + " )")
             src_pat_spec_set(srcPatSpec, name=srcPatName)
+
+
+            # check if the user did not set the 'ordered' field, we will
+            # default it to true
+            ordered = src_pat_spec_tryget(srcPatSpec, ordered=True)
+            if ordered == None:
+                ordered = True
+            # set whether or not this spec guarantees return of ordered
+            # results
+            src_pat_spec_set(srcPatSpec, ordered=ordered)
 
             cfgSrcPatVarSpecs = src_pat_spec_get(srcPatSpec,variables=True)
             for name,val in cfgSrcPatVarSpecs.items():

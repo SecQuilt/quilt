@@ -739,13 +739,18 @@ def create_src_query_spec(
     # TODO see Issue I001, this name may not be unique
     # logging.info("srcPatSpec looks like: " + str(srcPatSpec))
     srcPatName = quilt_data.src_pat_spec_get(srcPatSpec, name=True)
+    
+    # get whether src pattern is ordered 
+    ordered = quilt_data.src_pat_spec_get(srcPatSpec,ordered=True)
+    
     logging.debug("Creating " + srcQueryName + " from " + srcPatName)
     return quilt_data.src_query_spec_create(
         name=srcQueryName,
         srcPatternName=srcPatName,
         srcPatternInstance=srcPatInstance,
-        variables=srcQueryVarSpecs,
-        source=source)
+        source=source,
+        ordered=ordered,
+        variables=srcQueryVarSpecs)
 
 
                             

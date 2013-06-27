@@ -88,7 +88,7 @@ Classes:
                 
 
 
-        CompleteSourceQuery(
+        CompleteSrcQuery(
             string srcQueryId   # id for the source query)
             """
             Called by sourceManager when it is done processing the query
@@ -107,8 +107,9 @@ Classes:
             #   queries using the srcQueryId
 
             # if src query specifies that source returns out of order results
-               # sort results  by timestamp using interpret's 'at' function, see
-               #   prototype 'sorted.py'
+              # acquire lock and get source results for this srcQueryId
+              # sort results  by timestamp using interpret's 'at' function, see
+             #   prototype 'sorted.py'
 
             # acquire lock
                 # throw exception if source query is not in active
