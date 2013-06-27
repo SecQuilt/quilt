@@ -274,7 +274,25 @@ c9.NoDups
                                           {'timestamp': 10},
                                           {'timestamp': 10}],
 
+c10.lessthan
 
+    DESIGN
+
+    Add feature to sources where they can define whether or not they return
+    results in order
+
+    Add feature to query where it can sort results from returing out of order
+    sources
+
+    Add statistics to returning source queries/queries noting minnimum and
+    maximum of timestamp field
+    
+    IMPLEMENT
+
+    TEST
+
+    Create an out of order source
+    query it and make sure it is sorted
             
         
         
@@ -369,8 +387,6 @@ cX.Execution
         4. Dual-source pattern with cross-reference (e.g., flow.sip=1.2.3.4 and
         5. Multiple source pattern without cross-reference
         6. Multiple source pattern with cross reference
-cX.Return
-    Return query results from Source Master to Query Master
 
 cX.Evaluation
     Determine and fix weak points and refactor

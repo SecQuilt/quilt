@@ -73,6 +73,14 @@ bakflowevents = [
                 'sip'   : '10.0.0.5', 'dip' :   '10.1.0.1' }
             ]
 
+dnsevents = [
+        {'timesstamp':151, 'dom' : 'back.com', 'ip' : '10.1.0.1' },
+        {'timesstamp':176, 'dom' : 'back.com', 'ip' : '10.1.0.1' },
+        {'timesstamp':250, 'dom' : 'back.com', 'ip' : '10.1.0.1' },
+        {'timesstamp':275, 'dom' : 'back.com', 'ip' : '74.1.0.1' },
+        {'timesstamp':351, 'dom' : 'back.com', 'ip' : '10.1.0.1' },
+        {'timesstamp':376, 'dom' : 'back.com', 'ip' : '10.1.0.1' },
+        ]
 events = {
     'shutdown' : shutdownevents,
     'startup' : startupevents,
@@ -215,18 +223,64 @@ class fieldwrapper:
         # return self.items()[key]
         return recwrapper(self,key)
 
+    def _binned(self):
+        mystamps = at(self)
+        low = mystamps[0].get()
+        high = mystamps[-1].get()
+        bins = high-low+1
+        while bins > 100:
+            bins = bins / 2
+#        for 0 in range(bins):
+
+#        stopped here
+
+
+        
+
+    def _binary_operator(self, opFunc, opName, rhs):
+
+        print str(type(self)), opName, str(type(rhs))
+        myevents = getEvents(self.name)
+        name = self.name + "[" + self.key + "]" + opName 
+
+        if type(rhs) == int or type(rhs) == str or type(rhs) == float:
+            name += str(rhs)
+            if opName == '<':
+                newe = [i for i in myevents if i[self.key] < rhs]
+            elif opName == '==':
+                newe = [i for i in myevents if i[self.key] == rhs]
+            else:
+                raise Exception("Unexpected operator: " + opName)
+
+            return wrapper(name,newe)
+        elif type(rhs) == type(fieldwrapper):
+            pass
+            # bin left
+            self._binned()
+
+
+        raise Exception("Can not compare against object type: " +
+                str(type(rhs)))
+
+        
+
+        return True
+
     def __ne__(self, rhs):
         myevents = getEvents(self.name)
         newe = [i for i in myevents if i[self.key] != rhs]
         name = self.name + "[" + self.key + "]==" + str(rhs)
         
         return wrapper(name,newe)
+
     def __eq__(self, rhs):
-        myevents = getEvents(self.name)
-        newe = [i for i in myevents if i[self.key] == rhs]
-        name = self.name + "[" + self.key + "]==" + str(rhs)
-        
-        return wrapper(name,newe)
+        return self._binary_operator(self.__eq__, "==", rhs)
+
+
+    def __lt__(self, rhs):
+        return self._binary_operator(self.__lt__, "<", rhs)
+
+    
 
 class wrapper:
     def __init__(self, name, eventString=None):
