@@ -274,7 +274,7 @@ c9.NoDups
                                           {'timestamp': 10},
                                           {'timestamp': 10}],
 
-c10.lessthan
+c10.order
 
     DESIGN
 
@@ -283,11 +283,6 @@ c10.lessthan
 
     Add feature to query where it can sort results from returing out of order
     sources
-
-    Add statistics to returning source queries/queries noting minnimum and
-    maximum of timestamp field
-    
-    IMPLEMENT
 
     TEST
 

@@ -15,6 +15,9 @@ Responsibilities:
     do semantic processing on the results, publish results to the 
     QueryMaster
 
+Prototypes:
+    sorted.py
+
 Classes:
     class QuiltQuery : QuiltMasterClient
 
@@ -68,13 +71,21 @@ Classes:
             a source query.
             """
 
+
             # acquire lock
                 # if srcQueryId are not yet in 
                 #   the results dictionary, add their keys in
 
                 # try to get any previous results at this key
 
+                NOTE:  For future optimization, seperate sorted lists for
+                pieces of results can be maintained until complete query,
+                and then the merge can be performed
+                Merge new results, using python standard merge function
+                http://stackoverflow.com/questions/464342/combining-two-sorted-lists-in-python
+
                 # append the sourceResults at this key
+                
 
 
         CompleteSourceQuery(
@@ -83,9 +94,21 @@ Classes:
             Called by sourceManager when it is done processing the query
             """
 
-            NOTE: No reason to really lock here because each source will be
-                writing to one designated state field, but it is probably 
-                just a safe idea to lock in case of API misuse
+
+            NOTE:
+                Because the member data query specs are not entries are not
+                modified (Except during intialization) we do not have to lock
+                before reading from the list.  Also we assume no results
+                should be appended after a call to complete query so that we
+                can sort the list of data outside of a lock.  Also see note 
+                in AppendSourceQueryResults which could change the logic here
+
+            # get the source query from the member data collection of src 
+            #   queries using the srcQueryId
+
+            # if src query specifies that source returns out of order results
+               # sort results  by timestamp using interpret's 'at' function, see
+               #   prototype 'sorted.py'
 
             # acquire lock
                 # throw exception if source query is not in active

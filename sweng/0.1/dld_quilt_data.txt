@@ -69,4 +69,33 @@ Source Level Objects:
     
     
     
+Exceptional Functions:
+
+    def src_spec_create(cfgStr=None, cfgSection=None):
+        # we allow the user certain shortcuts when defining a spec,
+        # we now go through the spec they defined and translate the
+        # user input to the official sourceSpec schema
+
+        # if no parameters are passed a default empty source configuration
+        # spec is created and returned
+
+        # Users do not have to specify any 'name' attribute  For any
+        # dictionary object that is key'd by a name and has a 'name' entry,
+        # detect the situation where the name attribute is matching, and add
+        # in the key name.  Also detect if the user specified an inconsistant
+        # name
+
+        # Users do not have to specify if a source pattern returns inorder
+        # results.  in order results are assumed, so if the attribute is not
+        # specified in the input, add it in and set it to true
+
+        # If a user is specifying a variable, they may not be setting a
+        # default value.  If this is the case they may specify a variable
+        # definition by 'name' : 'description'.  We will convert this to a
+        # proper variable specification replacing the 'description' string
+        # with a variable config that has a description attribute and no
+        # default value attribute
+
+        
+    
 

@@ -301,4 +301,4 @@ Functions:
             #   default provided by the pattern, but if that has
             #   no default, use default provided by source pattern
         # return new src_query from name, patternName, and variables
-        #   described in src pattern
+        #   and record order, described in src pattern

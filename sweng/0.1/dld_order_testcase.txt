@@ -1,0 +1,65 @@
+quilt 0.1 order tests
+-------------------------
+
+
+Module: order_testcase
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test, including source defined as "out of
+        order"
+    Out of order source added to test data 'out_of_order'
+
+External Dependencies:
+    python-unittest
+
+Prototype:
+    None
+
+Responsibilities:
+    Perform a query on an out of order source to assure that the results are
+    transformed to be in order
+
+Classes:
+
+    class orderTestcase()
+
+            
+        def setUp():
+            """Setup the query master with some patterns used by the tests"""
+
+            # define query patterns
+
+            # get exact source name for 'out_of_order' source
+
+            # call quilt_define source(out_of_orderXXX,'grep')
+            #   -n out_of_order 
+            #   'out_of_orderXXX'
+
+
+        def test_order():
+            """
+            This test queries a source whose data is out fo order.  The
+            configuration of the source pattern indicates that the data is out
+            of order and quilt should transform it to ordered behind the
+            scenes.  We simply performa  query in the normal matter and assure
+            result is sorted
+            """
+            # issue valid query for out_of_order
+            # call quilt_submit out_of_order -y 
+
+            # sleep small ammount
+
+            # Assure the query ran successfully and get the results
+
+            # Check results
+            #   assure that results are in order
+
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

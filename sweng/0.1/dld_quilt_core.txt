@@ -68,16 +68,48 @@ Classes:
         def GetSourceManagers(  # [out] list of all defined source managers
             self)
 
+            # call GetSourceManagersUtil helper function to get names
+
+        def GetSourceManagersUtil(
+            string which    # string defining which mode this method operates
+                            #   in [names,specs] 
+            """
+            Returns either a list of names of source managers, or returns a
+            list of source specs for configuration managers
+            """
+
+            # git the directory containg discoverable source manager files
+            # from the config object in member data
+
+            # expand environment variables in the directory path
+
+            # log warning if the specified directory does not exist
+
+            # list the files in the directory and store them in a list
+
+            # initialize a cllection to an empty list or an empty src specs
+
+            # itterate the list of config files
+                # create a new config parser and read the current config file
+                # itterate the sections in the file
+                    # if which decides we are returning names
+                        # append the current section to the returning list
+                    # otherwise
+                        # get the content of source spec as string from the
+                        #   value of "sourceSpec" in the current section
+
+                        # call function that converts a user specified source
+                        #   spec into an actual source spec object
+
+                        # add created source spec object to the returning list
+
+
+
+
         def GetSourceManagerSpecs(  # [out] dict of source manager names mapped
                                    #    to dictionary of source manager's
                                    #    configuration data
-            #   create empty spec dict
-            #   iterate all smd files
-            #   load the config parsers
-            #   call the .items function for each section
-            #   convert the "sourceSpec" config field to a dict
-            #   store that dict with the section name in spec dict
-            #   return spec dict
+            # call GetSourceManagersUtil helper function to get specs
             
 
 
@@ -362,9 +394,8 @@ Schema:
                                 # about a source's interface
         sourcePatterns : {      # sourcPatterns are templates for sourceQueries
             "name" : {          # name of the pattern
-                "class" : 'x',  # type name of class defining the pattern
-                                # this sourcePatternSpec will be the input
-                                # data for the class
+            "ordered" : True    # if not present ordered will assume to be
+                                #   true
     NOTE:
         I do not want to detail this much further because it is rapidly
         changing   
