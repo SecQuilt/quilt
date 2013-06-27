@@ -80,6 +80,15 @@ srcname: secular_holidays
 srcname: christian_holidays
     patternname: grep
 
+smd.d/numbers.conf
+
+# patterns same as generic 'grep' pattern, but point to differnt data files
+
+$QUILT_HOME/test/etc/even_numbers
+$QUILT_HOME/test/etc/odd_numbers
+$QUILT_HOME/test/etc/big_numbers
+$QUILT_HOME/test/etc/out_of_order_numbers
+
 Scripts:
     Prototpe:
         get_script_path.sh

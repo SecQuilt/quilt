@@ -9,8 +9,7 @@ Type: Integration Test
 Internal Dependencies:
     *All classes
     configuration setup from quilt_test, including source defined as "out of
-        order"
-    Out of order source added to test data 'out_of_order'
+        order numbers"
 
 External Dependencies:
     python-unittest
@@ -32,7 +31,7 @@ Classes:
 
             # define query patterns
 
-            # get exact source name for 'out_of_order' source
+            # get exact source name for 'out_of_order_numbers' source
 
             # call quilt_define source(out_of_orderXXX,'grep')
             #   -n out_of_order 
