@@ -15,6 +15,24 @@ import quilt_data
 import lockfile
 import pprint
 
+class EquivalenceClass:
+    def __init__(self, symbol=None, equivalent_things=None):
+        self.symbol = symbol
+        self.equivalent_things = equivalent_things
+
+def ui_show(to_be_displayed):
+    print pprint.pformat(to_be_displayed)
+
+# returns the _symbol of the first EquivalenceClass in the list valid_inputs 
+# that has a member found in what's read from stdin
+def ui_tell(prompt, valid_inputs):
+    while True:
+        ui_show(prompt)
+        whats_read = sys.stdin.readline()
+        for ec in valid_inputs: #item should be EquivalenceClass
+            if contains_any(whats_read, ec.equivalent_things):
+                return ec.symbol
+
 class QuiltConfig:
     """Responsible for access to quilt configuration"""
 
@@ -441,6 +459,7 @@ def query_master_client_main_helper(
             break
 
 def common_init(name,strlevel):
+    
     """
     Common site for logging configuration, always call as first function
     from main and other initializeation
@@ -457,7 +476,6 @@ def common_init(name,strlevel):
 
 def contains_this(looked_in, looked_for):
     for item in looked_in:
-        print item, looked_for
         if item == looked_for:
             return True
     return False

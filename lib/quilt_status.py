@@ -13,8 +13,8 @@ class QuiltStatus(quilt_core.QueryMasterClient):
     def OnRegisterEnd(self):
         
         with self.GetQueryMasterProxy() as qm:
-            print 'Sources', qm.GetSourceManagerStats()
-            print 'Patterns', qm.GetPatternStats()
+            quilt_core.ui_show(['Sources', qm.GetSourceManagerStats()])
+            quilt_core.ui_show(['Patterns', qm.GetPatternStats()])
         # return false (prevent event loop from beginning)
         return False
         

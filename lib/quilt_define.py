@@ -97,7 +97,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             patName = qm.DefinePattern(patternSpec)
 
         # print out pattern Name
-        print 'Pattern', patName, ' defined'
+        quilt_core.ui_show('Pattern' + patName + ' defined')
     
         # return false (prevent event loop from beginning)
 
@@ -111,6 +111,16 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
 def main(argv):
     
+    #this chunk of code tests quilt_core.ui_tell
+    #prompt = "Please type in [a, b, or c]: "
+    #ay = quilt_core.EquivalenceClass('ay',['A','a'])
+    #bee = quilt_core.EquivalenceClass('bee',['B','b'])
+    #see = quilt_core.EquivalenceClass('see',['C','c'])
+    #if quilt_core.ui_tell(prompt, [ay, bee, see]) == ay.symbol:
+    #    quilt_core.ui_show("got back an a") 
+    #else:
+    #    quilt_core.ui_show("did not get back an a")
+
     # setup command line interface
     parser =  quilt_core.main_helper('qdef',"""
         Define a pattern to the query master.  A pattern is the template for a

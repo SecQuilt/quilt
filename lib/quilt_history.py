@@ -15,7 +15,7 @@ class QuiltHistory(quilt_core.QueryMasterClient):
             o = qm.GetQueryHistoryStats(self._args.query_id)
             
         if o != None:
-            print o
+            quilt_core.ui_show(o)
         
         # return false (prevent event loop from beginning)
         return False

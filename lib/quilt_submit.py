@@ -34,23 +34,18 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
                                  the query
         """
         try:
-            print "Query ID is:", queryId
+            quilt_core.ui_show(["Query ID is:", queryId])
 
             logging.info("Reciving validation request for query: " + 
                 str(queryId))
 
             if not self._args.confirm_query:
-                print queryMetricMsg
-                while True:
-                    print "Would you like to confirm query? [y,n]: "
-                    c = sys.stdin.readline()
-                    if len(c) >= 1:
-                        c = c[0]
-                        if c == 'n' or c == 'N':
-                            return False
-                        if c == 'y' or c == 'Y':
-                            break
-
+                quilt_core.ui_show(queryMetricMsg)
+                prompt = "Would you like to confirm query? [y,n]: "
+                yes = quilt_core.EquivalenceClass('yes',['Y','y'])
+                no = quilt_core.EquivalenceClass('no',['N','n'])
+                if quilt_core.ui_tell(prompt, [yes, no]) == no._symbol:
+                    return False
             return True
         finally:
             # set process events flag to false end event loop, allowing
