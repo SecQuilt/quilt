@@ -72,6 +72,90 @@ Classes:
             # return a string with patternId, field Name, and then list of
             # field values
 
+
+        def _bin(value, rangeMin, rangeMax, numBins):
+            """
+            Determine the proper range bin for a domain value
+            """
+            # determine the size for a bin
+            binSize = numBins / (rangeMax - rangeMin)
+
+            # determine how many bins from the start of the interval the
+            #   current value is
+            bin = (value - rangeMin) / binSize
+
+            return bin
+
+
+        def _binary_operator(self, opFunc, opName, rhs):
+            # begin constructing a new eventID based on the calling context
+            # using the name of the lhs object and the operator
+
+            # if rhs object is a primitive type
+                # append its value to the constructing name
+            # else 
+                # append the name of the rhs
+
+            # if if this eventID exist in global event dict
+                # return those events
+
+            # if rhs is primitive type
+                # iterate the values of this field
+                    # if binary operation with the primitive rhs is true
+                        # append current record to returning events
+                # set the new event list into the global dictionary
+                # return a wrapper pattern for the new event list
+
+            # if rhs is a field wrapper
+
+                # set cur lhs/rhs bin to invalid
+                # get python standard merge iterator to merge lhs and rhs together
+
+                # repeat until iterator is complete
+                    # get new lhs and rhs bins
+                    # if new bins are different than old bins
+                        # if old bins were invalid
+                            # set old bins to new bins
+                        # else
+                            # if new bin is different than old bin
+
+
+
+
+
+
+                    # get the bin for this object
+
+                # construct timestamp field rappers for lhs and rhs
+                # find the union of the time interval for lhs and rhs
+
+                # set the output number of records to the minimum of the number of
+                #   records from lhs and rhs
+
+                # set indexes of lhs, rhs, and out to initial value of 0
+                # set {lhs,rhs}Interval{Start,Stop to -1
+
+                # repeat until break
+                    # get cur lhs item bin
+                    # get cur rhs item bin
+
+
+                    # if rhs and lhs bins are the same
+                        # update Interval index counters
+                    # else if interval counters determine an interval was being processed
+
+                        # TODO process interval
+                    # else
+
+
+
+
+
+
+
+            # raise exception for unhandled type of rhs object
+
+
     class _pattern:
         def __init__(self, eventsId, events)      
             # if a new list of events is input, store them in

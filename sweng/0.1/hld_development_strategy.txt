@@ -290,7 +290,40 @@ c10.order
     query it and make sure it is sorted
             
         
-        
+c11.lessthan
+
+    DESIGN
+
+    want to do something like
+
+    secularHolidays[paradeSize] < christianHolidats[paradeSize]
+
+
+
+
+    Define lessthan operator in fields
+    seperate lhs,rhs objects into smaller lists over some small time segments
+    then perform the binary operator filtering over corresponding lists
+    
+    binning becomes a challange in situations like:
+
+    1
+    2
+    3
+    4      4 
+    5
+    6
+    7
+    8      8 
+    9      9
+
+
+    might look like
+    [1,2,3]     []
+    [4,5,6]     [4]
+    [7,8,9]     [8,9]
+
+
 cX.Testability
     Theme: Ensure testing fidelity and coverage
     DESIGN

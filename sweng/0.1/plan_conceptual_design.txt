@@ -13,6 +13,8 @@ Existing:
 
 New:
 
-Less Than Handler M
-Functor           VS
-2 Tests           S
+bin function        M
+interp function     VS
+generic_operator    L
+operator            VS
+2 Tests             M
