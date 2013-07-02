@@ -66,89 +66,89 @@ def bin(v, rmin, rmax, nbins):
     return (v - rmin) / s
 
 
-class bin:
-    def __init__(self, starti, startv, tol):
-        self.starti = starti
-        self.lastv = startv
-        self.len = 1
+class binerator:
+    def __init__(self, lhs, rhs, tol, startfunc, elementfunc, endfunc):
+        self.lhs = lhs
+        self.rhs = rhs
         self.tol = tol
-        print 'creating bin starting', startv
+        self.startfunc = startfunc
+        self.elementfunc = elementfunc
+        self.endfunc = endfunc
+
+    def startbin(self, startv):
+        self.lastv = startv
+        self.startfunc()
 
     def append(self, curv):
         if curv - self.lastv > self.tol:
             return False
         self.lastv = curv
-        self.len += 1
         # print 'appending bin', curv, 'newlen', self.len
         return True
 
-    def nextevent(self):
-        i = iter(self.starti)
-        l = self.len
-        while l >= 0:
-            v = next(i)
-            l -= 1
-            yield v
-
-    def __str__(self):
-        i = iter(self.starti)
-        l = self.len
-        bincol=[]
-        while (l>0):
-            bincol.append(next(i))
-        return str(bincol)
 
 
+    def nextbin(self):
+        lhs = self.lhs
+        rhs = self.rhs
+        tol = self.tol
+        start = merge(field(lhs, 'timestamp'), field(rhs, 'timestamp'))
+        print str(dir(start))
+        cur = iter(start)
+        curbin = None
+        retbin = None
+        first = True
+
+        while True:
+            try:
+
+                v = next(cur)
+
+                # if v % 2 == 0:
+                # isrhs = True
+
+                if first:
+                    self.startbin(v)
+                    first = False
+                elif not self.append(v):
+
+                    retbin = curbin
+                    self.endfunc()
+
+                    self.startbin(v)
+
+                    # yield v
+                    # else:
+                    #     print 'continuing bin', curbin.
+
+                print 'checking val', v
+
+            except StopIteration:
+                # yield retbin
+                # raise StopIteration
+                self.endfunc()
+                return
+
+    def do_it(self):
+        self.nextbin()
 
 
-def nextbin(lhs, rhs, tol):
-    start = merge(field(lhs, 'timestamp'), field(rhs, 'timestamp'))
-    print str(dir(start))
-    cur = iter(start)
-    curbin = None
-    retbin = None
+def bin_start():
+    print 'bin start'
 
-    while True:
-        try:
 
-            last = iter(cur)
-            v = next(cur)
-            print 'checking val', v
+def bin_element(v):
+    print v
 
-            # if v % 2 == 0:
-            # isrhs = True
 
-            if curbin is None:
-                 curbin = bin(last, v, tol)
-            elif not curbin.append(v):
-
-                 retbin = curbin
-                 curbin = bin(last, v, tol)
-#                 print str(retbin)
-
-                 yield retbin
-            # else:
-            #     print 'continuing bin', curbin.
-
-        except StopIteration:
-            yield retbin
-            raise StopIteration
+def bin_stop():
+    print 'bin stop'
 
 
 if __name__ == "__main__":
-    v = None
-    last = None
+    b = binerator(lhsevents, rhsevents, 2, bin_start, bin_element, bin_stop)
 
-    i = 0
-    bins = []
-    for b in nextbin(lhsevents, rhsevents, 1):
-        print 'got back', str(type(b))
-        bins.append(b)
-        # print '-'
-        # for e in b.nextevent():
-        #     print i, e
-        #     i = i + 1
-    print '1', bins[0],bins[0]
+    b.do_it()
 
 
 
