@@ -1,0 +1,64 @@
+quilt 0.1 operator tests
+------------------------
+
+
+Module: operators_testcase
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test
+    seeded values in *_holiday sources
+
+External Dependencies:
+    python-unittest
+
+Prototype:
+    Adhoc prototyping of queries, see hld_development_strategy.txt
+
+Responsibilities:
+    Perform quilt queries that will excersize the logic of the quilt operators
+    like less than (<)
+
+Classes:
+
+    class OperatorsTestcase()
+
+            
+        def setUp():
+            """Setup the query master with some patterns used by the tests"""
+
+            # get the full source name for christian and secular sources
+
+            # define template pattern code string
+            lessThanTemplate =
+                "(source('$SECULAR','grep') < source('$CHRISTIAN',
+                'grep')) < 100"
+
+            # replace CHRISTIAN and SECULAR variables in the template with
+            #   full source names
+
+            # call quilt_define with the pattern code and name query
+            #   operators_lesthan
+
+
+        def test_lessthan():
+            """
+            submits the operators_lesthan pattern.  Checks that that the
+            result only contains boxing day
+            """
+            
+            # call quilt submit -y operators_lesthan
+            # Assure proper execution, and get results from quilt_history
+            
+            # check results contain one instance of "boxing day"
+            # check results contains no value "valintines day"
+            
+        
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

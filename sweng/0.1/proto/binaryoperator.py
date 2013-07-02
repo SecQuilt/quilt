@@ -87,7 +87,6 @@ class binerator:
         return True
 
 
-
     def nextbin(self):
         lhs = self.lhs
         rhs = self.rhs
@@ -129,26 +128,70 @@ class binerator:
                 self.endfunc()
                 return
 
+    def nextbin2(self):
+        lhs = self.lhs
+        rhs = self.rhs
+        tol = self.tol
+        i = merge(field(lhs, 'timestamp'), field(rhs, 'timestamp'))
+
+        l = None
+        self.startfunc()
+        for v in i:
+            if l != None and v - l > tol:
+                self.endfunc()
+            self.elementfunc(v)
+            l = v
+        self.endfunc()
+
     def do_it(self):
-        self.nextbin()
+        self.nextbin2()
 
 
 def bin_start():
     print 'bin start'
 
 
-def bin_element(v):
-    print v
-
-
 def bin_stop():
     print 'bin stop'
 
 
+def bin_element(v):
+    print v
+
+
+class bop:
+    def startfunc(self):
+        print 'bin start'
+
+    def elementfunc(self, v):
+        print 'val', v
+
+    def endfunc(self):
+        print 'bin end'
+
+
+
+
+def bins(lhs, rhs, tol, bop):
+    print 'bin stop'
+
+    def nextbin2(self):
+        i = merge(field(lhs, 'timestamp'), field(rhs, 'timestamp'))
+
+        l = None
+        bop.startfunc()
+        for v in i:
+            if l != None and v - l > tol:
+                bop.endfunc()
+            bop.elementfunc(v)
+            l = v
+
+
+
 if __name__ == "__main__":
     b = binerator(lhsevents, rhsevents, 2, bin_start, bin_element, bin_stop)
-
     b.do_it()
+
 
 
 

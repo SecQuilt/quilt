@@ -289,8 +289,36 @@ c10.order
     Create an out of order source
     query it and make sure it is sorted
             
-        
+
 c11.lessthan
+
+    DESIGN
+
+    want to do something like
+
+    secularHolidays[paradeSize] < christianHolidats[paradeSize]
+
+    This will return all of the secularHolidays that have a parade size less
+    than the minimum sized christian holiday parade
+
+
+    Refactor field less than operator to determine if RHS is literal or
+    another field.
+
+    Iterate over the RHS field to determine min value,
+    Iterate over the LHS filter what is less than the minRHS value
+
+
+    TESTING
+
+    Add parade size to christian and secular holidays
+
+    Execute test that looks for any christian holidays with smaller parades
+    than any secular holidays
+
+
+
+cX.lessthanBinning
 
     DESIGN
 
