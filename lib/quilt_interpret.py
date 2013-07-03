@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import threading
+from xmlrpclib import _binary
 import quilt_data
 import itertools
 # import logging
@@ -62,7 +63,87 @@ class _field:
         # return length of event list
         eventSpecs = _get_events(self.eventsId)
         return len(eventSpecs)
-        
+
+
+
+    def _binary_operator_for_fields(lhsField, rhsField, tol, opFunc,
+            opName):
+
+        # set returning list to empty list
+
+        # if operation is less than
+            # set minRHS to None
+            # for each value on RHS
+                # if minRHS is None or cur value is less than minRHS
+                    # set minRHS to cur value
+
+            # for each value on LHS
+                # if value is less than minRHS
+                    # append event to returning list
+
+
+    def _binary_operator(self, opFunc, opName, rhs):
+        # begin constructing a new eventID based on the calling context
+        # using the name of the lhs object and the operator
+        returnEventsId = (self.eventsId + "." + self.fieldName +
+                opName)
+
+        isPrimRhs = type(rhs) == int or type(rhs) == str or type(rhs) == float
+
+        # if rhs object is a primitive type
+        if isPrimRhs:
+            # append its value to the constructing name
+            returnEventsId += str(rhs)
+        elif type(rhs) == _field:
+            # append the name of the rhs
+            returnEventsId += rhs.eventsId + "." + rhs.fieldName
+        else:
+            raise Exception("Unexpected type on RHS of binary operator: " +
+                            str(type(rhs)))
+
+        # if if eventID exist in global event dict
+        if _has_events(returnEventsId):
+            # return those events
+            return _pattern(returnEventsId)
+
+        # if rhs is primitive type
+        if isPrimRhs:
+
+            # get the event list from the global event dict with this id
+            events = _get_events(self.eventsId)
+            returningEvents = []
+
+
+            # iterate the values of this field
+            for lhsValue in events:
+                # if binary operation with the primitive rhs is true
+                if opFunc == _field.__lt__:
+                    # append current record to returning events
+                    if lhsValue[self.fieldName]:
+                        returningEvents.append(lhsValue)
+                else:
+                    raise Exception("Unknown binary operator for primitive "
+                                    "RHS: " + opName)
+
+        # otherwise if rhs is a field wrapper
+        elif type(rhs) == _field:
+
+            # call binary operator for field wrapper
+            # set new event list to the results
+            returningEvents = _binary_operator_for_fields(
+                self, rhs,opFunc, opName)
+        else:
+            # raise exception for unhandled type of rhs object
+            raise Exception("Unexpected type on RHS of binary operator: " +
+                                str(type(rhs)))
+
+
+        # set the new event list into the global dictionary
+        # return a wrapper pattern for the new event list
+        return _pattern(returnEventsId, returningEvents)
+
+
+
     def __eq__(self, value):
         # construct a new eventID based on the calling context
         # NOTE, we assume RHS is a literal currently
@@ -92,6 +173,9 @@ class _field:
         for i in self:
             s += str(i) + ','
         return s.rstrip(',') + ']'
+
+    def __lt__(self, rhs):
+        return _binary_operator(rhs)
 
 
 class _pattern:

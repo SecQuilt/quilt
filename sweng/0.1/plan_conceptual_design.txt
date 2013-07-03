@@ -13,8 +13,7 @@ Existing:
 
 New:
 
-bin function        M
-interp function     VS
-generic_operator    L
-operator            VS
-2 Tests             M
+
+M 3+1
+VS 1
+L 1

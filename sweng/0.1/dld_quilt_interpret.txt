@@ -120,7 +120,7 @@ Classes:
 
             # return the returning event list
 
-        def _binary_operator_for_fields(lhsField, rhsField, tol, opFunc,
+        def _binary_operator_for_fields(self, rhsField, tol, opFunc,
                 opName):
 
             # set returning list to empty list
@@ -131,9 +131,10 @@ Classes:
                     # if minRHS is None or cur value is less than minRHS
                         # set minRHS to cur value
 
-                # for each value on LHS
+                # for each value on LHS (self)
                     # if value is less than minRHS
                         # append event to returning list
+            # if unknown binary operation raise error
 
 
         def _binary_operator(self, opFunc, opName, rhs):
@@ -142,8 +143,9 @@ Classes:
 
             # if rhs object is a primitive type
                 # append its value to the constructing name
-            # else 
+            # else if rhs is a _ field
                 # append the name of the rhs
+            # raise exception for unhandled type of rhs object
 
             # if if this eventID exist in global event dict
                 # return those events
@@ -152,11 +154,13 @@ Classes:
                 # iterate the values of this field
                     # if binary operation with the primitive rhs is true
                         # append current record to returning events
+                    # if unknown binary operation
+                        # raise an error
 
             # otherwise if rhs is a field wrapper
                 # call binary operator for field wrapper
                 # set new event list to the results
-            # raise exception for unhandled type of rhs object
+
 
 
             # set the new event list into the global dictionary
