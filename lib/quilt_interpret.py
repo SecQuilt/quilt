@@ -65,21 +65,38 @@ class _field:
         return len(eventSpecs)
 
 
-
-    def _binary_operator_for_fields(lhsField, rhsField, tol, opFunc,
+    def _binary_operator_for_fields(self, rhsField, tol, opFunc,
             opName):
-
         # set returning list to empty list
+        retEvents = []
 
         # if operation is less than
+        if opFunc == _field.__lt__:
             # set minRHS to None
+            minRHS = None
             # for each value on RHS
+            for rhsRec in rhsField:
+                rhsVal = rhsRec.GetRec()
                 # if minRHS is None or cur value is less than minRHS
+                if minRHS == None or rhsVal < minRHS:
                     # set minRHS to cur value
+                    minRHS = rhsVal
 
+            if minRHS == None:
+                return retEvents
+
+            lhsEvents = _get_events(self.eventsId)
             # for each value on LHS
+            for lhsRec in self:
+                lhsVal = lhsRec.GetRec()
                 # if value is less than minRHS
+                if lhsVal < minRHS:
                     # append event to returning list
+                    retEvents.append(lhsEvents[lhsRec.index])
+
+            return retEvents
+        else:
+            raise Exception("Unhandled operation for fields wrapper: " + opName)
 
 
     def _binary_operator(self, opFunc, opName, rhs):
@@ -130,7 +147,7 @@ class _field:
 
             # call binary operator for field wrapper
             # set new event list to the results
-            returningEvents = _binary_operator_for_fields(
+            returningEvents = self._binary_operator_for_fields(
                 self, rhs,opFunc, opName)
         else:
             # raise exception for unhandled type of rhs object
@@ -175,7 +192,7 @@ class _field:
         return s.rstrip(',') + ']'
 
     def __lt__(self, rhs):
-        return _binary_operator(rhs)
+        return self._binary_operator(_field.__lt__, "<", rhs)
 
 
 class _pattern:

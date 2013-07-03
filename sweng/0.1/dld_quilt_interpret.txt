@@ -131,6 +131,8 @@ Classes:
                     # if minRHS is None or cur value is less than minRHS
                         # set minRHS to cur value
 
+                # if minRHS is None return empty event list
+
                 # for each value on LHS (self)
                     # if value is less than minRHS
                         # append event to returning list
