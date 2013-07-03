@@ -16,14 +16,14 @@ class OperatorsTestcase(unittest.TestCase):
         # ISSUE007
         # TODO, pyunit's bright idea is to call setup before each test.  It
         # was defining multiple patterns which was annoying but not a problem.
-        # The cleaneast way to do things is probably to remove patterns after
+        # The cleanest way to do things is probably to remove patterns after
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
 
         global firstTime
 
-        if firstTime != True:
+        if not firstTime:
             return
         firstTime = False
 
@@ -34,13 +34,15 @@ class OperatorsTestcase(unittest.TestCase):
             "secular_holidays")
 
         # define template pattern code string
-        lessThanTemplate = "(source('$SECULAR','grep') < source('$CHRISTIAN', 'grep')) < 100"
+        lessThanTemplate = (
+            "(source('$SECULAR','grep')['paradesize'] < source('$CHRISTIAN', "
+            "'grep')['paradesize'])['paradesize'] < 100")
 
         # replace EVEN and ODD variables in the template with full names
-        replacments = {'EVEN': christian_holidays, 'ODD': secular_holidays}
+        replacments = {'CHRISTIAN': christian_holidays,
+                       'SECULAR': secular_holidays}
         lessThanTemplate = Template(lessThanTemplate)
         patCode = lessThanTemplate.safe_substitute(replacments)
-
 
         # TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
@@ -49,11 +51,10 @@ class OperatorsTestcase(unittest.TestCase):
         quilt_test_core.call_quilt_script(
             'quilt_define.py', ['-n', 'operators_lessthan', patCode])
 
-
     # TODO see ISSUE008  We want to move this to test_core when there is a
     # less hacky way to do it
     def check_query_and_get_results3(self, submitStdout):
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_small()
 
         o = submitStdout
@@ -68,7 +69,6 @@ class OperatorsTestcase(unittest.TestCase):
 
         return o
 
-
     def contains(
             self,
             text_body,
@@ -79,10 +79,9 @@ class OperatorsTestcase(unittest.TestCase):
         in the text_body
         """
 
-        if (text_body == None or text_body == '' or
-                    search_string == None or search_string == ''):
+        if (text_body is None or text_body == '' or
+                    search_string is None or search_string == ''):
             raise Exception("Invalid string for use in contains")
-
 
         # use regular expression to count the number of occurences
         # assert an error if it did not occur n times
@@ -91,10 +90,9 @@ class OperatorsTestcase(unittest.TestCase):
                 search_string, text_body)]))
         self.assertTrue(occurences == noccurences)
 
-
     def test_lessthan(self):
         """
-        submits the operators_lesthan pattern.  Checks that that the
+        submits the operators_lessthan pattern.  Checks that that the
         result only contains boxing day
         """
 

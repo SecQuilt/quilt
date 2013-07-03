@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 import threading
-from xmlrpclib import _binary
 import quilt_data
 import itertools
 # import logging
-
 
 class _rec:
     def __init__(self, eventsId, index, fieldName):
@@ -22,7 +20,6 @@ class _rec:
         #   infinate loop shows up, I can't figure it out
         eventSpecs = _get_events(self.eventsId)
         eventSpecs[self.index]
-
 
     def GetRec(self):
         """
@@ -65,8 +62,7 @@ class _field:
         return len(eventSpecs)
 
 
-    def _binary_operator_for_fields(self, rhsField, tol, opFunc,
-            opName):
+    def _binary_operator_for_fields(self, rhsField, opFunc, opName):
         # set returning list to empty list
         retEvents = []
 
@@ -136,7 +132,7 @@ class _field:
                 # if binary operation with the primitive rhs is true
                 if opFunc == _field.__lt__:
                     # append current record to returning events
-                    if lhsValue[self.fieldName]:
+                    if lhsValue[self.fieldName] < rhs:
                         returningEvents.append(lhsValue)
                 else:
                     raise Exception("Unknown binary operator for primitive "
@@ -148,7 +144,7 @@ class _field:
             # call binary operator for field wrapper
             # set new event list to the results
             returningEvents = self._binary_operator_for_fields(
-                self, rhs,opFunc, opName)
+                self, rhs, opFunc, opName)
         else:
             # raise exception for unhandled type of rhs object
             raise Exception("Unexpected type on RHS of binary operator: " +

@@ -120,7 +120,7 @@ Classes:
 
             # return the returning event list
 
-        def _binary_operator_for_fields(self, rhsField, tol, opFunc,
+        def _binary_operator_for_fields(self, rhsField, opFunc,
                 opName):
 
             # set returning list to empty list

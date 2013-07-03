@@ -33,8 +33,9 @@ Classes:
 
             # define template pattern code string
             lessThanTemplate =
-                "(source('$SECULAR','grep') < source('$CHRISTIAN',
-                'grep')) < 100"
+                "(source('$SECULAR','grep')['paradesize'] < source
+                ('$CHRISTIAN',
+                'grep')['paradesize'])['paradesize'] < 100"
 
             # replace CHRISTIAN and SECULAR variables in the template with
             #   full source names
