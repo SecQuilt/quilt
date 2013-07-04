@@ -10,8 +10,8 @@ import os
 import subprocess
 import var_dict
 
-class QueryMaster:
 
+class QueryMaster:
     def __init__(self, args):
         self._args = args
         self.clients = {}
@@ -21,11 +21,11 @@ class QueryMaster:
         self.lock = threading.Lock()
 
     def RegisterClient(
-        self,
-        nameServerHost,
-        nameServerPort,
-        clientName,
-        clientType):
+            self,
+            nameServerHost,
+            nameServerPort,
+            clientName,
+            clientType):
         """
         Register a client with the query master
         string RegisterClient(   # return key name for the client
@@ -38,7 +38,7 @@ class QueryMaster:
         with self.lock:
 
             # get the proxy handle to the remote object 
-            
+
             # determine unique name for client (hopefuly just using the
             # passed in name, but double check registered list.
             uniqueName = clientName
@@ -47,25 +47,25 @@ class QueryMaster:
                 self.clients[clientType] = {}
 
             while uniqueName in self.clients[clientType]:
-                uniqueName = '_'.join(clientName,str(index))
+                uniqueName = '_'.join(clientName, str(index))
                 index = index + 1
-               
+
             # Store in list of registered clients
             # use object's name and type to key it in the registerd list
             self.clients[clientType][uniqueName] = {
-                'registrarHost' : nameServerHost,
-                'registrarPort' : nameServerPort,
-                'clientName' : clientName }
-                
+                'registrarHost': nameServerHost,
+                'registrarPort': nameServerPort,
+                'clientName': clientName}
+
 
             # return the determined name
             logging.debug("Registered client: " + uniqueName)
             return uniqueName
 
     def UnRegisterClient(
-        self,
-        clientType,
-        clientNameKey):
+            self,
+            clientType,
+            clientNameKey):
         """
         UnRegister a client with the query master
          string clientType - part of key
@@ -95,7 +95,7 @@ class QueryMaster:
         """
         # Get Clients is thread safe
         smgrs = self.GetClients("smd")
-            
+
         if smgrs == None:
             return "0 source managers"
 
@@ -104,10 +104,10 @@ class QueryMaster:
 
         return s
 
-    def GetClients(self,objType):
+    def GetClients(self, objType):
         """return the list of registered clients matching the specified
         type"""
-        
+
         clients = []
         with self.lock:
             if objType in self.clients:
@@ -115,7 +115,7 @@ class QueryMaster:
 
         return clients
 
-    def GetClientRec(self,objType,clientName):
+    def GetClientRec(self, objType, clientName):
         """return the master's client record for the specified client"""
         with self.lock:
             return self.clients[objType][clientName].copy()
@@ -135,22 +135,22 @@ class QueryMaster:
 
             with self.lock:
                 while patternName in self._patterns.keys():
-                    patternName = '_'.join([rootName,str(i)])
+                    patternName = '_'.join([rootName, str(i)])
                     i = i + 1
 
                 # store pattern spec in the member data
                 quilt_data.pat_spec_set(patternSpec, name=patternName)
                 quilt_data.pat_specs_add(self._patterns, patternSpec)
-                
-        
+
+
             # return the unique name for the pattern
             return patternName
 
         except Exception, e:
             logging.exception(e)
             raise
-            
-            
+
+
     def Query(self, submitterNameKey, querySpec):
         """
         string Query(                       # return the ID of the query
@@ -162,7 +162,7 @@ class QueryMaster:
         )
         """
 
-        
+
         # qid must be set because we use it when reporting the error
         if submitterNameKey != None:
             qid = str(submitterNameKey) + " unnamed query"
@@ -192,11 +192,11 @@ class QueryMaster:
                 # generate a query id
                 baseqid = submitterNameKey + "_" + patternName
                 i = 0
-                qid = baseqid 
+                qid = baseqid
                 while qid in self._queries or qid in self._history:
                     i = i + 1
                     qid = baseqid + "_" + str(i)
-                
+
                 # store querySpec in Q to reserve query id
                 quilt_data.query_spec_set(tmpQuerySpec, name=qid)
                 quilt_data.query_specs_add(self._queries, tmpQuerySpec)
@@ -207,7 +207,7 @@ class QueryMaster:
             quilt_data.query_spec_set(querySpec, name=qid)
 
             code = quilt_data.pat_spec_tryget(
-                    patternSpec, code=True)
+                patternSpec, code=True)
 
             # using the set of sources described in the query code if
             #   they exist, or the ones described by mappings otherwise
@@ -236,7 +236,7 @@ class QueryMaster:
 
             patVarSpecs = quilt_data.pat_spec_tryget(
                 patternSpec, variables=True)
-                
+
             mappings = quilt_data.pat_spec_tryget(
                 patternSpec, mappings=True)
 
@@ -257,7 +257,7 @@ class QueryMaster:
                         m, name=True)
                     if varName not in patVars:
                         continue
-                    
+
                     src = quilt_data.src_var_mapping_spec_get(
                         m, sourceName=True)
                     pat = quilt_data.src_var_mapping_spec_get(
@@ -265,19 +265,18 @@ class QueryMaster:
                     var = quilt_data.src_var_mapping_spec_get(
                         m, sourceVariable=True)
                     ins = quilt_data.src_var_mapping_spec_tryget(
-                            m, sourcePatternInstance=True)
+                        m, sourcePatternInstance=True)
 
-                    logging.debug("considering: varDict[" + var + "] = " + 
-                            str(varName))
+                    logging.debug("considering: varDict[" + var + "] = " +
+                                  str(varName))
                     # set append to appropriate value so that the varDict does
                     # not grow from mappings alone
                     var_dict.set_var(varDict, src, pat, ins, var, varName,
-                            append=append)
+                                     append=append)
 
             else:
                 logging.info("No query variables were specified")
                 append = append # prevents pylint warning
-
 
             logging.info("got varDict:\n " + pprint.pformat(varDict))
 
@@ -292,11 +291,11 @@ class QueryMaster:
             # iterate the collection of sources, and build collection of 
             # srcQuerySpecs for each source
             for source in varDict.keys():
-                
+
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
                 with get_client_proxy_from_type_and_name(
-                    self, "smd", source) as srcMgr:
+                        self, "smd", source) as srcMgr:
 
                     patterns = srcMgr.GetSourcePatterns()
 
@@ -314,19 +313,19 @@ class QueryMaster:
 
                         # create a query spec objects
                         curSrcQuerySpecs = create_src_query_specs(
-                            srcPatSpec, varDict, varSpecs, patVarSpecs, 
+                            srcPatSpec, varDict, varSpecs, patVarSpecs,
                             qid, source, patternName)
 
                         for srcQuerySpec in curSrcQuerySpecs.values():
                             # append completed sourceQuerySpec to querySpec
                             srcQuerySpecs = quilt_data.src_query_specs_add(
-                                    srcQuerySpecs, srcQuerySpec)
-                        
-            
+                                srcQuerySpecs, srcQuerySpec)
+
+
             # store sourceQueries in the querySpec
             if srcQuerySpecs != None:
                 quilt_data.query_spec_set(querySpec,
-                        sourceQuerySpecs=srcQuerySpecs)
+                                          sourceQuerySpecs=srcQuerySpecs)
 
             # use querySpec and srcQuery list
             # to create a validation string                    
@@ -335,20 +334,20 @@ class QueryMaster:
             msg['Sources to be queried'] = varDict.keys()
 
             validStr = pprint.pformat(msg)
-            
-            
+
+
             # ask submitter to validate the source Queries
             # get_client function is threadsafe, returns with the lock off
             with get_client_proxy_from_type_and_name(
-                self, "qsub", submitterNameKey) as submitter:
-                
+                    self, "qsub", submitterNameKey) as submitter:
+
                 # call back to the submitter to get validation
-                validated = submitter.ValidateQuery( validStr, qid)
+                validated = submitter.ValidateQuery(validStr, qid)
 
             # if submitter refuses to validate, 
             if not validated:
-                logging.info("Submitter: " + submitterNameKey + 
-                    " did not validate the query: " + qid)
+                logging.info("Submitter: " + submitterNameKey +
+                             " did not validate the query: " + qid)
                 # acuire lock remove query id from q
                 # delete the query record, it was determined invalid
                 # return early
@@ -356,31 +355,31 @@ class QueryMaster:
                     quilt_data.query_specs_del(self._queries, qid)
                 return
 
-            logging.info("Submitter: " + submitterNameKey + 
-                "did validate the query: " + qid)
+            logging.info("Submitter: " + submitterNameKey +
+                         "did validate the query: " + qid)
 
             # acquire lock
             with self.lock:
                 # store querySpec state as INITIALIZED, and place 
                 # validated contnts in member data
                 quilt_data.query_spec_set(querySpec,
-                    state=quilt_data.STATE_INITIALIZED)
+                                          state=quilt_data.STATE_INITIALIZED)
                 quilt_data.query_specs_add(self._queries,
-                    querySpec)
+                                           querySpec)
 
             # Process query...
             # get the path to the current directory
             # formulate the command line for quilt_query
             queryCmd = [
-                    os.path.join(os.path.dirname(__file__),"quilt_query.py"),
-                    qid ]
+                os.path.join(os.path.dirname(__file__), "quilt_query.py"),
+                qid]
             if self._args.log_level != None:
                 queryCmd.append("--log-level")
                 queryCmd.append(self._args.log_level)
-                    
-            # use subprocess module to fork off the process
-            # script, pass the query ID
-#           sei_core.run_process("sleep 5 && " + ' '.join(queryCmd) + " &",shell=True)
+
+                # use subprocess module to fork off the process
+                # script, pass the query ID
+            #           sei_core.run_process("sleep 5 && " + ' '.join(queryCmd) + " &",shell=True)
             subprocess.Popen(queryCmd)
 
         # catch exception! 
@@ -394,30 +393,30 @@ class QueryMaster:
                 # call submit's OnSubmitProblem
                 logging.info("Attempting to get proxy for errror report")
                 with get_client_proxy_from_type_and_name(
-                    self, "qsub", submitterNameKey) as submitter:
+                        self, "qsub", submitterNameKey) as submitter:
                     logging.info("Attempting to send error to submitter")
-                    Pyro4.async(submitter).OnSubmitProblem(qid,error)
+                    Pyro4.async(submitter).OnSubmitProblem(qid, error)
 
             except Exception, error2:
                 # stuff is going horribly wrong, we couldn't notify submitter
-                logging.error("Unable to notify submitter: " + 
-                    str(submitterNameKey) +
-                    " of error when submiting query: " + str(qid))
+                logging.error("Unable to notify submitter: " +
+                              str(submitterNameKey) +
+                              " of error when submiting query: " + str(qid))
                 logging.exception(error2)
 
             try:
                 logging.info("Cleaning up after query error")
                 if self.lock.locked():
                     self._try_move_query_to_hist(
-                            qid,quilt_data.STATE_ERROR)
+                        qid, quilt_data.STATE_ERROR)
                 else:
                     with self.lock:
                         self._try_move_query_to_hist(
-                                qid,quilt_data.STATE_ERROR)
+                            qid, quilt_data.STATE_ERROR)
             except Exception, error2:
                 logging.error("Failed to move error'd query to history")
                 logging.exception(error2)
-                
+
 
     def GetQueryQueueStats(self):
         """
@@ -431,7 +430,7 @@ class QueryMaster:
         format a string with information about the specified query
         return None if not found
         """
-        
+
         with self.lock:
             if queryId not in self._queries:
                 return None
@@ -452,8 +451,8 @@ class QueryMaster:
                     # throw error if query not found in history, 
                     # otherwise return the query's record
                     if queryId not in self._history:
-                        raise Exception("query id: " + str(queryId) + 
-                            " is not present in history")
+                        raise Exception("query id: " + str(queryId) +
+                                        " is not present in history")
                     results = pprint.pformat(quilt_data.query_specs_get(
                         self._history, queryId))
                 else:
@@ -465,7 +464,7 @@ class QueryMaster:
         except Exception, e:
             logging.exception(e)
             raise
-    
+
     def GetPatternStats(self):
         """Return a string describing the patterns defined in the query
         master"""
@@ -479,7 +478,7 @@ class QueryMaster:
         # else find queryId in history
         if querySpec == None:
             querySpec = quilt_data.query_specs_tryget(self._history,
-                    queryId)
+                                                      queryId)
         else:
             # move query spec from q to history member collection
             quilt_data.query_specs_add(self._history, querySpec)
@@ -505,21 +504,21 @@ class QueryMaster:
 
                 # set the results into the query spec
                 existingEvents = quilt_data.query_spec_tryget(
-                         querySpec, results=True)
+                    querySpec, results=True)
 
                 if existingEvents == None:
                     existingEvents = []
 
                 # append the results into the query spec
-                quilt_data.query_spec_set(querySpec, 
-                        results=(existingEvents + results))
+                quilt_data.query_spec_set(querySpec,
+                                          results=(existingEvents + results))
 
         except Exception, error:
             try:
                 # log exception here, because there is no detail in it once we 
                 #   pass it across pyro
-                logging.error("Unable append results for query: " + 
-                        str(queryId))
+                logging.error("Unable append results for query: " +
+                              str(queryId))
                 logging.exception(error)
             finally:
                 # throw the exception back over to the calling process
@@ -535,18 +534,18 @@ class QueryMaster:
             with self.lock:
                 # mark the query as completed in state
                 self._try_move_query_to_hist(
-                        qid, quilt_data.STATE_ERROR)
+                    qid, quilt_data.STATE_ERROR)
 
         except Exception, e:
             logging.error("Unable to properly process query error")
             logging.exception(e)
             raise
-        
+
         finally:
             # log the execption 
             logging.error("Error occured when processing query: " + str(qid))
             logging.error(quilt_core.exception_to_string(error))
-            
+
     def BeginQuery(self, queryId):
         """
         string queryID          # the query we are interested in
@@ -557,7 +556,7 @@ class QueryMaster:
 
         try:
             logging.info("Beginning query: " + str(queryId))
-        
+
             # lock self
             with self.lock:
 
@@ -569,21 +568,21 @@ class QueryMaster:
                 # if query state is not expected INITIALIZED state
                 if queryState != quilt_data.STATE_INITIALIZED:
                     # raise exception
-                    raise Exception("Query: " + str(queryId) + 
-                            " is not ready for processing")
+                    raise Exception("Query: " + str(queryId) +
+                                    " is not ready for processing")
 
                 # move query to ACTIVE state
                 quilt_data.query_spec_set(querySpec,
-                        state=quilt_data.STATE_ACTIVE)
+                                          state=quilt_data.STATE_ACTIVE)
 
                 # create a  copy of the query
                 querySpec = querySpec.copy()
 
                 # get a copy of the patternSpec
-                patternSpec = quilt_data.pat_specs_get(self._patterns, 
-                    quilt_data.query_spec_get(querySpec,patternName=True))
+                patternSpec = quilt_data.pat_specs_get(self._patterns,
+                                                       quilt_data.query_spec_get(querySpec, patternName=True))
                 patternSpec = patternSpec.copy()
- 
+
             # returning copy because we don't want to stay locked when asking
             #   pyro to marshall across process bounds.  Not that I know for
             #   a fact that that won't work, but it sounds like a bad idea
@@ -622,26 +621,29 @@ class QueryMaster:
                 # throw the exception back over to the calling process
                 raise error
 
-def get_client_proxy( clientRec):
+
+def get_client_proxy(clientRec):
     """
     return a pyro proxy object to the specified by the client record
     """
     pyroname = clientRec["clientName"]
     nshost = clientRec["registrarHost"]
     nsport = clientRec["registrarPort"]
-    
+
     uri = quilt_core.get_uri(nshost, nsport, pyroname)
 
     return Pyro4.Proxy(uri)
 
-def get_client_proxy_from_type_and_name( qm, clientType, clientName):
+
+def get_client_proxy_from_type_and_name(qm, clientType, clientName):
     # lock access to the clients of the query masteter
     with qm.lock:
         rec = qm.clients[clientType][clientName].copy()
     return get_client_proxy(rec)
-    
+
+
 def create_src_query_specs(
-    srcPatSpec, varDict, varSpecs, patVarSpecs, qid, source, patternName):
+        srcPatSpec, varDict, varSpecs, patVarSpecs, qid, source, patternName):
     """
     get new sourceQuery specs from the sourcePatternSpec and the
     varDict
@@ -651,26 +653,20 @@ def create_src_query_specs(
 
     patInstanceDict = varDict[source][patternName]
 
-    
     for patInstanceName in patInstanceDict.keys():
-
         curSrcQuerySpec = create_src_query_spec(
-                srcPatSpec, patInstanceName, varSpecs, patVarSpecs, qid, source,
-                patternName, varDict)
+            srcPatSpec, patInstanceName, varSpecs, patVarSpecs, qid, source,
+            patternName, varDict)
 
-        srcQuerySpecs = quilt_data.src_query_specs_add( srcQuerySpecs,
-                curSrcQuerySpec)
-
+        srcQuerySpecs = quilt_data.src_query_specs_add(srcQuerySpecs,
+                                                       curSrcQuerySpec)
 
     return srcQuerySpecs
 
 
-
-
-
 def create_src_query_spec(
-    srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source, patternName,
-    varDict):
+        srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source, patternName,
+        varDict):
     """Helper function for filling out a srcQuerySpec with variable values"""
 
     srcPatVars = quilt_data.src_pat_spec_get(
@@ -687,21 +683,21 @@ def create_src_query_spec(
     # iterate the variables in the "new" 
     #   sourceQuerySpec
     for srcVarName, srcPatVarSpec in srcPatVars.items():
-        
+
         # find that source variable in the pattern's 
         #   mappings
         # get the name of the query variable that maps to it
         varValue = None
         if srcVarName in srcVarToVarDict:
             varName = srcVarToVarDict[srcVarName]
-    
+
             # get the value of the query variable from the
             #   querySpec, if it was given in the query spec
             varSpec = quilt_data.var_specs_tryget(varSpecs, varName)
             if varSpec != None:
                 varValue = quilt_data.var_spec_tryget(varSpec, value=True)
 
-            if (varValue == None and patVarSpecs != None 
+            if (varValue == None and patVarSpecs != None
                 and varName in patVarSpecs):
                 # user did not supply value for the variable in the
                 # query, but there is a default set in pattern definition
@@ -709,7 +705,7 @@ def create_src_query_spec(
                     patVarSpecs, varName)
                 # use the default in the pattern
                 varValue = quilt_data.var_spec_tryget(
-                    patVarSpec,default=True)
+                    patVarSpec, default=True)
 
         if varValue == None:
             # pattern definer did not supply a default, check
@@ -722,16 +718,16 @@ def create_src_query_spec(
                 # must throw error
                 raise Exception("""No value set or default found
                     for the variable: """ + varName)
-        
+
         # create a source query variable value with the determined value
         srcQueryVarSpec = quilt_data.var_spec_create(
             name=srcVarName, value=varValue)
         # append it to a list of src query variables
         srcQueryVarSpecs = quilt_data.var_specs_add(
             srcQueryVarSpecs, srcQueryVarSpec)
-    
+
     # Combine strings to get a name for this source query
-    srcQueryName = '_'.join([qid,source,patternName])
+    srcQueryName = '_'.join([qid, source, patternName])
     if srcPatInstance != None:
         srcQueryName += "_" + str(srcPatInstance)
 
@@ -739,10 +735,10 @@ def create_src_query_spec(
     # TODO see Issue I001, this name may not be unique
     # logging.info("srcPatSpec looks like: " + str(srcPatSpec))
     srcPatName = quilt_data.src_pat_spec_get(srcPatSpec, name=True)
-    
+
     # get whether src pattern is ordered 
-    ordered = quilt_data.src_pat_spec_get(srcPatSpec,ordered=True)
-    
+    ordered = quilt_data.src_pat_spec_get(srcPatSpec, ordered=True)
+
     logging.debug("Creating " + srcQueryName + " from " + srcPatName)
     return quilt_data.src_query_spec_create(
         name=srcQueryName,

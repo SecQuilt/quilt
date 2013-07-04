@@ -7,12 +7,11 @@ import sei_core
 import quilt_data
 import Pyro4
 
+
 class SourceManager(quilt_core.QueryMasterClient):
-
-
     def __init__(self, args, sourceName, sourceSpec):
         # chain to call super class constructor 
-        quilt_core.QueryMasterClient.__init__(self,sourceName)
+        quilt_core.QueryMasterClient.__init__(self, sourceName)
         self._args = args
         self._sourceName = sourceName
         self._sourceSpec = sourceSpec
@@ -21,9 +20,9 @@ class SourceManager(quilt_core.QueryMasterClient):
 
 
     def Query(self, queryId, sourceQuerySpec,
-            queryClientName,
-            queryClientNamseServerHost,
-            queryClientNamseServerPort):
+              queryClientName,
+              queryClientNamseServerHost,
+              queryClientNamseServerPort):
         """
         Query the source, currently hardcoded to behave as calling a cmdline
         tool that outputs source results on each output line
@@ -36,23 +35,23 @@ class SourceManager(quilt_core.QueryMasterClient):
 
             # _sourceName should not change, set at init, so ok to read
             # without lock
-            logging.info("Source Manager: " + str(self._sourceName) + 
-                " recieved query: " + str(queryId))
+            logging.info("Source Manager: " + str(self._sourceName) +
+                         " recieved query: " + str(queryId))
 
             # get the sourcePatternSpec from the pattern name in the
             #   sourceQuerySpec
             # pattern spec should be read only and safe to access without
             #   a lock
-            srcPatSpecs = quilt_data.src_spec_get(self._sourceSpec, 
-                sourcePatterns=True)
-            srcPatSpec = quilt_data.src_pat_specs_get(srcPatSpecs, 
-                quilt_data.src_query_spec_get(sourceQuerySpec, 
-                srcPatternName=True))
-    
+            srcPatSpecs = quilt_data.src_spec_get(self._sourceSpec,
+                                                  sourcePatterns=True)
+            srcPatSpec = quilt_data.src_pat_specs_get(srcPatSpecs,
+                                                      quilt_data.src_query_spec_get(sourceQuerySpec,
+                                                                                    srcPatternName=True))
+
             # get the variables in the query
-            srcQueryVars = quilt_data.src_query_spec_get(sourceQuerySpec, 
-                variables=True)
-            
+            srcQueryVars = quilt_data.src_query_spec_get(sourceQuerySpec,
+                                                         variables=True)
+
             # iterate src query variables map, create a simple var name to
             #   var value map
             varNameValueDict = {}
@@ -65,30 +64,30 @@ class SourceManager(quilt_core.QueryMasterClient):
             #   provided for the variables, and environment variables
             replacments = {}
             # replacments = os.environ.copy()
-            for k,v in varNameValueDict.items():
+            for k, v in varNameValueDict.items():
                 replacments[k] = v
 
             # "template" was not added as oficial schema member because it is 
             # specific to this command line case
             templateCmd = srcPatSpec['template']
             template = Template(templateCmd)
-            logging.info ("Ready to use : " + templateCmd + 
-                " with replacments: " + str(replacments))
+            logging.info("Ready to use : " + templateCmd +
+                         " with replacments: " + str(replacments))
             cmdline = template.safe_substitute(replacments)
 
             # setup context for the cmdline stdout callback
             srcQueryId = quilt_data.src_query_spec_get(
-                    sourceQuerySpec,name=True)
-            context = { 'queryId' : queryId, 'srcQueryId' : srcQueryId  } 
+                sourceQuerySpec, name=True)
+            context = {'queryId': queryId, 'srcQueryId': srcQueryId}
 
-#           sei_core.run_process_lite(cmdline, shell=True,
-#               outFunc=self.OnGrepLine, outObj=context)
+            #           sei_core.run_process_lite(cmdline, shell=True,
+            #               outFunc=self.OnGrepLine, outObj=context)
 
-#           I thought run_process apparently has problems
+            #           I thought run_process apparently has problems
             sei_core.run_process(cmdline, shell=True,
-                whichReturn=sei_core.EXITCODE, 
-                outFunc=self.OnGrepLine, outObj=context, logToPython=False)
-            
+                                 whichReturn=sei_core.EXITCODE,
+                                 outFunc=self.OnGrepLine, outObj=context, logToPython=False)
+
             # Set query result events list in query master using query id
             results = []
             with self._lock:
@@ -97,35 +96,34 @@ class SourceManager(quilt_core.QueryMasterClient):
                         results = list(self._sourceResults[queryId][srcQueryId])
 
             uri = quilt_core.get_uri(queryClientNamseServerHost,
-                    queryClientNamseServerPort,queryClientName)
+                                     queryClientNamseServerPort, queryClientName)
 
             with Pyro4.Proxy(uri) as query:
                 query.AppendSourceQueryResults(srcQueryId, results)
                 query.CompleteSrcQuery(srcQueryId)
-     
-    # catch exception! 
+
+                # catch exception!
         except Exception, error:
             try:
 
                 # attempt to report error to the query client
                 uri = quilt_core.get_uri(queryClientNamseServerHost,
-                        queryClientNamseServerPort,queryClientName)
+                                         queryClientNamseServerPort, queryClientName)
                 srcQueryId = quilt_data.src_query_spec_get(
-                        sourceQuerySpec,name=True)
+                    sourceQuerySpec, name=True)
 
                 with Pyro4.Proxy(uri) as query:
-                    query.OnSourceQueryError(srcQueryId,error)
+                    query.OnSourceQueryError(srcQueryId, error)
 
             except Exception, error2:
                 logging.error("Unable to send source query error to " +
-                    "query master")
+                              "query master")
                 logging.exception(error2)
             finally:
                 logging.error("Failed to execute source query")
                 logging.exception(error)
-                
 
-             
+
     def GetLastQuery(self):
         with self._lock:
             return self._lastQuery
@@ -139,7 +137,7 @@ class SourceManager(quilt_core.QueryMasterClient):
         srcQueryId = contextData['srcQueryId']
         srcRes = []
         with self._lock:
-            
+
             # list in query master using query id and srcQuery Id
 
             if queryId not in self._sourceResults:
@@ -160,7 +158,7 @@ class SourceManager(quilt_core.QueryMasterClient):
 
     def GetType(self):
         return "smd"
-        
+
 
     def GetSourcePatterns(self):
         """Returns a list of names of defined source patterns"""
@@ -170,12 +168,12 @@ class SourceManager(quilt_core.QueryMasterClient):
 
             # iterate sourceSpec member's patterns
             # append returning list with pattern names
-            srcPatSpecs = quilt_data.src_spec_tryget(self._sourceSpec, 
-                sourcePatterns=True)
-           
+            srcPatSpecs = quilt_data.src_spec_tryget(self._sourceSpec,
+                                                     sourcePatterns=True)
+
             if srcPatSpecs == None:
                 return []
-            
+
             return srcPatSpecs.keys()
 
         # we log exception because this was likely called from another process
@@ -191,7 +189,7 @@ class SourceManager(quilt_core.QueryMasterClient):
         # access the source pattern spec with the specified key in the
         # sourceSpec, return a copy
         return quilt_data.src_pat_specs_get(quilt_data.src_spec_get(
-            self._sourceSpec,sourcePatterns=True), patternName)
+            self._sourceSpec, sourcePatterns=True), patternName)
 
 
 class Smd(quilt_core.QuiltDaemon):
@@ -201,7 +199,6 @@ class Smd(quilt_core.QuiltDaemon):
         self._args = args
 
     def run(self):
-
         cfg = quilt_core.QuiltConfig()
         smspecs = cfg.GetSourceManagerSpecs()
 
@@ -209,23 +206,23 @@ class Smd(quilt_core.QuiltDaemon):
 
         objs = {}
         # iterate through source manager configurations
-        for smname,smspec in smspecs.items():
+        for smname, smspec in smspecs.items():
             logging.debug(smname + " specified from configuration")
             # create each source manager object
             sm = SourceManager(self._args, smname, smspec)
             objs[sm.localname] = sm
-        
+
         # logging.info("Creating source managers: " + str(objs))
-            
+
         # start the client with all the source managers
         quilt_core.query_master_client_main_helper(objs)
 
+
 def main(argv):
-    
     # setup command line interface
-    parser =  quilt_core.main_helper('smd',"""Source manager
+    parser = quilt_core.main_helper('smd', """Source manager
        daemon""",
-        argv)
+                                    argv)
 
     # setup argument parser in accordance with funcitonal specification
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
@@ -235,7 +232,6 @@ def main(argv):
     Smd(args).main(argv)
 
 
-        
 if __name__ == "__main__":
     main(sys.argv[1:])
 

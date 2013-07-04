@@ -170,8 +170,6 @@ class bop:
         print 'bin end'
 
 
-
-
 def bins(lhs, rhs, tol, bop):
     print 'bin stop'
 
@@ -185,7 +183,6 @@ def bins(lhs, rhs, tol, bop):
                 bop.endfunc()
             bop.elementfunc(v)
             l = v
-
 
 
 if __name__ == "__main__":

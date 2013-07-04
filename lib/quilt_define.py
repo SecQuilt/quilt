@@ -5,11 +5,11 @@ import quilt_core
 import quilt_data
 import quilt_parse
 
-class QuiltDefine(quilt_core.QueryMasterClient):
 
+class QuiltDefine(quilt_core.QueryMasterClient):
     def __init__(self, args):
         # chain to call super class constructor 
-        quilt_core.QueryMasterClient.__init__(self,self.GetType())
+        quilt_core.QueryMasterClient.__init__(self, self.GetType())
         self._args = args
 
     def OnRegisterEnd(self):
@@ -24,7 +24,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         else:
             requestedName = self._args.name[0]
 
-        patternSpec=quilt_data.pat_spec_create(name=requestedName)
+        patternSpec = quilt_data.pat_spec_create(name=requestedName)
 
         # if the pattern code is specified, set it in the pattern as 
         #   a string
@@ -38,7 +38,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             quilt_data.pat_spec_set(patternSpec, code=codestr)
 
         # create the specs for the variables
-        variables=None
+        variables = None
         if self._args.variable != None:
             for v in self._args.variable:
                 # create the variables section if it does not exist
@@ -58,8 +58,8 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                     quilt_data.var_spec_set(varSpec, default=varDef)
                 variables = quilt_data.var_specs_add(variables, varSpec)
 
-        quilt_data.pat_spec_set(patternSpec,variables=variables)
-        
+        quilt_data.pat_spec_set(patternSpec, variables=variables)
+
         mappings = None
         # create the specs for the variable mappings
         if self._args.mapping != None:
@@ -73,24 +73,24 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                     srcPatInstance = m[4]
 
 
-        
+
                 # query variables are allowed to map to multiple
                 # source variables.  Initalize a blank list if it isn't present
                 # then append the new mapping information
-                
+
                 srcVarMappingSpec = quilt_data.src_var_mapping_spec_create(
                     name=varName,
                     sourceName=src,
                     sourcePattern=srcPat,
                     sourceVariable=srcVar,
                     sourcePatternInstance=srcPatInstance)
-            
+
                 mappings = quilt_data.src_var_mapping_specs_add(
                     mappings, srcVarMappingSpec)
 
         if mappings != None:
-            quilt_data.pat_spec_set(patternSpec,mappings=mappings)
-            
+            quilt_data.pat_spec_set(patternSpec, mappings=mappings)
+
         # define patternSpec in the query master as a syncronous call
         # return will be the pattern name
         with self.GetQueryMasterProxy() as qm:
@@ -98,7 +98,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         # print out pattern Name
         print 'Pattern', patName, ' defined'
-    
+
         # return false (prevent event loop from beginning)
 
         return False
@@ -107,34 +107,31 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         return "qdef"
 
 
-
-
 def main(argv):
-    
     # setup command line interface
-    parser =  quilt_core.main_helper('qdef',"""
+    parser = quilt_core.main_helper('qdef', """
         Define a pattern to the query master.  A pattern is the template for a
         query.  The specified name of the pattern may be modified so as to
         become unique.  The official name of the pattern will be displayed.
         quilt_define will not return until pattern is defined or an error has
         occured.  It will output the finalized (unique) name for the pattern
         """,
-        argv)
+                                    argv)
 
-    parser.add_argument('code',nargs='?',
-            help="the code for the pattern")
+    parser.add_argument('code', nargs='?',
+                        help="the code for the pattern")
 
-    parser.add_argument('-n','--name', nargs=1,
-        help="suggested name of the pattern")
+    parser.add_argument('-n', '--name', nargs=1,
+                        help="suggested name of the pattern")
 
-    parser.add_argument('-v','--variable', nargs='+', action='append',
-        help="""VARIABLE [DESCRIPTION [DEFAULT]]]  The variables that are 
+    parser.add_argument('-v', '--variable', nargs='+', action='append',
+                        help="""VARIABLE [DESCRIPTION [DEFAULT]]]  The variables that are
             part of the pattern, and an optional text description of the 
             purpose of the variable, and the oprional default value of the 
             variable""")
 
-    parser.add_argument('-m','--mapping', nargs='+', action='append',
-        help="""VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE 
+    parser.add_argument('-m', '--mapping', nargs='+', action='append',
+                        help="""VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE
             [SOURCE_PATTERN_INSTANCE] Provide mapping from a pattern variable 
             to a source variable.  Pattern variables are described with the 
             -v, --variable command.  Source variables are described in the 
@@ -150,8 +147,8 @@ def main(argv):
 
     # start the client
     quilt_core.query_master_client_main_helper({
-        client.localname : client})
-        
+        client.localname: client})
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

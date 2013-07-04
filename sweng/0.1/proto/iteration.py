@@ -2,10 +2,11 @@
 import sys
 import itertools
 
-a=[1,2,3,4,5,6,7,8,9]
-b=[2,4,6,8]
-c=[4,8]
-_all=[a,b,c]
+a = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+b = [2, 4, 6, 8]
+c = [4, 8]
+_all = [a, b, c]
+
 
 def checkEqual1(iterator):
     try:
@@ -15,7 +16,8 @@ def checkEqual1(iterator):
     except StopIteration:
         return True
 
-x = itertools.ifilter( checkEqual1, itertools.product(*_all))
+
+x = itertools.ifilter(checkEqual1, itertools.product(*_all))
 
 z = [y[0] for y in x]
 

@@ -3,33 +3,30 @@ import sys
 import quilt_core
 import Pyro4
 
+
 class Registrar(quilt_core.QuiltDaemon):
     def __init__(self):
         quilt_core.QuiltDaemon.__init__(self)
         self.setup_process("registrar")
 
     def run(self):
-
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()
         # access the registrar's host and port number from config
         registrarHost = cfg.GetValue(
             'registrar', 'host', None)
         registrarPort = cfg.GetValue(
-            'registrar', 'port', None) 
-       
+            'registrar', 'port', None)
+
         # start the name server
-        Pyro4.naming.startNSloop(registrarHost,registrarPort)
-
-
+        Pyro4.naming.startNSloop(registrarHost, registrarPort)
 
 
 def main(argv):
-    
     # setup command line interface
-    parser =  quilt_core.main_helper("qreg",
-        "a meta server for quilt objects",
-        argv)
+    parser = quilt_core.main_helper("qreg",
+                                    "a meta server for quilt objects",
+                                    argv)
 
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
     parser.parse_args()
@@ -38,6 +35,7 @@ def main(argv):
     # start the daemon
     Registrar().main(argv)
 
-if __name__ == "__main__":        
+
+if __name__ == "__main__":
     main(sys.argv[1:])
 

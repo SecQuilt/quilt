@@ -6,10 +6,10 @@ import quilt_test_core
 import re
 from string import Template
 
-firstTime=True
+firstTime = True
+
 
 class SemanticsTestcase(unittest.TestCase):
-
     # TODO see ISSUE008  We want to move this to test_core when there is a
     # less hacky way to do it
     def check_query_and_get_results(self, submitStdout):
@@ -22,12 +22,11 @@ class SemanticsTestcase(unittest.TestCase):
         qid = o[a:]
 
         # call quilt_history query_id
-        o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        o = quilt_test_core.call_quilt_script('quilt_history.py', [qid])
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
         return o
-
 
 
     def setUp(self):
@@ -40,7 +39,7 @@ class SemanticsTestcase(unittest.TestCase):
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
-    
+
         global firstTime
 
         if firstTime != True:
@@ -48,61 +47,62 @@ class SemanticsTestcase(unittest.TestCase):
         firstTime = False
 
         christian_holidays = quilt_test_core.get_source_name(
-                "christian_holidays")
+            "christian_holidays")
         secular_holidays = quilt_test_core.get_source_name(
-                "secular_holidays")
+            "secular_holidays")
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py', [
             'source("' + secular_holidays + '","grep")',
             '-n', 'semantics_one_source',
-            '-v', 'WHICH_HOLIDAY', 
+            '-v', 'WHICH_HOLIDAY',
             '-v', 'UNUSED',
             '-m', 'WHICH_HOLIDAY', secular_holidays, 'grep', 'GREP_ARGS',
             '-m', 'UNUSED', christian_holidays, 'grep', 'GREP_ARGS'
-            ])
+        ])
 
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py', [
             'at(source("' + christian_holidays + '","grep"))==12',
             '-n', 'semantics_equals_literal'
-            ])
+        ])
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py', [
             "concurrent(source('" + christian_holidays + "','grep')," +
-                        "source('" + secular_holidays   + "','grep'))",
-                        '-n', 'semantics_concurrent'])
+            "source('" + secular_holidays + "','grep'))",
+            '-n', 'semantics_concurrent'])
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py', [
             "concurrent(source('" + christian_holidays + "','grep')," +
-                        "source('" + secular_holidays   + "','grep')['major']=='True')",
-                        '-n', 'semantics_nested'])
+            "source('" + secular_holidays + "','grep')['major']=='True')",
+            '-n', 'semantics_nested'])
 
-            
+
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py', [
             'follows(1,' +
-                "source('" + secular_holidays   + "','grep')," +
-                "source('" + christian_holidays   + "','grep'))",
+            "source('" + secular_holidays + "','grep')," +
+            "source('" + christian_holidays + "','grep'))",
             '-n', 'semantics_follows'
-            ])
+        ])
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py', [
             'until(' +
-                "source('" + secular_holidays   + "','grep')," +
-                "source('" + christian_holidays   + "','grep'))",
+            "source('" + secular_holidays + "','grep')," +
+            "source('" + christian_holidays + "','grep'))",
             '-n', 'semantics_until'
-            ])
+        ])
+
     def test_one_source(self):
         """
         This test assures that a simple case of semantics is tested
@@ -117,9 +117,9 @@ class SemanticsTestcase(unittest.TestCase):
         """
 
         # issue a valid query
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_one_source', '-y', '-v', 'WHICH_HOLIDAY', "newyears"
-            ]))
+        ]))
 
         o = self.check_query_and_get_results(o)
 
@@ -135,7 +135,6 @@ class SemanticsTestcase(unittest.TestCase):
                 "easter", o)]))
         self.assertTrue(occurences == 0)
 
-
         occurences = (
             len([m.start() for m in re.finditer(
                 "christmass", o)]))
@@ -143,12 +142,12 @@ class SemanticsTestcase(unittest.TestCase):
 
 
         # issue a valid query
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_one_source', '-y', '-v', 'UNUSED', "valentines"
-            ]))
+        ]))
 
         o = self.check_query_and_get_results(o)
-        
+
         # find some particulars in the results
         occurences = (
             len([m.start() for m in re.finditer(
@@ -168,9 +167,9 @@ class SemanticsTestcase(unittest.TestCase):
 
         # issue valid query for christian_holidays
         # call quilt_submit christian_holidays -y 
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_equals_literal', '-y'
-            ]))
+        ]))
 
         # Check results
         # call quilt_history query_id
@@ -196,12 +195,12 @@ class SemanticsTestcase(unittest.TestCase):
         function call.  Also covers case where pattern has no mapped
         variables, but still references sources
         """
-        
+
         # issue valid query for concurrent_holidays
         # call quilt_submit semantics_concurrent -y 
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_concurrent', '-y'
-            ]))
+        ]))
 
         # Check result, call quilt_history query_id
         # capture stdout, assure good exitcode
@@ -233,9 +232,9 @@ class SemanticsTestcase(unittest.TestCase):
 
         # issue valid query for concurrent_holidays
         # call quilt_submit semantics_concurrent -y 
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_nested', '-y'
-            ]))
+        ]))
 
         # Check results
         # call quilt_history query_id
@@ -263,9 +262,9 @@ class SemanticsTestcase(unittest.TestCase):
         """
         # issue valid query for concurrent_holidays
         # call quilt_submit semantics_concurrent -y 
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_follows', '-y'
-            ]))
+        ]))
 
         # Check results
         # call quilt_history query_id
@@ -311,9 +310,9 @@ class SemanticsTestcase(unittest.TestCase):
         """
         # issue valid query for concurrent_holidays
         # call quilt_submit semantics_concurrent -y 
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_until', '-y'
-            ]))
+        ]))
 
         # Check results
         # call quilt_history query_id
@@ -344,7 +343,8 @@ class SemanticsTestcase(unittest.TestCase):
                 "boxingday", o)]))
         self.assertTrue(occurences == 0)
 
+
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(
-        "Run integration test for semantic processing",sys.argv)
+        "Run integration test for semantic processing", sys.argv)
     unittest.main()

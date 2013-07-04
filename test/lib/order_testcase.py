@@ -5,11 +5,10 @@ import quilt_data
 import quilt_test_core
 import logging
 
-firstTime=True
+firstTime = True
+
 
 class OrderTestcase(unittest.TestCase):
-
-
     def setUp(self):
         """Setup the query master with some patterns used by the tests"""
 
@@ -20,7 +19,7 @@ class OrderTestcase(unittest.TestCase):
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
-    
+
         global firstTime
 
         if firstTime != True:
@@ -29,15 +28,15 @@ class OrderTestcase(unittest.TestCase):
 
         # get the full source name for even and odd sources
         out_of_order_numbers = quilt_test_core.get_source_name(
-                "out_of_order_numbers")
+            "out_of_order_numbers")
 
         # TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
         # call quilt_define with the pattern code and name query
         #   dups_follows
         quilt_test_core.call_quilt_script('quilt_define.py', ['-n',
-            'out_of_order', 'source("' + out_of_order_numbers + '","grep")'])
-
+                                                              'out_of_order',
+                                                              'source("' + out_of_order_numbers + '","grep")'])
 
 
     # TODO see ISSUE008  We want to move this to test_core when there is a
@@ -52,7 +51,7 @@ class OrderTestcase(unittest.TestCase):
         qid = o[a:]
 
         # call quilt_history query_id
-        o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        o = quilt_test_core.call_quilt_script('quilt_history.py', [qid])
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
@@ -69,22 +68,22 @@ class OrderTestcase(unittest.TestCase):
 
         # issue a valid query
         # Assure proper execution, and get results from quilt_history
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
-            '-y', 'out_of_order' ]))
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
+            '-y', 'out_of_order']))
 
         o = self.check_query_and_get_results3(o)
 
         # Check results
         #   assure that results are in order
         l = []
-        for i in xrange(1,6):
-            searchStr="{'timestamp': " + str(i) + '}'
+        for i in xrange(1, 6):
+            searchStr = "{'timestamp': " + str(i) + '}'
             index = o.find(searchStr)
             logging.debug("looking for string: " + searchStr)
             self.assertTrue(index != -1)
             l.append(index)
 
-        isSorted = all(l[i] <= l[i+1] for i in xrange(len(l)-1))
+        isSorted = all(l[i] <= l[i + 1] for i in xrange(len(l) - 1))
         self.assertTrue(isSorted)
 
 

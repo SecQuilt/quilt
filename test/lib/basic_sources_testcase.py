@@ -6,11 +6,10 @@ import quilt_test_core
 import quilt_data
 import re
 
-firstTime=True
+firstTime = True
+
 
 class BasicSourcesTestcase(unittest.TestCase):
-
-
     def setUp(self):
         """Setup the query master with some patterns used by the tests"""
 
@@ -21,7 +20,7 @@ class BasicSourcesTestcase(unittest.TestCase):
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
-    
+
         global firstTime
 
         if firstTime != True:
@@ -33,7 +32,7 @@ class BasicSourcesTestcase(unittest.TestCase):
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
-        quilt_test_core.call_quilt_script('quilt_define.py',[
+        quilt_test_core.call_quilt_script('quilt_define.py', [
             '-n', 'bigpattern',
             '-v', 'SEARCHSTRING1', 'the Search string1',
             '-v', 'SEARCHSTRING2', 'the Search string2',
@@ -43,29 +42,27 @@ class BasicSourcesTestcase(unittest.TestCase):
             '-v', 'SEARCHSTRING6', 'the Search string6',
             '-m', 'SEARCHSTRING1', syslog, 'grep', 'OPTIONS',
             '-m', 'SEARCHSTRING2', syslog, 'grep', 'OPTIONS', 'fooInst',
-            '-m', 'SEARCHSTRING3', multisource, 'pat1', 'PAT1SRCVAR1', 
-            '-m', 'SEARCHSTRING4', multisource, 'pat1', 'PAT1SRCVAR2', 
-            '-m', 'SEARCHSTRING5', multisource, 'pat2', 'PAT2SRCVAR1', 
+            '-m', 'SEARCHSTRING3', multisource, 'pat1', 'PAT1SRCVAR1',
+            '-m', 'SEARCHSTRING4', multisource, 'pat1', 'PAT1SRCVAR2',
+            '-m', 'SEARCHSTRING5', multisource, 'pat2', 'PAT2SRCVAR1',
             '-m', 'SEARCHSTRING6', multisource, 'pat2', 'PAT2SRCVAR2'
-            ])
+        ])
 
 
-
-            
     def test_multi_sources(self):
         """
         check multiple variables, and multiple patterns are functioning
         """
 
         # defaults specified in source patterns for SEARCHSTRING[4,6]
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'bigpattern',
-            '-y', 
+            '-y',
             '-v', 'SEARCHSTRING1', "Occurs_1_time",
             '-v', 'SEARCHSTRING2', "Occurs_3_times",
             '-v', 'SEARCHSTRING3', "word-regexp",
             '-v', 'SEARCHSTRING5', "word-regexp"
-            ]))
+        ]))
         # sleep a small ammount
         quilt_test_core.sleep_large()
 
@@ -76,7 +73,7 @@ class BasicSourcesTestcase(unittest.TestCase):
         # issue a valid query
 
         # call quilt_history query_id
-        o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        o = quilt_test_core.call_quilt_script('quilt_history.py', [qid])
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
@@ -96,20 +93,19 @@ class BasicSourcesTestcase(unittest.TestCase):
 
 
         # have no + 1, these are defaults set from src pattern
-        
+
         occurences = (
             len([m.start() for m in re.finditer(
                 "src default for pat2 occurs twice", o)]))
-        self.assertTrue(occurences ==  3)
+        self.assertTrue(occurences == 3)
 
         occurences = (
             len([m.start() for m in re.finditer(
                 "src default for pat1 occurs once", o)]))
-        self.assertTrue(occurences ==  2)
-
+        self.assertTrue(occurences == 2)
 
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(
-        "Run integration test for multiple basic source",sys.argv)
+        "Run integration test for multiple basic source", sys.argv)
     unittest.main()

@@ -3,11 +3,12 @@ import ast
 import sys
 import pprint
 
+
 class v(ast.NodeVisitor):
     def __init__(self):
         ast.NodeVisitor.__init__(self)
-        self.head={}
-        self.cur=[self.head]
+        self.head = {}
+        self.cur = [self.head]
 
 
     def generic_visit(self, node):
@@ -15,23 +16,21 @@ class v(ast.NodeVisitor):
 
         ast.NodeVisitor.generic_visit(self, node)
 
-    def visit_Name(self, node): 
+    def visit_Name(self, node):
         print 'Name:', node.id
 
-def visit(node, depth):
 
+def visit(node, depth):
     rnode = {}
     basename = type(node).__name__
     name = basename
     index = 0
     while name in rnode:
         index = index + 1
-        name = basename + index 
-
-
+        name = basename + index
 
     for n in ast.iter_child_nodes(node):
-        subobj = visit(n,depth+1)
+        subobj = visit(n, depth + 1)
         if len(subobj.keys()) == 0:
             continue
 
@@ -51,7 +50,6 @@ def visit(node, depth):
 
 
 def tree_print(node, depth):
-
     basename = type(node).__name__
 
     s = ""
@@ -67,7 +65,8 @@ def tree_print(node, depth):
 
     print s
     for n in ast.iter_child_nodes(node):
-        tree_print(n,depth+1)
+        tree_print(n, depth + 1)
+
 
 def print_stack(s):
     q = "[ "
@@ -76,10 +75,9 @@ def print_stack(s):
         q += str(basename) + "r, "
     q += " ["
     print q
-        
-    
-def tree_do(node, depth, stack):
 
+
+def tree_do(node, depth, stack):
     basename = type(node).__name__
 
     s = ""
@@ -96,7 +94,7 @@ def tree_do(node, depth, stack):
     stack.append(node)
     #print_stack(stack)
     for n in ast.iter_child_nodes(node):
-        tree_do(n,depth+1,stack)
+        tree_do(n, depth + 1, stack)
 
     if type(node) == ast.Add:
         arg1 = stack.pop()
@@ -124,6 +122,7 @@ def get_pattern_vars(code):
                 srcs.add(value)
     return srcs
 
+
 def justwalk(tree):
     srcs = set()
 
@@ -133,11 +132,10 @@ def justwalk(tree):
                 src = []
 
     print srcs
-        
+
+
 class srcpuller(ast.NodeVisitor):
-
-
-    def visit_Call(self, node): 
+    def visit_Call(self, node):
         super(srcpuller, self).generic_visit(node)
         state = 0
         for n in ast.iter_child_nodes(node):
@@ -173,12 +171,13 @@ class srcpuller(ast.NodeVisitor):
                             break
             break
 
+
 def do_parse(codeline):
     print "Parsing->", codeline
     #visitor = v()
     tree = ast.parse(codeline)
 
-    tree_print(tree,0)
+    tree_print(tree, 0)
     #tree_do(tree,0,stack)
     # newobj = visit(tree,0)
     #pprint.pprint(newobj)

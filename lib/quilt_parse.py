@@ -31,14 +31,15 @@ class SourceVisitor(ast.NodeVisitor):
     AST.  Reposnible for collecting sources referenced in pattern
     code
     """
+
     def __init__(self):
         # chain call to parent constructor
         ast.NodeVisitor.__init__(self)
         # initialize sourcePattern dictionary member
         self.varDict = var_dict.create()
 
-    def visit_Call(self, node): 
-        # chain call to perent class generic visitor to assure 
+    def visit_Call(self, node):
+    # chain call to perent class generic visitor to assure
         #   recursive operations
         super(SourceVisitor, self).generic_visit(node)
 
@@ -113,6 +114,7 @@ class SourceVisitor(ast.NodeVisitor):
         self.visit(tree)
         # return the sourcePattern dictionary
         return self.varDict
+
 
 def get_pattern_src_refs(code):
     """

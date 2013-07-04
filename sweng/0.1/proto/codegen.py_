@@ -24,8 +24,9 @@
 # listner.flush()
 
 
-def run_func(funcType,args)
+def run_func(funcType, args)
     pass
+
 
 def emit_from_src(srcName)
     pass
@@ -34,22 +35,24 @@ def emit_from_src(srcName)
 class Module:
     def run(self):
         return self.expr.run()
+
     class Expr:
         def run(self):
             return self.call.run()
+
         class Call:
             def run(self):
                 concurrent.run(
                     [access_log.run(),
-                    error_log.run()])
+                     error_log.run()])
 
             class Concurrent:
-                def run(self,args):
-                    return  
-                    
+                def run(self, args):
+                    return
+
 
             concurrent = Concurrent()
-            
+
             class Access_log:
                 pass
 
@@ -61,7 +64,10 @@ class Module:
             error_log = Error_log()
 
         call = Call()
+
     expr = Expr()
+
+
 module = Module()
 
 module.run()

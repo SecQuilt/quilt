@@ -6,11 +6,10 @@ import quilt_test_core
 import re
 from string import Template
 
-firstTime=True
+firstTime = True
+
 
 class DuplicateEventsTestcase(unittest.TestCase):
-
-
     def setUp(self):
         """Setup the query master with some patterns used by the tests"""
 
@@ -21,7 +20,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
-    
+
         global firstTime
 
         if firstTime != True:
@@ -30,15 +29,15 @@ class DuplicateEventsTestcase(unittest.TestCase):
 
         # get the full source name for even and odd sources
         even_numbers = quilt_test_core.get_source_name(
-                "even_numbers")
+            "even_numbers")
         odd_numbers = quilt_test_core.get_source_name(
-                "odd_numbers")
+            "odd_numbers")
 
         # define template pattern code string
         followsTemplate = "follows(5, source('$EVEN','grep'),source('$ODD','grep'))"
-        
+
         # replace EVEN and ODD variables in the template with full names
-        replacments = { 'EVEN': even_numbers, 'ODD': odd_numbers }
+        replacments = {'EVEN': even_numbers, 'ODD': odd_numbers}
         followsTemplate = Template(followsTemplate)
         followsPatCode = followsTemplate.safe_substitute(replacments)
 
@@ -48,7 +47,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
         # call quilt_define with the pattern code and name query
         #   dups_follows
         quilt_test_core.call_quilt_script('quilt_define.py', ['-n',
-            'dups_follows', followsPatCode])
+                                                              'dups_follows', followsPatCode])
 
         # define template pattern code string
         concurrentTemplate = "concurrent(source('$EVEN','grep'),source('$EVEN','grep'), source('$EVEN','grep'))"
@@ -63,19 +62,19 @@ class DuplicateEventsTestcase(unittest.TestCase):
         #   dups_concurrent
 
         quilt_test_core.call_quilt_script('quilt_define.py', ['-n',
-            'dups_concurrent', concurrentPatCode])
+                                                              'dups_concurrent', concurrentPatCode])
 
     def contains_once(
-        self,
-        text_body,
-        search_string ):
+            self,
+            text_body,
+            search_string):
         """
         Assert a test failure if search_string iff does not occur one time
         in the text_body
         """
 
         if (text_body == None or text_body == '' or
-                search_string == None or search_string == ''):
+                    search_string == None or search_string == ''):
             raise Exception("Invalid string for use in contains_once")
 
 
@@ -99,7 +98,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
         qid = o[a:]
 
         # call quilt_history query_id
-        o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        o = quilt_test_core.call_quilt_script('quilt_history.py', [qid])
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
@@ -114,15 +113,15 @@ class DuplicateEventsTestcase(unittest.TestCase):
 
         # issue a valid query
         # Assure proper execution, and get results from quilt_history
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
-            '-y', 'dups_follows' ]))
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
+            '-y', 'dups_follows']))
 
         o = self.check_query_and_get_results2(o)
 
-        self.contains_once(o,"{'timestamp': 3}")
-        self.contains_once(o,"{'timestamp': 5}")
-        self.contains_once(o,"{'timestamp': 7}")
-        self.contains_once(o,"{'timestamp': 9}")
+        self.contains_once(o, "{'timestamp': 3}")
+        self.contains_once(o, "{'timestamp': 5}")
+        self.contains_once(o, "{'timestamp': 7}")
+        self.contains_once(o, "{'timestamp': 9}")
 
 
     def test_concurrent(self):
@@ -134,19 +133,19 @@ class DuplicateEventsTestcase(unittest.TestCase):
 
         # issue a valid query
         # Assure proper execution, and get results from quilt_history
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
-            '-y', 'dups_concurrent' ]))
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
+            '-y', 'dups_concurrent']))
 
         o = self.check_query_and_get_results2(o)
 
-        self.contains_once(o,"{'timestamp': 2}")
-        self.contains_once(o,"{'timestamp': 4}")
-        self.contains_once(o,"{'timestamp': 6}")
-        self.contains_once(o,"{'timestamp': 8}")
-        self.contains_once(o,"{'timestamp': 10}")
+        self.contains_once(o, "{'timestamp': 2}")
+        self.contains_once(o, "{'timestamp': 4}")
+        self.contains_once(o, "{'timestamp': 6}")
+        self.contains_once(o, "{'timestamp': 8}")
+        self.contains_once(o, "{'timestamp': 10}")
 
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(
-        "Run integration test for duplicate event prevention",sys.argv)
+        "Run integration test for duplicate event prevention", sys.argv)
     unittest.main()

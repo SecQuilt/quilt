@@ -11,7 +11,7 @@ for i in range(10):
         print "uploading", i
 
         msgs.put(i)
-        time.sleep(random.random()*10)
+        time.sleep(random.random() * 10)
 
         print "downloading", msgs.get()
 

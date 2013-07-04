@@ -6,7 +6,6 @@ import itertools
 
 class _rec:
     def __init__(self, eventsId, index, fieldName):
-
         # set id and field name in member data
         self.eventsId = eventsId
         # if not _has_events(eventsId):
@@ -34,20 +33,20 @@ class _rec:
         return eventSpec[self.fieldName]
 
     def __str__(self):
-        return "<"+str(self.GetRec())+">"
+        return "<" + str(self.GetRec()) + ">"
 
-   
+
 class _field:
     def __init__(self, eventsId, fieldName):
         # set id and field name in member data
         self.eventsId = eventsId
         self.fieldName = fieldName
 
-    def __getitem__(self, index): 
-        # create and return a wrapper for this record
+    def __getitem__(self, index):
+    # create and return a wrapper for this record
         return _rec(self.eventsId, index, self.fieldName)
 
-    def __setitem__(self,key,val):
+    def __setitem__(self, key, val):
         # raise unimplemented exception
         raise Exception("This function is not implemented")
 
@@ -99,9 +98,9 @@ class _field:
         # begin constructing a new eventID based on the calling context
         # using the name of the lhs object and the operator
         returnEventsId = (self.eventsId + "." + self.fieldName +
-                opName)
+                          opName)
 
-        isPrimRhs = isinstance(rhs,(int, str, float, bool))
+        isPrimRhs = isinstance(rhs, (int, str, float, bool))
 
         # if rhs object is a primitive type
         if isPrimRhs:
@@ -148,7 +147,7 @@ class _field:
         else:
             # raise exception for unhandled type of rhs object
             raise Exception("Unexpected type on RHS of binary operator: " +
-                                rhs.__class__.__name__)
+                            rhs.__class__.__name__)
 
 
         # set the new event list into the global dictionary
@@ -156,12 +155,11 @@ class _field:
         return _pattern(returnEventsId, returningEvents)
 
 
-
     def __eq__(self, value):
         # construct a new eventID based on the calling context
         # NOTE, we assume RHS is a literal currently
-        returnEventsId = (self.eventsId + "." + self.fieldName + 
-                "==" + str(value))
+        returnEventsId = (self.eventsId + "." + self.fieldName +
+                          "==" + str(value))
 
         # if if eventID exist in global event dict
         if _has_events(returnEventsId):
@@ -192,13 +190,13 @@ class _field:
 
 
 class _pattern:
-    def __init__(self, eventsId, events = None):
+    def __init__(self, eventsId, events=None):
         # set events and id in member data
         self.eventsId = eventsId
         # if a new list of events is input, store them in
         #   the global pool
         if events != None:
-            _set_events(eventsId,events)
+            _set_events(eventsId, events)
 
         if not _has_events(eventsId):
             raise Exception("No event list available for: " + str(eventsId))
@@ -207,8 +205,8 @@ class _pattern:
         # return a new _field object from this
         #   eventId, and fieldName
         return _field(self.eventsId, fieldName)
-        
-    def __setitem__(self,key,val):
+
+    def __setitem__(self, key, val):
         # raise unimplemented exception
         raise Exception("This function is not implemented")
 
@@ -226,19 +224,20 @@ class _pattern:
         for e in self:
             s += "\t" + str(e) + "\n"
         return s
-            
+
 
 def at(pattern):
     # return timestamp field of the pattern
     return pattern['timestamp']
 
-def source(srcName,srcPatName,srcPatInstance=None):
+
+def source(srcName, srcPatName, srcPatInstance=None):
     """
     Construct a pattern wrapper from the specified source
     """
     # use the global query spec
-    srcQuerySpecs = quilt_data.query_spec_get(_get_query_spec(), 
-            sourceQuerySpecs=True)
+    srcQuerySpecs = quilt_data.query_spec_get(_get_query_spec(),
+                                              sourceQuerySpecs=True)
     # logging.debug("srcQuerySpecs:\n" + pprint.pformat(srcQuerySpecs))
 
     # logging.debug("Looking for Source: " + str(srcName) + ", pattern: " + str(srcPatName) 
@@ -250,30 +249,29 @@ def source(srcName,srcPatName,srcPatInstance=None):
         # if matching (srcName, patName, and patInstanceName)
         # if None was supplied as one of the parameter, then there
         #   must only be one instance to choose, keyed by 'None'
-        curSrc = quilt_data.src_query_spec_get(srcQuerySpec, 
-                source=True) 
-        curSrcPat = quilt_data.src_query_spec_get( srcQuerySpec, 
-                srcPatternName=True) 
+        curSrc = quilt_data.src_query_spec_get(srcQuerySpec,
+                                               source=True)
+        curSrcPat = quilt_data.src_query_spec_get(srcQuerySpec,
+                                                  srcPatternName=True)
         curSrcPatInst = quilt_data.src_query_spec_tryget(
-                    srcQuerySpec, srcPatternInstance=True) 
+            srcQuerySpec, srcPatternInstance=True)
 
         # logging.debug("checking " + curSrc + ", " + curSrcPat + 
         #         ", " + str( curSrcPatInst))
 
-        if (srcName == curSrc and 
-            srcPatName == curSrcPat and 
-            srcPatInstance == curSrcPatInst):
-
+        if (srcName == curSrc and
+                    srcPatName == curSrcPat and
+                    srcPatInstance == curSrcPatInst):
             # get the global srcResults for that srcQueryID
             srcResults = _get_events(srcQueryId)
 
             # return a new _pattern with the srcResults as the events
             return _pattern(srcQueryId, srcResults)
 
-    # raise exception if mathing srcQuery not found
-    raise Exception("Source: " + str(srcName) + ", pattern: " + str(srcPatName) 
-            + ". instance: " + str(srcPatInstance) +  
-            ", could not be found among the source queries")
+    # raise exception if matching srcQuery not found
+    raise Exception("Source: " + str(srcName) + ", pattern: " + str(srcPatName)
+                    + ". instance: " + str(srcPatInstance) +
+                    ", could not be found among the source queries")
 
 
 # http://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
@@ -285,7 +283,8 @@ def _check_equal(iterator):
         return all(first == rest.GetRec() for rest in iterator)
     except StopIteration:
         return True
-    #TODO ISSUE015 ISSUE016
+        #TODO ISSUE015 ISSUE016
+
 
 def concurrent(*patterns):
     """return all patterns that occur at the same time"""
@@ -294,15 +293,15 @@ def concurrent(*patterns):
     returnEventsId = "concurrent("
     for curPattern in patterns:
         returnEventsId += curPattern.eventsId + ","
-    returnEventsId = returnEventsId.rstrip(',') +')'
+    returnEventsId = returnEventsId.rstrip(',') + ')'
 
     # if eventlist of generated name exists
     if _has_events(returnEventsId):
         #   return previously generated event list
         return _pattern(returnEventsId)
 
-    # construct a new empty list of fields
-    # itterate the patterns
+        # construct a new empty list of fields
+        # itterate the patterns
         # call 'at' on the pattern, append to list of fields
     fields = [at(curPattern) for curPattern in patterns]
 
@@ -323,7 +322,7 @@ def concurrent(*patterns):
         for timestampRecord in joinedTuple:
             index = timestampRecord.index
             eventsId = timestampRecord.eventsId
-            event = _get_events(eventsId)[index] 
+            event = _get_events(eventsId)[index]
             if not event in returnEvents:
                 returnEvents.append(event)
 
@@ -332,13 +331,14 @@ def concurrent(*patterns):
     # by returning a _pattern for the new list
     return _pattern(returnEventsId, returnEvents)
 
-    
+
 class _check_follows:
     """
     Object represents a functor.  In the class constructor the delta time
     ammount is passed.  In the class's check funciton is used as a
     callback for pairs of timestamps. 
     """
+
     def __init__(self, howlong):
         # set how long into member data
         self.howlong = howlong
@@ -362,11 +362,9 @@ class _check_follows:
         #   otherwise return False 
         delta = after - before
         return delta > 0 and delta <= self.howlong
-        
+
         #TODO ISSUE016
 
-
-        
 
 def follows(howlong, before, after):
     """
@@ -380,9 +378,9 @@ def follows(howlong, before, after):
 
     # generate a name for a new pattern like:
     #   follows( howlong, name of before patter, name of after pattern)
-    returnEventsId = ("follows(" + str(howlong) + "," + before.eventsId + 
-        "," + after.eventsId + ')')
-    
+    returnEventsId = ("follows(" + str(howlong) + "," + before.eventsId +
+                      "," + after.eventsId + ')')
+
     # if events can be found with the generated name
     if _has_events(returnEventsId):
         # return previously generated event list
@@ -418,7 +416,7 @@ def follows(howlong, before, after):
         if not event in returnEvents:
             # append the event to a returning list of events 
             returnEvents.append(event)
-            
+
     # return a new pattern wrapper with the generated name and the
     #   newly determined events
     return _pattern(returnEventsId, returnEvents)
@@ -433,9 +431,9 @@ def until(before, after):
 
     # generate a name for a new pattern like:
     #   until( name of before pattern, name of after pattern)
-    
+
     returnEventsId = "until(" + before.eventsId + "," + after.eventsId + ')'
-    
+
     # if events can be found with the generated name
     if _has_events(returnEventsId):
         # return previously generated event list
@@ -477,21 +475,27 @@ def until(before, after):
     #   newly determined events
     return _pattern(returnEventsId, returnEvents)
 
+
 def _get_events(eventsId):
 #   logging.debug("accessing " + str(eventsId))
     return globals()['_eventPool'][eventsId]
 
-def _set_events(eventsId,events):
+
+def _set_events(eventsId, events):
     globals()['_eventPool'][eventsId] = events
+
 
 def _has_events(eventsId):
     # logging.debug("Looking for " + str(eventsId) + " in " + str(globals()['_eventPool'].keys()))
     return eventsId in globals()['_eventPool']
 
+
 def _get_query_spec():
     return globals()['_querySpec']
 
+
 _interpret_lock = threading.Lock()
+
 
 def evaluate_query(patternSpec, querySpec, srcResults):
     """

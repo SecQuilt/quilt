@@ -14,22 +14,23 @@ class SomeTest(unittest.TestCase):
         return self.lazy
 
     def __init__(self, testName):
-        unittest.TestCase.__init__(self,testName)
+        unittest.TestCase.__init__(self, testName)
         self.lazy = None
 
     def test_one(self):
         self.get()
         print "one"
-            
+
     def test_two(self):
         self.get()
         print "two"
-        
+
     def __del__(self):
         print "exiting"
         if self.lazy != None:
             print "destroying"
             self.lazy = None
+
 
 if __name__ == "__main__":
     unittest.main()
