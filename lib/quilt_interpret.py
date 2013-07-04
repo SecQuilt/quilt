@@ -101,18 +101,18 @@ class _field:
         returnEventsId = (self.eventsId + "." + self.fieldName +
                 opName)
 
-        isPrimRhs = type(rhs) == int or type(rhs) == str or type(rhs) == float
+        isPrimRhs = isinstance(rhs,(int, str, float, bool))
 
         # if rhs object is a primitive type
         if isPrimRhs:
             # append its value to the constructing name
             returnEventsId += str(rhs)
-        elif type(rhs) == _field:
+        elif isinstance(rhs, _field):
             # append the name of the rhs
             returnEventsId += rhs.eventsId + "." + rhs.fieldName
         else:
             raise Exception("Unexpected type on RHS of binary operator: " +
-                            str(type(rhs)))
+                            rhs.__class__.__name__)
 
         # if if eventID exist in global event dict
         if _has_events(returnEventsId):
@@ -139,16 +139,16 @@ class _field:
                                     "RHS: " + opName)
 
         # otherwise if rhs is a field wrapper
-        elif type(rhs) == _field:
+        elif isinstance(rhs, _field):
 
             # call binary operator for field wrapper
             # set new event list to the results
             returningEvents = self._binary_operator_for_fields(
-                self, rhs, opFunc, opName)
+                rhs, opFunc, opName)
         else:
             # raise exception for unhandled type of rhs object
             raise Exception("Unexpected type on RHS of binary operator: " +
-                                str(type(rhs)))
+                                rhs.__class__.__name__)
 
 
         # set the new event list into the global dictionary
