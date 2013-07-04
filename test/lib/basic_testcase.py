@@ -14,7 +14,7 @@ class BasicTestcase(unittest.TestCase):
         qstr = 'find me again ' + str(random.random())
         # call quilt_submit "find me again" (check return code)
         quilt_test_core.call_quilt_script('quilt_submit.py',
-                                          [qstr, '-y'], checkCall=False)
+            [qstr, '-y'], checkCall=False)
         # sleep a small ammount
         quilt_test_core.sleep_small()
         # Use QuiltConfig, Call GetSourceManagers, for each one
@@ -51,11 +51,11 @@ class BasicTestcase(unittest.TestCase):
 
         # define the query
         o = quilt_test_core.call_quilt_script('quilt_define.py',
-                                              ['-n', qstr])
+            ['-n', qstr])
 
         # call quilt_submit "find me again" (check return code)
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py',
-                                                  [qstr, '-y']))
+            [qstr, '-y']))
         # sleep a small ammount
         quilt_test_core.sleep_small()
 
@@ -79,7 +79,7 @@ class BasicTestcase(unittest.TestCase):
             qid + 'FAKE'])
 
         # assure no output
-        self.assertTrue(o == None or len(o) == 0)
+        self.assertTrue(o is None or len(o) == 0)
 
         # check qmd to be sure that all quilt_q's have unregistered
         # do this by accessing Config, finding qmd name,
@@ -101,7 +101,7 @@ class BasicTestcase(unittest.TestCase):
 
         # call quilt_status (check return code, capture output)
         out = sei_core.run_process([quilt_status_file, '-l', 'DEBUG'],
-                                   whichReturn=sei_core.STDOUT, logToPython=False)
+            whichReturn=sei_core.STDOUT, logToPython=False)
 
         # assure that name of the test source manager appears in the
         # output, test source name specified in testing 
@@ -119,5 +119,6 @@ class BasicTestcase(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    quilt_test_core.unittest_main_helper("Run the most basic of test cases", sys.argv)
+    quilt_test_core.unittest_main_helper("Run the most basic of test cases",
+        sys.argv)
     unittest.main()

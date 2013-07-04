@@ -8,7 +8,7 @@ class SomeTest(unittest.TestCase):
 #        pass
 
     def get(self):
-        if self.lazy == None:
+        if self.lazy is None:
             self.lazy = "Initied"
             print "init"
         return self.lazy
@@ -27,7 +27,7 @@ class SomeTest(unittest.TestCase):
 
     def __del__(self):
         print "exiting"
-        if self.lazy != None:
+        if self.lazy is not None:
             print "destroying"
             self.lazy = None
 

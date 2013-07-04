@@ -25,13 +25,15 @@ class EmbeddedServer(object):
 
 print("initializing services... servertype=%s" % Pyro4.config.SERVERTYPE)
 # start a name server with broadcast server as well
-nameserverUri, nameserverDaemon, broadcastServer = Pyro4.naming.startNS(host=hostname)
+nameserverUri, nameserverDaemon, broadcastServer = Pyro4.naming.startNS(
+    host=hostname)
 assert broadcastServer is not None, "expect a broadcast server to be created"
 
 print("got a Nameserver, uri=%s" % nameserverUri)
 print("ns daemon location string=%s" % nameserverDaemon.locationStr)
 print("ns daemon sockets=%s" % nameserverDaemon.sockets)
-print("bc server socket=%s (fileno %d)" % (broadcastServer.sock, broadcastServer.fileno()))
+print("bc server socket=%s (fileno %d)" % (
+broadcastServer.sock, broadcastServer.fileno()))
 
 # create a Pyro daemon
 pyrodaemon = Pyro4.core.Daemon(host=hostname)
@@ -54,7 +56,8 @@ while True:
     # (a set provides fast lookup compared to a list)
     nameserverSockets = set(nameserverDaemon.sockets)
     pyroSockets = set(pyrodaemon.sockets)
-    rs = [broadcastServer] # only the broadcast server is directly usable as a select() object
+    rs = [
+        broadcastServer] # only the broadcast server is directly usable as a select() object
     rs.extend(nameserverSockets)
     rs.extend(pyroSockets)
     rs, _, _ = select.select(rs, [], [], 3)

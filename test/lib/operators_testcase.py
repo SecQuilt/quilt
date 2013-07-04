@@ -40,7 +40,7 @@ class OperatorsTestcase(unittest.TestCase):
 
         # replace EVEN and ODD variables in the template with full names
         replacments = {'CHRISTIAN': christian_holidays,
-                       'SECULAR': secular_holidays}
+            'SECULAR': secular_holidays}
         lessThanTemplate = Template(lessThanTemplate)
         patCode = lessThanTemplate.safe_substitute(replacments)
 
@@ -80,7 +80,7 @@ class OperatorsTestcase(unittest.TestCase):
         """
 
         if (text_body is None or text_body == '' or
-                    search_string is None or search_string == ''):
+                search_string is None or search_string == ''):
             raise Exception("Invalid string for use in contains")
 
         # use regular expression to count the number of occurences

@@ -6,71 +6,71 @@ import itertools
 
 shutdownevents = [
     {'timestamp': 100,
-     'content': 'rsyslog has shutdown'},
+        'content': 'rsyslog has shutdown'},
     {'timestamp': 200,
-     'content': 'rsyslog has shutdown'},
+        'content': 'rsyslog has shutdown'},
     {'timestamp': 300,
-     'content': 'rsyslog has shutdown'}]
+        'content': 'rsyslog has shutdown'}]
 
 startupevents = [
     {'timestamp': 101,
-     'content': 'rsyslog has startup'},
+        'content': 'rsyslog has startup'},
     {'timestamp': 202,
-     'content': 'rsyslog has startup'},
+        'content': 'rsyslog has startup'},
     {'timestamp': 301,
-     'content': 'rsyslog has startup'}]
+        'content': 'rsyslog has startup'}]
 
 maintevents = [
     {'timestamp': 150,
-     'content': 'running maintenance'},
+        'content': 'running maintenance'},
     {'timestamp': 175,
-     'content': 'running maintenance'},
+        'content': 'running maintenance'},
     {'timestamp': 250,
-     'content': 'running maintenance'},
+        'content': 'running maintenance'},
     {'timestamp': 275,
-     'content': 'running maintenance'},
+        'content': 'running maintenance'},
     {'timestamp': 350,
-     'content': 'running maintenance'},
+        'content': 'running maintenance'},
     {'timestamp': 375,
-     'content': 'running maintenance'}]
+        'content': 'running maintenance'}]
 
 bakevents = [
     {'timestamp': 150,
-     'content': 'running bak'},
+        'content': 'running bak'},
     {'timestamp': 175,
-     'content': 'running bak'},
+        'content': 'running bak'},
     {'timestamp': 250,
-     'content': 'running bak'},
+        'content': 'running bak'},
     {'timestamp': 350,
-     'content': 'running bak'},
+        'content': 'running bak'},
     {'timestamp': 375,
-     'content': 'running bak'}]
+        'content': 'running bak'}]
 
 bakflowevents = [
     {'timestamp': 151,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 176,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 250,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 275,
-     'sip': '10.0.0.4', 'dip': '74.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '74.1.0.1'},
     {'timestamp': 351,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 376,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 151,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 176,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 250,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 275,
-     'sip': '10.0.0.5', 'dip': '74.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '74.1.0.1'},
     {'timestamp': 351,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 376,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'}
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'}
 ]
 
 dnsevents = [
@@ -288,7 +288,7 @@ class fieldwrapper:
 class wrapper:
     def __init__(self, name, eventString=None):
         self.name = name
-        if eventString != None:
+        if eventString is not None:
             events[name] = eventString
 
     def __getitem__(self, key):

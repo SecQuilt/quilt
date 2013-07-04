@@ -52,10 +52,10 @@ class QuiltConfig:
             self._config.read(quiltcfg)
 
     def GetValue(# [out] string
-                 self,
-                 sectionName, # [in] string, name of section
-                 valueName, # [in] string, name of value
-                 default):        # [in] value of default
+            self,
+            sectionName, # [in] string, name of section
+            valueName, # [in] string, name of value
+            default):        # [in] value of default
         """
         Access a configuration value.  Configuraiton values can be
         specified with a section and a name.  The configuration value is
@@ -63,9 +63,9 @@ class QuiltConfig:
         default is returned.
         """
 
-        if (    self._config == None or
-                    not self._config.has_section(sectionName) or
-                    not self._config.has_option(sectionName, valueName)):
+        if (    self._config is None or
+            not self._config.has_section(sectionName) or
+            not self._config.has_option(sectionName, valueName)):
             return default
 
         return self._config.get(sectionName, valueName)
@@ -75,7 +75,7 @@ class QuiltConfig:
 
         # iterate through the source managers defined in the configuration
         smdcfgdir = self.GetValue('source_managers', 'config_dir',
-                                  os.path.join(self.GetCfgDir(), 'smd.d'))
+            os.path.join(self.GetCfgDir(), 'smd.d'))
 
         smdcfgdir = os.path.expandvars(smdcfgdir)
         if not os.path.exists(smdcfgdir):
@@ -84,7 +84,7 @@ class QuiltConfig:
                 smdcfgdir)
 
         smdcfgs = [f for f in listdir(smdcfgdir)
-                   if isfile(join(smdcfgdir, f))]
+            if isfile(join(smdcfgdir, f))]
 
         #logging.debug("Source manager config files: " + str(smdcfgs))
 
@@ -107,8 +107,8 @@ class QuiltConfig:
                 else:
                     specStr = c.get(s, 'sourceSpec')
                     quilt_data.src_specs_add(smds,
-                                             quilt_data.src_spec_create(
-                                                 cfgStr=specStr, cfgSection=s))
+                        quilt_data.src_spec_create(
+                            cfgStr=specStr, cfgSection=s))
 
         return smds
 
@@ -175,7 +175,7 @@ class QuiltDaemon(object):
 
 
 def GetQueryMasterProxy(config=None):
-    if config == None:
+    if config is None:
         config = QuiltConfig()
 
     qmhost = config.GetValue(
@@ -224,7 +224,7 @@ class QueryMasterClient:
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable
         rport = config.GetValue("registrar", "port", None)
-        if rport != None:
+        if rport is not None:
             rport = int(rport)
         rhost = config.GetValue("registrar", "host", None)
         logging.debug("Registering " + self.localname + ", to query master" +
@@ -270,7 +270,7 @@ class QueryMasterClient:
         return True
 
     def UnregisterFromQueryMaster(self):
-        if self._remotename != None:
+        if self._remotename is not None:
             with self.GetQueryMasterProxy() as qm:
                 qm.UnRegisterClient(self.GetType(), self._remotename)
 
@@ -284,12 +284,12 @@ class QueryMasterClient:
         # see design notes on ISSUE012
         # NOTE: this pattern of access is not completely safe, if reference 
         #   assignment is not atomic
-        if self._config == None:
+        if self._config is None:
             # I may be paranoid, but I am constructing config object outside
             # of the lock becuse it might take a while
             c = QuiltConfig()
             with self._lock:
-                if self._config == None:
+                if self._config is None:
                     self._config = c
         return self._config
 
@@ -300,10 +300,10 @@ class QueryMasterClient:
         # see design notes on ISSUE012
         # NOTE: this pattern of access is not completely safe, if string 
         #   assignment is not atomic
-        if self._qmuri == None:
+        if self._qmuri is None:
             config = self.GetConfig()
             with self._lock:
-                if self._qmuri == None:
+                if self._qmuri is None:
                     qmhost = config.GetValue(
                         "query_master", "registrar_host", None)
                     qmport = config.GetValue(
@@ -447,11 +447,11 @@ def common_init(name, strlevel):
     from main and other initializeation
     """
     # TODO eval security issue
-    if strlevel == None:
+    if strlevel is None:
         strlevel = 'WARN'
     strlevel = 'logging.' + strlevel
     logging.basicConfig(level=eval(strlevel),
-                        format='%(asctime)s:' + name + '%(process)d:%(levelname)s:%(message)s')
+        format='%(asctime)s:' + name + '%(process)d:%(levelname)s:%(message)s')
 
     # common init stuff together
     Pyro4.config.HMAC_KEY = "Itsnotmuchofacheeshopisit"
@@ -467,7 +467,7 @@ def main_helper(name, description, argv):
     argparser = argparse.ArgumentParser(description)
 
     argparser.add_argument('-l', '--log-level', nargs='?',
-                           help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
+        help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
 
     args, unknownArgs = argparser.parse_known_args(argv)
     unknownArgs = unknownArgs # its a pylint thing

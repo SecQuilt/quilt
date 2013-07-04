@@ -47,7 +47,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
         # call quilt_define with the pattern code and name query
         #   dups_follows
         quilt_test_core.call_quilt_script('quilt_define.py', ['-n',
-                                                              'dups_follows', followsPatCode])
+            'dups_follows', followsPatCode])
 
         # define template pattern code string
         concurrentTemplate = "concurrent(source('$EVEN','grep'),source('$EVEN','grep'), source('$EVEN','grep'))"
@@ -62,7 +62,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
         #   dups_concurrent
 
         quilt_test_core.call_quilt_script('quilt_define.py', ['-n',
-                                                              'dups_concurrent', concurrentPatCode])
+            'dups_concurrent', concurrentPatCode])
 
     def contains_once(
             self,
@@ -73,8 +73,8 @@ class DuplicateEventsTestcase(unittest.TestCase):
         in the text_body
         """
 
-        if (text_body == None or text_body == '' or
-                    search_string == None or search_string == ''):
+        if (text_body is None or text_body == '' or
+                search_string is None or search_string == ''):
             raise Exception("Invalid string for use in contains_once")
 
 

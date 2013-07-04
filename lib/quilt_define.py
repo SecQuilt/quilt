@@ -19,7 +19,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         # create the spec with it's requested name
         requestedName = self._args.name
-        if requestedName == None:
+        if requestedName is None:
             requestedName = "pattern"
         else:
             requestedName = self._args.name[0]
@@ -28,7 +28,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         # if the pattern code is specified, set it in the pattern as 
         #   a string
-        if (self._args.code != None):
+        if (self._args.code is not None):
             # perform first pass parse on the pattern to ensure syntax
             # call get_pattern_vars from parser, but ignore the result
             #   this will check the syntax
@@ -39,7 +39,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         # create the specs for the variables
         variables = None
-        if self._args.variable != None:
+        if self._args.variable is not None:
             for v in self._args.variable:
                 # create the variables section if it does not exist
 
@@ -62,7 +62,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         mappings = None
         # create the specs for the variable mappings
-        if self._args.mapping != None:
+        if self._args.mapping is not None:
             for m in self._args.mapping:
                 varName = m[0]
                 src = m[1]
@@ -88,7 +88,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                 mappings = quilt_data.src_var_mapping_specs_add(
                     mappings, srcVarMappingSpec)
 
-        if mappings != None:
+        if mappings is not None:
             quilt_data.pat_spec_set(patternSpec, mappings=mappings)
 
         # define patternSpec in the query master as a syncronous call
@@ -116,22 +116,22 @@ def main(argv):
         quilt_define will not return until pattern is defined or an error has
         occured.  It will output the finalized (unique) name for the pattern
         """,
-                                    argv)
+        argv)
 
     parser.add_argument('code', nargs='?',
-                        help="the code for the pattern")
+        help="the code for the pattern")
 
     parser.add_argument('-n', '--name', nargs=1,
-                        help="suggested name of the pattern")
+        help="suggested name of the pattern")
 
     parser.add_argument('-v', '--variable', nargs='+', action='append',
-                        help="""VARIABLE [DESCRIPTION [DEFAULT]]]  The variables that are
+        help="""VARIABLE [DESCRIPTION [DEFAULT]]]  The variables that are
             part of the pattern, and an optional text description of the 
             purpose of the variable, and the oprional default value of the 
             variable""")
 
     parser.add_argument('-m', '--mapping', nargs='+', action='append',
-                        help="""VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE
+        help="""VARIABLE SOURCE SOURCE_PATTERN SOURCE_VARIABLE
             [SOURCE_PATTERN_INSTANCE] Provide mapping from a pattern variable 
             to a source variable.  Pattern variables are described with the 
             -v, --variable command.  Source variables are described in the 

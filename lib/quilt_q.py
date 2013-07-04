@@ -13,12 +13,12 @@ class QuiltQueue(quilt_core.QueryMasterClient):
     def OnRegisterEnd(self):
 
         with self.GetQueryMasterProxy() as qm:
-            if self._args.query_id == None:
+            if self._args.query_id is None:
                 o = qm.GetQueryQueueStats()
             else:
                 o = qm.TryGetQueryStats(self._args.query_id)
 
-        if o != None:
+        if o is not None:
             print o
 
         # return false (prevent event loop from beginning)
@@ -34,10 +34,10 @@ def main(argv):
         information about queries in the queue.  If id is specified, only 
         that query's information will be displayed, if that id is not present
         nothing is displayed""",
-                                    argv)
+        argv)
 
     parser.add_argument('query_id', nargs='?',
-                        help="a query ID for a query in the quilt queue")
+        help="a query ID for a query in the quilt queue")
 
     args = parser.parse_args(argv)
 

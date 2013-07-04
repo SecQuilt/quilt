@@ -35,8 +35,8 @@ class OrderTestcase(unittest.TestCase):
         # call quilt_define with the pattern code and name query
         #   dups_follows
         quilt_test_core.call_quilt_script('quilt_define.py', ['-n',
-                                                              'out_of_order',
-                                                              'source("' + out_of_order_numbers + '","grep")'])
+            'out_of_order',
+            'source("' + out_of_order_numbers + '","grep")'])
 
 
     # TODO see ISSUE008  We want to move this to test_core when there is a

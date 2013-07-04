@@ -13,7 +13,7 @@ class QuiltHistory(quilt_core.QueryMasterClient):
         with self.GetQueryMasterProxy() as qm:
             o = qm.GetQueryHistoryStats(self._args.query_id)
 
-        if o != None:
+        if o is not None:
             print o
 
         # return false (prevent event loop from beginning)
@@ -31,10 +31,10 @@ def main(argv):
         it its definition, the state of the query, and any results that are
         available.  If there are no completed queries with the specified ID 
         present, An error occurs.""",
-                                    argv)
+        argv)
 
     parser.add_argument('query_id', nargs='?',
-                        help="a query ID for a query in the history")
+        help="a query ID for a query in the history")
 
     args = parser.parse_args(argv)
 

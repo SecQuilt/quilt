@@ -20,9 +20,9 @@ class SourceManager(quilt_core.QueryMasterClient):
 
 
     def Query(self, queryId, sourceQuerySpec,
-              queryClientName,
-              queryClientNamseServerHost,
-              queryClientNamseServerPort):
+            queryClientName,
+            queryClientNamseServerHost,
+            queryClientNamseServerPort):
         """
         Query the source, currently hardcoded to behave as calling a cmdline
         tool that outputs source results on each output line
@@ -43,14 +43,14 @@ class SourceManager(quilt_core.QueryMasterClient):
             # pattern spec should be read only and safe to access without
             #   a lock
             srcPatSpecs = quilt_data.src_spec_get(self._sourceSpec,
-                                                  sourcePatterns=True)
+                sourcePatterns=True)
             srcPatSpec = quilt_data.src_pat_specs_get(srcPatSpecs,
-                                                      quilt_data.src_query_spec_get(sourceQuerySpec,
-                                                                                    srcPatternName=True))
+                quilt_data.src_query_spec_get(sourceQuerySpec,
+                    srcPatternName=True))
 
             # get the variables in the query
             srcQueryVars = quilt_data.src_query_spec_get(sourceQuerySpec,
-                                                         variables=True)
+                variables=True)
 
             # iterate src query variables map, create a simple var name to
             #   var value map
@@ -85,8 +85,8 @@ class SourceManager(quilt_core.QueryMasterClient):
 
             #           I thought run_process apparently has problems
             sei_core.run_process(cmdline, shell=True,
-                                 whichReturn=sei_core.EXITCODE,
-                                 outFunc=self.OnGrepLine, outObj=context, logToPython=False)
+                whichReturn=sei_core.EXITCODE,
+                outFunc=self.OnGrepLine, outObj=context, logToPython=False)
 
             # Set query result events list in query master using query id
             results = []
@@ -96,7 +96,7 @@ class SourceManager(quilt_core.QueryMasterClient):
                         results = list(self._sourceResults[queryId][srcQueryId])
 
             uri = quilt_core.get_uri(queryClientNamseServerHost,
-                                     queryClientNamseServerPort, queryClientName)
+                queryClientNamseServerPort, queryClientName)
 
             with Pyro4.Proxy(uri) as query:
                 query.AppendSourceQueryResults(srcQueryId, results)
@@ -108,7 +108,7 @@ class SourceManager(quilt_core.QueryMasterClient):
 
                 # attempt to report error to the query client
                 uri = quilt_core.get_uri(queryClientNamseServerHost,
-                                         queryClientNamseServerPort, queryClientName)
+                    queryClientNamseServerPort, queryClientName)
                 srcQueryId = quilt_data.src_query_spec_get(
                     sourceQuerySpec, name=True)
 
@@ -169,9 +169,9 @@ class SourceManager(quilt_core.QueryMasterClient):
             # iterate sourceSpec member's patterns
             # append returning list with pattern names
             srcPatSpecs = quilt_data.src_spec_tryget(self._sourceSpec,
-                                                     sourcePatterns=True)
+                sourcePatterns=True)
 
-            if srcPatSpecs == None:
+            if srcPatSpecs is None:
                 return []
 
             return srcPatSpecs.keys()
@@ -222,7 +222,7 @@ def main(argv):
     # setup command line interface
     parser = quilt_core.main_helper('smd', """Source manager
        daemon""",
-                                    argv)
+        argv)
 
     # setup argument parser in accordance with funcitonal specification
     parser.add_argument('action', choices=['start', 'stop', 'restart'])

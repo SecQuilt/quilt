@@ -73,13 +73,13 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             notificationEmail=self._args.notifcation_email)
 
         #   set variables/values from args
-        if self._args.variable != None and len(self._args.variable) > 0:
+        if self._args.variable is not None and len(self._args.variable) > 0:
             variables = quilt_data.var_specs_create()
             for v in self._args.variable:
                 vname = v[0]
                 vval = v[1]
                 quilt_data.var_specs_add(variables,
-                                         quilt_data.var_spec_create(name=vname, value=vval))
+                    quilt_data.var_spec_create(name=vname, value=vval))
             quilt_data.query_spec_set(querySpec, variables=variables)
 
         logging.info('Submiting query: ' + pprint.pformat(querySpec))
@@ -167,23 +167,23 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
 def main(argv):
     # setup command line interface
     parser = quilt_core.main_helper('qsub',
-                                    """
-                                    Quilt Submit will allow submission of a query.  It will communicate
-                                    with the query master, recieve estimated time/space metrics of the
-                                    query, get user confirmation (if no -y), then deliver the query, to
-                                    the master for processing, print the query id, and then exit.
-                                    A user may select a pattern and then substitute the VARIABLEs
-                                    defined in the pattern with the submitted values""",
-                                    argv)
+        """
+        Quilt Submit will allow submission of a query.  It will communicate
+        with the query master, recieve estimated time/space metrics of the
+        query, get user confirmation (if no -y), then deliver the query, to
+        the master for processing, print the query id, and then exit.
+        A user may select a pattern and then substitute the VARIABLEs
+        defined in the pattern with the submitted values""",
+        argv)
 
     parser.add_argument('pattern',
-                        help="name of the pattern to create the query from")
+        help="name of the pattern to create the query from")
     parser.add_argument('-e', '--notifcation-email', nargs='?',
-                        help="comma seperated list of emails to supply with notifcations")
+        help="comma seperated list of emails to supply with notifcations")
     parser.add_argument('-y', '--confirm-query', action='store_true',
-                        default=False, help="whether to automatically confirm the query")
+        default=False, help="whether to automatically confirm the query")
     parser.add_argument('-v', '--variable', nargs=2, action='append',
-                        help="Arguments used to provide values to the variables in a pattern")
+        help="Arguments used to provide values to the variables in a pattern")
 
     # parse command line
     args = parser.parse_args(argv)

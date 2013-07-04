@@ -7,7 +7,8 @@ import fcntl
 import time
 
 
-def log_line(line, prefix='', postfix='', seperator=' ', loglevel='logging.DEBUG'):
+def log_line(line, prefix='', postfix='', seperator=' ',
+        loglevel='logging.DEBUG'):
     """Output a line to the log"""
     o = []
     if prefix:
@@ -21,7 +22,8 @@ def log_line(line, prefix='', postfix='', seperator=' ', loglevel='logging.DEBUG
     logging.log(eval(loglevel), seperator.join(o))
 
 
-def log_stream(stream, prefix='', postfix='', seperator=' ', loglevel='logging.DEBUG'):
+def log_stream(stream, prefix='', postfix='', seperator=' ',
+        loglevel='logging.DEBUG'):
     """output the specified stream to the log"""
     for line in stream:
         log_line(line, prefix, postfix, seperator, loglevel)
@@ -72,10 +74,11 @@ def log_process(
                 handled = True
             if lineos:
                 if logToPython:
-                    log_line(lineos, prefix + ':stdout', postfix, seperator, loglevel)
+                    log_line(lineos, prefix + ':stdout', postfix, seperator,
+                        loglevel)
                     handled = True
 
-                if outFunc != None:
+                if outFunc is not None:
                     outFunc(lineos[:-1], outObj)
                     handled = True
 
@@ -92,7 +95,8 @@ def log_process(
             linees = err.readline()
             if linees:
                 if logToPython:
-                    log_line(linees, prefix + ':stderr', postfix, seperator, loglevel)
+                    log_line(linees, prefix + ':stderr', postfix, seperator,
+                        loglevel)
                 else:
                     print >> sys.stderr, linees[:-1]
 
@@ -119,25 +123,28 @@ def log_process(
 
 
 def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True,
-                logToPython=True, outFunc=None, outObj=None):
+        logToPython=True, outFunc=None, outObj=None):
     """run the specified process and wait for completion, throw exception if nonzero exit occurs, log output of process to the logging module, return stdout as string"""
     if type(cmd) != str:
         logging.debug("Executing: " + str(cmd)[1:-1].replace(',', ''))
     else:
         logging.debug("Executing: " + cmd)
 
-    p = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
     o = log_process(p, whichReturn=whichReturn,
-                    logToPython=logToPython, outFunc=outFunc, outObj=outObj)
+        logToPython=logToPython, outFunc=outFunc, outObj=outObj)
     exitCode = p.poll()
     if checkCall and exitCode != 0:
-        raise RuntimeError('cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(exitCode))
-    #TODO when we run out of memory, make it optional to return a giant std out
+        raise RuntimeError(
+            'cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(
+                exitCode))
+        #TODO when we run out of memory, make it optional to return a giant std out
     return o
 
 
 def run_process_lite(cmd, shell=False, checkCall=True,
-                     outFunc=None, outObj=None):
+        outFunc=None, outObj=None):
     logging.debug('run_process {begin}' + str(cmd) + '{end}')
     p = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE)
 
@@ -146,19 +153,21 @@ def run_process_lite(cmd, shell=False, checkCall=True,
         p.stdout.flush()
         oline = p.stdout.readline()
 
-        if outFunc != None and oline != None and oline != '':
+        if outFunc is not None and oline is not None and oline != '':
             outFunc(oline[:-1], outObj)
-        if exitCode != None:
+        if exitCode is not None:
             break
 
     if checkCall and exitCode != 0:
-        raise RuntimeError('cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(exitCode))
+        raise RuntimeError(
+            'cmd: ' + str(cmd) + ' returned non zero exit code: ' + str(
+                exitCode))
     return exitCode
 
 
 def shell_cmd_output_iter(command):
     p = subprocess.Popen(command, shell=True,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.STDOUT)
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT)
     for line in iter(proc.stdout.readline, ''):
         return iter(p.stdout.readline, b'')

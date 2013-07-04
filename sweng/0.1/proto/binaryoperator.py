@@ -8,29 +8,29 @@ from heapq import merge
 
 rhsevents = [
     {'timestamp': 151,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 175,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 251,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 275,
-     'sip': '10.0.0.4', 'dip': '74.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '74.1.0.1'},
     {'timestamp': 351,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 377,
-     'sip': '10.0.0.4', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.4', 'dip': '10.1.0.1'},
     {'timestamp': 151,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 177,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 251,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 275,
-     'sip': '10.0.0.5', 'dip': '74.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '74.1.0.1'},
     {'timestamp': 351,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'},
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'},
     {'timestamp': 375,
-     'sip': '10.0.0.5', 'dip': '10.1.0.1'}
+        'sip': '10.0.0.5', 'dip': '10.1.0.1'}
 ]
 
 rhsevents.sort(key=lambda x: x['timestamp'])
@@ -137,7 +137,7 @@ class binerator:
         l = None
         self.startfunc()
         for v in i:
-            if l != None and v - l > tol:
+            if l is not None and v - l > tol:
                 self.endfunc()
             self.elementfunc(v)
             l = v
@@ -179,7 +179,7 @@ def bins(lhs, rhs, tol, bop):
         l = None
         bop.startfunc()
         for v in i:
-            if l != None and v - l > tol:
+            if l is not None and v - l > tol:
                 bop.endfunc()
             bop.elementfunc(v)
             l = v

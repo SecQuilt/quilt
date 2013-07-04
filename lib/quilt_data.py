@@ -9,9 +9,9 @@ STATE_ERROR = "ERROR"
 
 # Generic spec functions
 def spec_set(spec, name=None):
-    if spec == None:
+    if spec is None:
         spec = {}
-    if name != None: spec['name'] = name
+    if name is not None: spec['name'] = name
     return spec
 
 
@@ -32,11 +32,11 @@ def spec_name_set(spec, name):
 # Variable Spec functions
 
 def var_spec_get(spec,
-                 name=False,
-                 value=False,
-                 #sourceMapping=False,
-                 description=False,
-                 default=False
+        name=False,
+        value=False,
+        #sourceMapping=False,
+        description=False,
+        default=False
 ):
     """Accessor for information from the variable spec.  Only one parameter 
     should be set to true, otherwise first paramter that evaluates positively 
@@ -50,11 +50,11 @@ def var_spec_get(spec,
 
 
 def var_spec_tryget(spec,
-                    name=False,
-                    value=False,
-                    #sourceMapping=False,
-                    description=False,
-                    default=False
+        name=False,
+        value=False,
+        #sourceMapping=False,
+        description=False,
+        default=False
 ):
     """Accessor for information from the variable spec.  Only one parameter 
     should be set to true, otherwise first paramter that evaluates positively 
@@ -68,19 +68,19 @@ def var_spec_tryget(spec,
 
 
 def var_spec_set(spec,
-                 name=None,
-                 value=None,
-                 #sourceMapping=None,
-                 description=None,
-                 default=None
+        name=None,
+        value=None,
+        #sourceMapping=None,
+        description=None,
+        default=None
 ):
-    if spec == None:
+    if spec is None:
         spec = {}
-    if name != None: spec_name_set(spec, name)
-    if value != None: spec['value'] = value
-    #if sourceMapping != None: spec['sourceMapping']= sourceMapping
-    if description != None: spec['description'] = description
-    if default != None: spec['default'] = default
+    if name is not None: spec_name_set(spec, name)
+    if value is not None: spec['value'] = value
+    #if sourceMapping is not None: spec['sourceMapping']= sourceMapping
+    if description is not None: spec['description'] = description
+    if default is not None: spec['default'] = default
     return spec
 
 
@@ -106,7 +106,7 @@ def var_specs_create():
 
 
 def var_specs_add(specs, varspec):
-    if specs == None:
+    if specs is None:
         specs = var_specs_create()
     specs[var_spec_get(varspec, name=True)] = varspec
     return specs
@@ -117,7 +117,7 @@ def var_specs_get(specs, varName):
 
 
 def var_specs_tryget(specs, varName):
-    if specs == None or varName not in specs:
+    if specs is None or varName not in specs:
         return None
     return specs[varName]
 
@@ -146,12 +146,13 @@ def src_var_mapping_spec_set(
         sourcePatternInstance=None,
         sourceVariable=None
 ):
-    if spec == None: spec = {}
-    if name != None: spec_name_set(spec, name)
-    if sourceName != None: spec['sourceName'] = sourceName
-    if sourcePattern != None: spec['sourcePattern'] = sourcePattern
-    if sourcePatternInstance != None: spec['sourcePatternInstance'] = sourcePatternInstance
-    if sourceVariable != None: spec['sourceVariable'] = sourceVariable
+    if spec is None: spec = {}
+    if name is not None: spec_name_set(spec, name)
+    if sourceName is not None: spec['sourceName'] = sourceName
+    if sourcePattern is not None: spec['sourcePattern'] = sourcePattern
+    if sourcePatternInstance is not None: spec[
+        'sourcePatternInstance'] = sourcePatternInstance
+    if sourceVariable is not None: spec['sourceVariable'] = sourceVariable
     return spec
 
 
@@ -189,8 +190,10 @@ def src_var_mapping_spec_tryget(
     if name: return spec_name_tryget(spec)
     if sourceName and 'sourceName' in spec: return spec['sourceName']
     if sourcePattern and 'sourcePattern' in spec: return spec['sourcePattern']
-    if sourcePatternInstance and 'sourcePatternInstance' in spec: return spec['sourcePatternInstance']
-    if sourceVariable and 'sourceVariable' in spec: return spec['sourceVariable']
+    if sourcePatternInstance and 'sourcePatternInstance' in spec: return spec[
+        'sourcePatternInstance']
+    if sourceVariable and 'sourceVariable' in spec: return spec[
+        'sourceVariable']
     return None
 
 
@@ -199,7 +202,7 @@ def src_var_mapping_specs_create():
 
 
 def src_var_mapping_specs_add(mappingSpecs, mappingSpec):
-    if mappingSpecs == None:
+    if mappingSpecs is None:
         mappingSpecs = src_var_mapping_specs_create()
     mappingSpecs.append(mappingSpec)
     return mappingSpecs
@@ -212,11 +215,11 @@ def pat_spec_set(
         code=None,
         variables=None
 ):
-    if spec == None: spec = {}
-    if name != None: spec_name_set(spec, name)
-    if mappings != None: spec['mappings'] = mappings
-    if code != None: spec['code'] = code
-    if variables != None: spec['variables'] = variables
+    if spec is None: spec = {}
+    if name is not None: spec_name_set(spec, name)
+    if mappings is not None: spec['mappings'] = mappings
+    if code is not None: spec['code'] = code
+    if variables is not None: spec['variables'] = variables
     return spec
 
 
@@ -279,7 +282,7 @@ def pat_specs_create():
 
 
 def pat_specs_add(patSpecs, patSpec):
-    if patSpecs == None:
+    if patSpecs is None:
         patSpecs = pat_specs_create()
     name = pat_spec_get(patSpec, name=True)
     patSpecs[name] = patSpec
@@ -305,14 +308,15 @@ def query_spec_set(
         sourceQuerySpecs=None,
         variables=None
 ):
-    if spec == None: spec = {}
-    if name != None: spec_name_set(spec, name)
-    if state != None: spec['state'] = state
-    if patternName != None: spec['patternName'] = patternName
-    if notificationEmail != None: spec['notificationEmail'] = notificationEmail
-    if results != None: spec['results'] = results
-    if sourceQuerySpecs != None: spec['sourceQuerySpecs'] = sourceQuerySpecs
-    if variables != None: spec['variables'] = variables
+    if spec is None: spec = {}
+    if name is not None: spec_name_set(spec, name)
+    if state is not None: spec['state'] = state
+    if patternName is not None: spec['patternName'] = patternName
+    if notificationEmail is not None: spec[
+        'notificationEmail'] = notificationEmail
+    if results is not None: spec['results'] = results
+    if sourceQuerySpecs is not None: spec['sourceQuerySpecs'] = sourceQuerySpecs
+    if variables is not None: spec['variables'] = variables
     return spec
 
 
@@ -375,9 +379,11 @@ def query_spec_tryget(
     if name: return spec_name_tryget(spec)
     if state and 'state' in spec: return spec['state']
     if patternName and 'patternName' in spec: return spec['patternName']
-    if notificationEmail and 'notificationEmail' in spec: return spec['notificationEmail']
+    if notificationEmail and 'notificationEmail' in spec: return spec[
+        'notificationEmail']
     if results and 'results' in spec: return spec['results']
-    if sourceQuerySpecs and 'sourceQuerySpecs' in spec: return spec['sourceQuerySpecs']
+    if sourceQuerySpecs and 'sourceQuerySpecs' in spec: return spec[
+        'sourceQuerySpecs']
     if variables and 'variables' in spec: return spec['variables']
     return None
 
@@ -390,7 +396,7 @@ def query_specs_create():
 
 
 def query_specs_add(querySpecs, querySpec):
-    if querySpecs == None:
+    if querySpecs is None:
         querySpecs = query_specs_create()
     querySpecs[query_spec_get(querySpec, name=True)] = querySpec
     return querySpecs
@@ -414,7 +420,7 @@ def query_specs_del(querySpecs, querySpecName):
 
 def query_specs_trydel(querySpecs, querySpecName):
     spec = query_specs_tryget(querySpecs, querySpecName)
-    if spec != None:
+    if spec is not None:
         del querySpecs[querySpecName]
     return spec
 
@@ -426,10 +432,10 @@ def src_pat_spec_set(
         ordered=None,
         variables=None
 ):
-    if spec == None: spec = {}
-    if name != None: spec_name_set(spec, name)
-    if ordered != None: spec['ordered'] = ordered
-    if variables != None: spec['variables'] = variables
+    if spec is None: spec = {}
+    if name is not None: spec_name_set(spec, name)
+    if ordered is not None: spec['ordered'] = ordered
+    if variables is not None: spec['variables'] = variables
     return spec
 
 
@@ -514,14 +520,15 @@ def src_query_spec_set(
         ordered=None,
         variables=None
 ):
-    if spec == None: spec = {}
-    if name != None: spec_name_set(spec, name)
-    if srcPatternName != None: spec['srcPatternName'] = srcPatternName
-    if srcPatternInstance != None: spec['srcPatternInstance'] = srcPatternInstance
-    if state != None: spec['state'] = state
-    if source != None: spec['source'] = source
-    if ordered != None: spec['ordered'] = ordered
-    if variables != None: spec['variables'] = variables
+    if spec is None: spec = {}
+    if name is not None: spec_name_set(spec, name)
+    if srcPatternName is not None: spec['srcPatternName'] = srcPatternName
+    if srcPatternInstance is not None: spec[
+        'srcPatternInstance'] = srcPatternInstance
+    if state is not None: spec['state'] = state
+    if source is not None: spec['source'] = source
+    if ordered is not None: spec['ordered'] = ordered
+    if variables is not None: spec['variables'] = variables
     return spec
 
 
@@ -562,8 +569,10 @@ def src_query_spec_tryget(
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If value is not present in spec, None is returned"""
     if name: return spec_name_tryget(spec)
-    if srcPatternName and 'srcPatternName' in spec: return spec['srcPatternName']
-    if srcPatternInstance and 'srcPatternInstance' in spec: return spec['srcPatternInstance']
+    if srcPatternName and 'srcPatternName' in spec: return spec[
+        'srcPatternName']
+    if srcPatternInstance and 'srcPatternInstance' in spec: return spec[
+        'srcPatternInstance']
     if state and 'state' in spec: return spec['state']
     if source and 'soruce' in spec: return spec['soruce']
     if ordered and 'ordered' in spec: return spec['ordered']
@@ -576,7 +585,7 @@ def src_query_specs_create():
 
 
 def src_query_specs_add(srcQuerySpecs, srcQuerySpec):
-    if srcQuerySpecs == None:
+    if srcQuerySpecs is None:
         srcQuerySpecs = src_query_specs_create()
     name = src_query_spec_get(srcQuerySpec, name=True)
     srcQuerySpecs[name] = srcQuerySpec
@@ -588,19 +597,19 @@ def src_query_specs_get(srcQuerySpecs, srcQueryName):
 
 
 def src_spec_set(spec,
-                 name=None,
-                 sourcePatterns=None
+        name=None,
+        sourcePatterns=None
 ):
-    if spec == None:
+    if spec is None:
         spec = src_spec_create()
-    if name != None: spec_name_set(spec, name)
-    if sourcePatterns != None: spec['sourcePatterns'] = sourcePatterns
+    if name is not None: spec_name_set(spec, name)
+    if sourcePatterns is not None: spec['sourcePatterns'] = sourcePatterns
     return spec
 
 
 def src_spec_get(spec,
-                 name=False,
-                 sourcePatterns=False
+        name=False,
+        sourcePatterns=False
 ):
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
@@ -611,26 +620,27 @@ def src_spec_get(spec,
 
 
 def src_spec_tryget(spec,
-                    name=False,
-                    sourcePatterns=False
+        name=False,
+        sourcePatterns=False
 ):
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
     returned.  If no arguments evaluate positively, None will be returned"""
     if name: return spec_name_tryget(spec)
-    if sourcePatterns and 'sourcePatterns' in spec: return spec['sourcePatterns']
+    if sourcePatterns and 'sourcePatterns' in spec: return spec[
+        'sourcePatterns']
     return None
 
 
 def src_spec_create(cfgStr=None, cfgSection=None):
-    if cfgStr != None:
+    if cfgStr is not None:
         # we allow the user certain shortcuts when defining a spec,
         # we now go through the spec they defined and translate the
         # user input to the official sourceSpec schema
         #TODO harden against eval
         cfgSrcSpec = eval(cfgStr)
 
-        if src_spec_tryget(cfgSrcSpec, name=True) == None:
+        if src_spec_tryget(cfgSrcSpec, name=True) is None:
             # lazy user did not provide name, use the config section as name
             src_spec_set(cfgSrcSpec, name=cfgSection)
 
@@ -641,7 +651,7 @@ def src_spec_create(cfgStr=None, cfgSection=None):
             # the srcPatSpec.  If user did not specify it just set it
             # to the key value
             srcPatSpecName = src_pat_spec_tryget(srcPatSpec, name=True)
-            if srcPatSpecName != None and srcPatSpecName != srcPatName:
+            if srcPatSpecName is not None and srcPatSpecName != srcPatName:
                 # user has specified inconsistant names for a source pattern
                 # throw an error
                 raise Exception("Inconsitant names specified for source" +
@@ -652,7 +662,7 @@ def src_spec_create(cfgStr=None, cfgSection=None):
             # check if the user did not set the 'ordered' field, we will
             # default it to true
             ordered = src_pat_spec_tryget(srcPatSpec, ordered=True)
-            if ordered == None:
+            if ordered is None:
                 ordered = True
                 # set whether or not this spec guarantees return of ordered
             # results
@@ -672,15 +682,17 @@ def src_spec_create(cfgStr=None, cfgSection=None):
 
                     # user may have specified conflicting name for key and 
                     # actual name, guard against this stupidity
-                    if srcVarName != None and srcVarName != name:
+                    if srcVarName is not None and srcVarName != name:
                         raise Exception("Inconsitant names specified for " +
-                                        "source pattern variable: ( " + str(srcVarName) +
+                                        "source pattern variable: ( " + str(
+                            srcVarName) +
                                         ", " + str(name) + " )")
                         # set the official name into the variable spec
                     var_spec_set(val, name=name)
                 else:
                     raise Exception("Do not know how to specify source " +
-                                    "variable with object of type: " + str(type(val)))
+                                    "variable with object of type: " + str(
+                        type(val)))
 
                 logging.info("Variable created: " + str(name))
 
@@ -693,7 +705,7 @@ def src_specs_create():
 
 
 def src_specs_add(srcSpecs, srcSpec):
-    if srcSpecs == None:
+    if srcSpecs is None:
         srcSpecs = src_specs_create()
     srcSpecs[src_spec_get(srcSpec, name=True)] = srcSpec
     return srcSpecs

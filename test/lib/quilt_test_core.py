@@ -32,7 +32,7 @@ def unittest_main_helper(description='', argv=sys.argv):
     # setup the argument parser
     parser = argparse.ArgumentParser(description)
     parser.add_argument('-l', '--log-level', nargs='?',
-                        help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
+        help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
     args, unknown = parser.parse_known_args(argv)
     unknown = unknown # pylint thing
 
@@ -60,7 +60,7 @@ def call_quilt_script(scriptName, args=None, checkCall=True):
                             #   directory
         args                # arguments to pass to the script):
     """
-    if args == None:
+    if args is None:
         args = []
 
     quilt_lib_dir = get_quilt_lib_dir()
@@ -71,8 +71,8 @@ def call_quilt_script(scriptName, args=None, checkCall=True):
     args = [script_file, '-l', 'DEBUG'] + args
     # print("Executing under test: " + str(args))
     out = sei_core.run_process(args,
-                               whichReturn=sei_core.STDOUT, logToPython=False,
-                               checkCall=checkCall)
+        whichReturn=sei_core.STDOUT, logToPython=False,
+        checkCall=checkCall)
 
     return out
 
@@ -84,7 +84,7 @@ def get_source_name(partialName):
         " | grep " + partialName +
         " | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\" -e \"s/'//g\" ")
     srcName = sei_core.run_process(cmd, whichReturn=sei_core.STDOUT,
-                                   logToPython=False, shell=True)
+        logToPython=False, shell=True)
     return srcName
 
 

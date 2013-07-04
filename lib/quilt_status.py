@@ -26,7 +26,7 @@ def main(argv):
     # setup command line interface
     parser = quilt_core.main_helper('qstat', """Display information
         about the quilt system, including registered source managers""",
-                                    argv)
+        argv)
 
     args = parser.parse_args(argv)
 

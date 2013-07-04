@@ -47,7 +47,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         """
         try:
             # use query id passed in arguments
-            if self._args.query_id != None:
+            if self._args.query_id is not None:
                 qid = self._args.query_id[0]
             else:
                 raise Exception("Query ID is required")
@@ -55,7 +55,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             # Access the QuiltQuery's registrar's host and port from the config
             config = quilt_core.QuiltConfig()
             rport = config.GetValue("registrar", "port", None)
-            if rport != None:
+            if rport is not None:
                 rport = int(rport)
             rhost = config.GetValue("registrar", "host", None)
             self._registrarPort = rport
@@ -67,7 +67,8 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 self._patternSpec, self._querySpec = qm.BeginQuery(qid)
 
                 # get the query spec from query master
-                queryState = quilt_data.query_spec_get(self._querySpec, state=True)
+                queryState = quilt_data.query_spec_get(self._querySpec,
+                    state=True)
                 if queryState != quilt_data.STATE_ACTIVE:
                     raise Exception("Query: " + qid + ", must be in " +
                                     quilt_data.STATE_ACTIVE +
@@ -79,7 +80,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     self._querySpec, sourceQuerySpecs=True)
 
                 # there are no source query specs specified
-                if srcQuerySpecs == None:
+                if srcQuerySpecs is None:
                     # so just don't do anything
                     self._processEvents = False
                     return
@@ -88,7 +89,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 for srcQuerySpec in srcQuerySpecs.values():
                     # mark the sourceQuery ACTIVE
                     quilt_data.src_query_spec_set(srcQuerySpec,
-                                                  state=quilt_data.STATE_ACTIVE)
+                        state=quilt_data.STATE_ACTIVE)
 
                     # get proxy to the source manager
                     source = quilt_data.src_query_spec_get(
@@ -144,7 +145,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 srcQuerySpec = quilt_data.src_query_spec_get(
                     self._srcQuerySpecs, srcQueryId)
                 quilt_data.src_query_spec_set(srcQuerySpec,
-                                              state=quilt_data.STATE_ERROR)
+                    state=quilt_data.STATE_ERROR)
                 qid = quilt_data.query_spec_get(srcQuerySpec, name=True)
 
             # call query Master's Error function
@@ -217,7 +218,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     if srcQueryId in self._srcResults:
                         results = self._srcResults[srcQueryId]
 
-                if results != None:
+                if results is not None:
                     # sort results  by timestamp using interpret's 'at' 
                     #   function
                     results.sort(key=lambda rec: at(rec))
@@ -230,14 +231,14 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 # If query is progressing through the system properly it
                 # should be an active state when it gets here
                 srcQueryState = quilt_data.src_query_spec_get(srcQuerySpec,
-                                                              state=True)
+                    state=True)
                 if srcQueryState != quilt_data.STATE_ACTIVE:
                     raise Exception("Source Query is: " + srcQueryState +
                                     ". Can only complete a query that is " +
                                     quilt_data.STATE_ACTIVE)
 
                 quilt_data.src_query_spec_set(srcQuerySpec,
-                                              state=quilt_data.STATE_COMPLETED)
+                    state=quilt_data.STATE_COMPLETED)
 
             try:
 
@@ -247,9 +248,9 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     completed = True
                     for srcQuerySpec in self._srcQuerySpecs.values():
                         srcState = quilt_data.src_query_spec_get(srcQuerySpec,
-                                                                 state=True)
+                            state=True)
                         if (srcState != quilt_data.STATE_COMPLETED and
-                                    srcState != quilt_data.STATE_ERROR):
+                                srcState != quilt_data.STATE_ERROR):
                             completed = False
                             logging.debug("At least " + srcQuerySpec['name'] +
                                           " is still in progress")
@@ -334,7 +335,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 qid = quilt_data.query_spec_get(self._querySpec, name=True)
 
                 # if there is no query code
-                if code == None:
+                if code is None:
                     with self.GetQueryMasterProxy() as qm:
                         # for each source result
                         for curResult in self._srcResults.values():
@@ -348,7 +349,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     # evaluate the query by calling quilt_interpret
                     #   pass the query spec, and source Results
                     result = quilt_interpret.evaluate_query(self._patternSpec,
-                                                            self._querySpec, self._srcResults)
+                        self._querySpec, self._srcResults)
                     # append the returned results to the query master's
                     #   results for this query
                     logging.info("Posting results for query: " + str(qid))
@@ -380,17 +381,17 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 def main(argv):
     # setup command line interface
     parser = quilt_core.main_helper('qury',
-                                    """
-                                    Quilt Query will run a query.  It will communicate
-                                    with the query master, recieve the specifications for the
-                                    query, the issue source queries to sources.
+        """
+        Quilt Query will run a query.  It will communicate
+        with the query master, recieve the specifications for the
+        query, the issue source queries to sources.
 
-                                    Quilt Query should not be called directly by a user
-                                    """,
-                                    argv)
+        Quilt Query should not be called directly by a user
+        """,
+        argv)
 
     parser.add_argument('query_id', nargs=1,
-                        help="The specification of which query to process")
+        help="The specification of which query to process")
 
     # parse command line
     args = parser.parse_args(argv)

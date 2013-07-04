@@ -73,11 +73,11 @@ class _field:
             for rhsRec in rhsField:
                 rhsVal = rhsRec.GetRec()
                 # if minRHS is None or cur value is less than minRHS
-                if minRHS == None or rhsVal < minRHS:
+                if minRHS is None or rhsVal < minRHS:
                     # set minRHS to cur value
                     minRHS = rhsVal
 
-            if minRHS == None:
+            if minRHS is None:
                 return retEvents
 
             lhsEvents = _get_events(self.eventsId)
@@ -195,7 +195,7 @@ class _pattern:
         self.eventsId = eventsId
         # if a new list of events is input, store them in
         #   the global pool
-        if events != None:
+        if events is not None:
             _set_events(eventsId, events)
 
         if not _has_events(eventsId):
@@ -237,7 +237,7 @@ def source(srcName, srcPatName, srcPatInstance=None):
     """
     # use the global query spec
     srcQuerySpecs = quilt_data.query_spec_get(_get_query_spec(),
-                                              sourceQuerySpecs=True)
+        sourceQuerySpecs=True)
     # logging.debug("srcQuerySpecs:\n" + pprint.pformat(srcQuerySpecs))
 
     # logging.debug("Looking for Source: " + str(srcName) + ", pattern: " + str(srcPatName) 
@@ -250,9 +250,9 @@ def source(srcName, srcPatName, srcPatInstance=None):
         # if None was supplied as one of the parameter, then there
         #   must only be one instance to choose, keyed by 'None'
         curSrc = quilt_data.src_query_spec_get(srcQuerySpec,
-                                               source=True)
+            source=True)
         curSrcPat = quilt_data.src_query_spec_get(srcQuerySpec,
-                                                  srcPatternName=True)
+            srcPatternName=True)
         curSrcPatInst = quilt_data.src_query_spec_tryget(
             srcQuerySpec, srcPatternInstance=True)
 
@@ -260,8 +260,8 @@ def source(srcName, srcPatName, srcPatInstance=None):
         #         ", " + str( curSrcPatInst))
 
         if (srcName == curSrc and
-                    srcPatName == curSrcPat and
-                    srcPatInstance == curSrcPatInst):
+                srcPatName == curSrcPat and
+                srcPatInstance == curSrcPatInst):
             # get the global srcResults for that srcQueryID
             srcResults = _get_events(srcQueryId)
 
@@ -448,7 +448,7 @@ def until(before, after):
     tv = None
     for f in afterFields:
         # find the earliest occuring time
-        if t == None or f.GetRec() < tv:
+        if t is None or f.GetRec() < tv:
             t = f
             tv = t.GetRec()
 
@@ -457,7 +457,7 @@ def until(before, after):
     #  empty list for returning events
     returnEvents = []
 
-    if t != None:
+    if t is not None:
         eventsId = before.eventsId
         # iterate the before timestamp fields
         for b in beforeFields:

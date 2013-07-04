@@ -25,8 +25,8 @@ class Registrar(quilt_core.QuiltDaemon):
 def main(argv):
     # setup command line interface
     parser = quilt_core.main_helper("qreg",
-                                    "a meta server for quilt objects",
-                                    argv)
+        "a meta server for quilt objects",
+        argv)
 
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
     parser.parse_args()

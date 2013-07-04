@@ -84,7 +84,7 @@ class QueryMaster:
             del self.clients[clientType][clientNameKey]
 
         # client not found exit silently
-        if clientDict == None:
+        if clientDict is None:
             return
 
 
@@ -96,7 +96,7 @@ class QueryMaster:
         # Get Clients is thread safe
         smgrs = self.GetClients("smd")
 
-        if smgrs == None:
+        if smgrs is None:
             return "0 source managers"
 
         # oterate source managers, gather nfo
@@ -128,7 +128,7 @@ class QueryMaster:
             # determine unique name for the pattern based off suggested name
             #   in the spec
             rootName = quilt_data.pat_spec_tryget(patternSpec, name=True)
-            if rootName == None:
+            if rootName is None:
                 rootName = "pattern"
             patternName = rootName
             i = 1
@@ -164,7 +164,7 @@ class QueryMaster:
 
 
         # qid must be set because we use it when reporting the error
-        if submitterNameKey != None:
+        if submitterNameKey is not None:
             qid = str(submitterNameKey) + " unnamed query"
         else:
             qid = "Unknown query"
@@ -174,7 +174,7 @@ class QueryMaster:
 
             # a slightly better name for the query id
             tqid = quilt_data.query_spec_tryget(querySpec, name=True)
-            if tqid != None:
+            if tqid is not None:
                 qid = tqid
 
             # placeholder query spec to reserve the unique qid
@@ -227,7 +227,7 @@ class QueryMaster:
             # if pattern code specified
             #   parse the pattern text, and get set of variables mentioned
             #   in the pattern code
-            if code != None:
+            if code is not None:
                 varDict = quilt_parse.get_pattern_src_refs(code)
                 append = False
             else:
@@ -246,7 +246,7 @@ class QueryMaster:
             # if code was specified, only bother making the map for
             #   sources referenced in the code, otherwise use anything
             #   that was declared in the pattern spec mappings 
-            if patVarSpecs != None and mappings != None:
+            if patVarSpecs is not None and mappings is not None:
 
                 patVars = patVarSpecs.keys()
 
@@ -272,7 +272,7 @@ class QueryMaster:
                     # set append to appropriate value so that the varDict does
                     # not grow from mappings alone
                     var_dict.set_var(varDict, src, pat, ins, var, varName,
-                                     append=append)
+                        append=append)
 
             else:
                 logging.info("No query variables were specified")
@@ -323,9 +323,9 @@ class QueryMaster:
 
 
             # store sourceQueries in the querySpec
-            if srcQuerySpecs != None:
+            if srcQuerySpecs is not None:
                 quilt_data.query_spec_set(querySpec,
-                                          sourceQuerySpecs=srcQuerySpecs)
+                    sourceQuerySpecs=srcQuerySpecs)
 
             # use querySpec and srcQuery list
             # to create a validation string                    
@@ -363,9 +363,9 @@ class QueryMaster:
                 # store querySpec state as INITIALIZED, and place 
                 # validated contnts in member data
                 quilt_data.query_spec_set(querySpec,
-                                          state=quilt_data.STATE_INITIALIZED)
+                    state=quilt_data.STATE_INITIALIZED)
                 quilt_data.query_specs_add(self._queries,
-                                           querySpec)
+                    querySpec)
 
             # Process query...
             # get the path to the current directory
@@ -373,7 +373,7 @@ class QueryMaster:
             queryCmd = [
                 os.path.join(os.path.dirname(__file__), "quilt_query.py"),
                 qid]
-            if self._args.log_level != None:
+            if self._args.log_level is not None:
                 queryCmd.append("--log-level")
                 queryCmd.append(self._args.log_level)
 
@@ -447,7 +447,7 @@ class QueryMaster:
             # acquire lock
             with self.lock:
             # if queryID specified
-                if queryId != None:
+                if queryId is not None:
                     # throw error if query not found in history, 
                     # otherwise return the query's record
                     if queryId not in self._history:
@@ -476,14 +476,14 @@ class QueryMaster:
         """Private function, only call with self_lock engaged"""
         querySpec = quilt_data.query_specs_trydel(self._queries, queryId)
         # else find queryId in history
-        if querySpec == None:
+        if querySpec is None:
             querySpec = quilt_data.query_specs_tryget(self._history,
-                                                      queryId)
+                queryId)
         else:
             # move query spec from q to history member collection
             quilt_data.query_specs_add(self._history, querySpec)
 
-        if querySpec != None:
+        if querySpec is not None:
             # mark the query as the specified state
             quilt_data.query_spec_set(querySpec, state=state)
 
@@ -506,12 +506,12 @@ class QueryMaster:
                 existingEvents = quilt_data.query_spec_tryget(
                     querySpec, results=True)
 
-                if existingEvents == None:
+                if existingEvents is None:
                     existingEvents = []
 
                 # append the results into the query spec
                 quilt_data.query_spec_set(querySpec,
-                                          results=(existingEvents + results))
+                    results=(existingEvents + results))
 
         except Exception, error:
             try:
@@ -573,14 +573,14 @@ class QueryMaster:
 
                 # move query to ACTIVE state
                 quilt_data.query_spec_set(querySpec,
-                                          state=quilt_data.STATE_ACTIVE)
+                    state=quilt_data.STATE_ACTIVE)
 
                 # create a  copy of the query
                 querySpec = querySpec.copy()
 
                 # get a copy of the patternSpec
                 patternSpec = quilt_data.pat_specs_get(self._patterns,
-                                                       quilt_data.query_spec_get(querySpec, patternName=True))
+                    quilt_data.query_spec_get(querySpec, patternName=True))
                 patternSpec = patternSpec.copy()
 
             # returning copy because we don't want to stay locked when asking
@@ -610,7 +610,8 @@ class QueryMaster:
                 # delete the query from the Q
                 # set the state to COMPLETED
                 # Add the query to the history
-                self._try_move_query_to_hist(queryId, quilt_data.STATE_COMPLETED)
+                self._try_move_query_to_hist(queryId,
+                    quilt_data.STATE_COMPLETED)
         except Exception, error:
             try:
                 # log exception here, because there is no detail in it once we 
@@ -659,19 +660,20 @@ def create_src_query_specs(
             patternName, varDict)
 
         srcQuerySpecs = quilt_data.src_query_specs_add(srcQuerySpecs,
-                                                       curSrcQuerySpec)
+            curSrcQuerySpec)
 
     return srcQuerySpecs
 
 
 def create_src_query_spec(
-        srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source, patternName,
+        srcPatSpec, srcPatInstance, varSpecs, patVarSpecs, qid, source,
+        patternName,
         varDict):
     """Helper function for filling out a srcQuerySpec with variable values"""
 
     srcPatVars = quilt_data.src_pat_spec_get(
         srcPatSpec, variables=True)
-    if srcPatVars == None:
+    if srcPatVars is None:
         return
 
     srcVarToVarDict = varDict[source][patternName][srcPatInstance]
@@ -694,11 +696,11 @@ def create_src_query_spec(
             # get the value of the query variable from the
             #   querySpec, if it was given in the query spec
             varSpec = quilt_data.var_specs_tryget(varSpecs, varName)
-            if varSpec != None:
+            if varSpec is not None:
                 varValue = quilt_data.var_spec_tryget(varSpec, value=True)
 
-            if (varValue == None and patVarSpecs != None
-                and varName in patVarSpecs):
+            if (varValue is None and patVarSpecs is not None
+            and varName in patVarSpecs):
                 # user did not supply value for the variable in the
                 # query, but there is a default set in pattern definition
                 patVarSpec = quilt_data.var_specs_tryget(
@@ -707,13 +709,13 @@ def create_src_query_spec(
                 varValue = quilt_data.var_spec_tryget(
                     patVarSpec, default=True)
 
-        if varValue == None:
+        if varValue is None:
             # pattern definer did not supply a default, check
             # to see if there is a default in the source pattern
             varValue = quilt_data.var_spec_tryget(
                 srcPatVarSpec, default=True)
 
-            if varValue == None:
+            if varValue is None:
                 # could not determine a value for this variable
                 # must throw error
                 raise Exception("""No value set or default found
@@ -728,7 +730,7 @@ def create_src_query_spec(
 
     # Combine strings to get a name for this source query
     srcQueryName = '_'.join([qid, source, patternName])
-    if srcPatInstance != None:
+    if srcPatInstance is not None:
         srcQueryName += "_" + str(srcPatInstance)
 
     # create and return a src query spec

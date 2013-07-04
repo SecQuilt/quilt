@@ -44,7 +44,7 @@ class Module:
             def run(self):
                 concurrent.run(
                     [access_log.run(),
-                     error_log.run()])
+                        error_log.run()])
 
             class Concurrent:
                 def run(self, args):
