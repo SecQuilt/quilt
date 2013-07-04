@@ -7,7 +7,7 @@ Module: quilt_interpret
 Type: Library
 
 External Dependencies:
-    ast
+    ast, heapq
 
 Internal Dependencies:
 
@@ -40,7 +40,6 @@ Classes:
             return wrapped record string
             """
 
-
     class _field:
         def __init__(self, eventsId, fieldName)      
             # set id and field name in member data
@@ -67,10 +66,111 @@ Classes:
             #   field matching the value
             # set new event list into global events dict
             # return a new _pattern for the new event list
-        
+
+        def __lt__(self, rhs):
+            return results from _binary_operator
+
         def __str__(self)
             # return a string with patternId, field Name, and then list of
             # field values
+
+
+
+        NOTE:
+        Code complexity is by design.
+        A more OO design would present cleaner code.  It maybe premature
+        optimization, particularly without benchmarks, but it is assumed
+        that the lookups of methods and calling methods inside a looop
+        chaining of them will produce a measureable overhead.  Experieance and
+        time will possibly affect this decision.
+
+
+
+        NOTE: temporal binning feature is tabled at this time,
+                do not implement.
+
+        def _binning_binary_operator_for_fields(lhsField, rhsField, tol,
+        opFunc,
+                opName):
+            # see prototype binaryoperator.py
+
+            # set returning events member data to empy list
+            # if operator is lessThan
+                # set member data number of passes to 2
+                # set minRHS to None
+
+            # for each required pass
+                # create a iterator by merging the lhs and rhs using std merge
+                #   function
+
+
+                # set lastValue to value that marks it as unintialized
+                # call start field
+                # for each value in the merged iterator
+
+
+                    # if last is un initialized or differnce between current
+                    # and last value is greater than tol
+                        # perform logic for next bin ...
+
+                    # perform logic for current value
+                        ...
+
+                    # otherwise raise an error for unhandled operator case
+
+            # return the returning event list
+
+        def _binary_operator_for_fields(self, rhsField, opFunc,
+                opName):
+
+            # set returning list to empty list
+
+            # if operation is less than
+                # set minRHS to None
+                # for each value on RHS
+                    # if minRHS is None or cur value is less than minRHS
+                        # set minRHS to cur value
+
+                # if minRHS is None return empty event list
+
+                # for each value on LHS (self)
+                    # if value is less than minRHS
+                        # append event to returning list
+            # if unknown binary operation raise error
+
+
+        def _binary_operator(self, opFunc, opName, rhs):
+            # begin constructing a new eventID based on the calling context
+            # using the name of the lhs object and the operator
+
+            # if rhs object is a primitive type
+                # append its value to the constructing name
+            # else if rhs is a _ field
+                # append the name of the rhs
+            # raise exception for unhandled type of rhs object
+
+            # if if this eventID exist in global event dict
+                # return those events
+
+            # if rhs is primitive type
+                # iterate the values of this field
+                    # if binary operation with the primitive rhs is true
+                        # append current record to returning events
+                    # if unknown binary operation
+                        # raise an error
+
+            # otherwise if rhs is a field wrapper
+                # call binary operator for field wrapper
+                # set new event list to the results
+
+
+
+            # set the new event list into the global dictionary
+            # return a wrapper pattern for the new event list
+
+
+
+
 
     class _pattern:
         def __init__(self, eventsId, events)      
