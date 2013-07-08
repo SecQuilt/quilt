@@ -78,12 +78,10 @@ Classes:
 
         NOTE:
         Code complexity is by design.
-        A more OO design would present cleaner code.  It maybe premature
-        optimization, particularly without benchmarks, but it is assumed
-        that the lookups of methods and calling methods inside a looop
-        chaining of them will produce a measureable overhead.  Experieance and
-        time will possibly affect this decision.
-
+        A more OO design would present cleaner code.  but basic timing tests
+        of branches inside loops revealed them to be measurable less efficient.
+        virtual functions inside of loops would likely be very
+        noticable.
 
 
         NOTE: temporal binning feature is tabled at this time,
@@ -125,6 +123,9 @@ Classes:
 
             # set returning list to empty list
 
+            # if else statments for the binary operators
+            # <, <=, >, >=
+
             # if operation is less than
                 # set minRHS to None
                 # for each value on RHS
@@ -136,7 +137,9 @@ Classes:
                 # for each value on LHS (self)
                     # if value is less than minRHS
                         # append event to returning list
-            # if unknown binary operation raise error
+            # else, next operator....
+
+            # else if unknown binary operation raise error
 
 
         def _binary_operator(self, opFunc, opName, rhs):
@@ -153,11 +156,18 @@ Classes:
                 # return those events
 
             # if rhs is primitive type
-                # iterate the values of this field
-                    # if binary operation with the primitive rhs is true
+
+                # if else statments for the binary operators
+                # <, <=, >, >=, ==
+
+                # if binary operation with the primitive rhs is true
+                    # iterate the values of this field
                         # append current record to returning events
-                    # if unknown binary operation
-                        # raise an error
+                # else if next operator...
+
+                # if unknown binary operation
+                    # raise an error
+
 
             # otherwise if rhs is a field wrapper
                 # call binary operator for field wrapper
@@ -340,6 +350,18 @@ Functions:
 
         # raise exception if mathing srcQuery not found
 
+    def get_replacment_dict(querySpec):
+        """
+        return a dictionary mapping variable names to replacment values using
+        the variable specs in the query spec
+        """
+
+        # create empty dictionary
+        # for each variable spec in the query spec
+            # set variable value at variable name indictionary
+
+        # return replacment dictionary
+
     def evaluate_query(patternSpec, querySpec, srcResults):
         """
         Semantically process the source results according to the pattern
@@ -351,6 +373,10 @@ Functions:
         # with a global lock
             # try to evaluate the query
                 # set querySpec and srcResults (as eventDict) into global scope
+
+                # create a variable replacment map from query spec
+                # create Template based on pattern code
+                # substitute variables in pattern code's template
 
                 # evaluate the pattern code, returns a _pattern
 

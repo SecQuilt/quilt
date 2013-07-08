@@ -41,7 +41,31 @@ Classes:
             #   full source names
 
             # call quilt_define with the pattern code and name query
-            #   operators_lesthan
+            #   operators_lessthan
+
+
+            # define template pattern code string
+            compareFieldsTemplate =
+                "(source('$SECULAR','grep')['paradesize'] $OPERATOR source
+                ('$CHRISTIAN','grep')['paradesize'])"
+
+            # replace CHRISTIAN and SECULAR variables in the template with
+            #   full source names
+
+            # call quilt_define with the pattern code and name query
+            #   operators_comparefields
+            #   define one variable OPERATOR
+
+            # define template pattern code string
+            compareValueTemplate =
+                "(source('$SECULAR','grep')['paradesize'] $OPERATOR $VALUE"
+
+            # replace SECULAR variable in the template with
+            #   full source names
+
+            # call quilt_define with the pattern code and name query
+            #   operators_comparevalue
+            #   define 2 variables OPERATOR, and VALUE
 
 
         def test_lessthan():
@@ -56,7 +80,48 @@ Classes:
             # check results contain one instance of "boxing day"
             # check results contains no value "valintines day"
             
-        
+
+        def test_compare_fields():
+            """
+            Test will submit a query for each comparison operator and verify
+            results.  This will use a field on the lhs and rhs of the operator
+            """
+
+            # initialize a dictionary, where key's are the comparison operators
+            # and value is a string that should appear in the results
+
+            # for each key and value pair
+                # submit the operators_comparefields query
+                #   pass key as value for operator variable
+
+                # Assure proper execution, and get results from quilt_history
+                # check results contain one instance of "value"
+
+        def test_compare_value():
+            """
+            Test will submit a query for each comparison operator and verify
+            results.  This will use a field on the lhs and a value on the rhs
+            of the operator
+            """
+
+            # initialize a dictionary, where key's are the comparison operators
+            #   and value is a tuple.  The first element of the tuple is
+            #   the value to use in the query code, and the second element
+            #   of the tuple is the  string that should appear in the results
+
+            # for each key and value pair
+                # submit the operators_comparefields query
+                #   pass key as value for OPERATOR variable
+                #   pass first element of value tuple as VALUE variable
+
+                # Assure proper execution, and get results from quilt_history
+                # check results contain one instance of second part of value
+                #   tuple
+
+
+
+
+
 
 def main:
 

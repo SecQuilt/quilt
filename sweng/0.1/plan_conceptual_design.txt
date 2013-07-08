@@ -14,6 +14,8 @@ Existing:
 New:
 
 
-M 3+1
-VS 1
-L 1
+10 S
+18 VS
+1 L
+
+reusing 56 lines

@@ -15,8 +15,9 @@ Queries:
     in the quilt pattern
 * A default value specified in a quilt pattern will overide a default value
     set in the source pattern
-* The expression pattern < pattern means all rows on LHS that are < min of
-    rows on RHS
+
+
+
 * Quilt Grammer is supported for queries:
 
     pattern ::= until(pattern,pattern) |
@@ -39,6 +40,17 @@ Queries:
     literal ::= string | numeric
     source ::= identifier
     field ::= identifier | identifier [ term ]
+
+Semantic Behavior:
+* The expression field < field means all rows on LHS with LHS field value< min of rows on RHS
+* The expression field <= field means all rows on LHS with LHS field value <= min of rows on RHS
+* The expression field > field means all rows on LHS with LHS field value > max of rows on RHS
+* The expression field >= field means all rows on LHS with LHS field value >= max of rows on RHS
+* The expression field < factor means all rows on LHS with LHS field value < factor on RHS
+* The expression field <= factor means all rows on LHS with LHS field value <= factor on RHS
+* The expression field > factor means all rows on LHS with LHS field value > factor on RHS
+* The expression field >= factor means all rows on LHS with LHS field value >= factor on RHS
+* The expression field == factor means all rows on LHS with LHS field value == factor on RHS
 
 
 Results:

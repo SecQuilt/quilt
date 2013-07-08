@@ -317,6 +317,18 @@ c11.lessthan
     than any secular holidays
 
 
+c12.compare
+
+    DESIGN
+
+    Fill out the pattern from lessthan, but with more operators
+    refactor a bit to put loops inside of if statments, as prototype
+    'comparetimings' revealed it is a bit more efficient
+
+    TESTING
+
+    create a test pattern with even and odd numbers, create one test that runs
+    through the operators
 
 cX.lessthanBinning
 
