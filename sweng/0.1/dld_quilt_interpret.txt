@@ -7,7 +7,7 @@ Module: quilt_interpret
 Type: Library
 
 External Dependencies:
-    ast, heapq
+    ast, heapq, string.Template
 
 Internal Dependencies:
 
@@ -358,7 +358,7 @@ Functions:
 
         # create empty dictionary
         # for each variable spec in the query spec
-            # set variable value at variable name indictionary
+            # set variable value at variable name in dictionary
 
         # return replacment dictionary
 
