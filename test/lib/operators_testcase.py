@@ -40,7 +40,7 @@ class OperatorsTestcase(unittest.TestCase):
 
         # replace EVEN and ODD variables in the template with full names
         replacments = {'CHRISTIAN': christian_holidays,
-            'SECULAR': secular_holidays}
+                       'SECULAR': secular_holidays}
         lessThanTemplate = Template(lessThanTemplate)
         patCode = lessThanTemplate.safe_substitute(replacments)
 
@@ -65,7 +65,7 @@ class OperatorsTestcase(unittest.TestCase):
         #   define a variable for which binary operator to use
         quilt_test_core.call_quilt_script(
             'quilt_define.py', ['-n', 'operators_comparefields', patCode,
-                '-v', 'OPERATOR'])
+                                '-v', 'OPERATOR'])
 
         # define template pattern code string
         template = (
@@ -79,9 +79,9 @@ class OperatorsTestcase(unittest.TestCase):
         # call quilt_define with the pattern code and name query
         #   define a variable for which binary operator to use
         #   define a variable for what value to use on RHS
-        quilt_test_core.call_quilt_script(
-            'quilt_define.py', ['-n', 'operators_comparevalue', patCode,
-                '-v', 'OPERATOR', '-v', 'VALUE'])
+        quilt_test_core.call_quilt_script('quilt_define.py',
+            ['-n', 'operators_comparevalue', patCode, '-v', 'OPERATOR', '-v',
+             "VALUE"])
 
 
 # TODO see ISSUE008  We want to move this to test_core when there is a
@@ -114,7 +114,7 @@ def contains(
     """
 
     if (text_body is None or text_body == '' or
-            search_string is None or search_string == ''):
+                search_string is None or search_string == ''):
         raise Exception("Invalid string for use in contains")
 
     # use regular expression to count the number of occurences
