@@ -289,12 +289,6 @@ class SemanticsTestcase(unittest.TestCase):
                 "valentines", o)]))
         self.assertTrue(occurences == 0)
 
-        # assure output contains no easter
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "easter", o)]))
-        self.assertTrue(occurences == 0)
-
         # assure output contains no boxingday
         occurences = (
             len([m.start() for m in re.finditer(

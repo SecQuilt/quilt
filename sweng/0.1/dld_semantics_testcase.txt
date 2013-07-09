@@ -172,7 +172,7 @@ Classes:
 
             # assure the query is successfull, and get results
 
-            # check that results contain no easter, valentines day,
+            # check that results contain no valentines day,
             #   or boxingday
             # check that results contain ashwednesday, christmass
 
