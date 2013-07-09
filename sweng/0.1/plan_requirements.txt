@@ -42,6 +42,9 @@ Queries:
     field ::= identifier | identifier [ term ]
 
 Semantic Behavior:
+* Query code will suppourt arbitary textual substitution with pattern
+    variables, when a default for the pattern variable is defined
+
 * The expression field < field means all rows on LHS with LHS field value< min of rows on RHS
 * The expression field <= field means all rows on LHS with LHS field value <= min of rows on RHS
 * The expression field > field means all rows on LHS with LHS field value > max of rows on RHS

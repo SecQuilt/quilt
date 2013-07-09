@@ -81,6 +81,8 @@ Classes:
 
             # if pattern code specified
             # TODO Fix ISSUE011
+            #   generate pattern code by substituting any pattern defined
+            #       variables in the pattern code
             #   parse the pattern text, and get set of
             #   sources/patterns/instance
             #   referened in the pattern code

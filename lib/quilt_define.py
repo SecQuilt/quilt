@@ -26,17 +26,6 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         patternSpec = quilt_data.pat_spec_create(name=requestedName)
 
-        # if the pattern code is specified, set it in the pattern as 
-        #   a string
-        if (self._args.code is not None):
-            # perform first pass parse on the pattern to ensure syntax
-            # call get_pattern_vars from parser, but ignore the result
-            #   this will check the syntax
-            codestr = str(self._args.code)
-            quilt_parse.get_pattern_src_refs(codestr)
-            # store the code in the pattern
-            quilt_data.pat_spec_set(patternSpec, code=codestr)
-
         # create the specs for the variables
         variables = None
         if self._args.variable is not None:
@@ -90,6 +79,24 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         if mappings is not None:
             quilt_data.pat_spec_set(patternSpec, mappings=mappings)
+
+
+        # if the pattern code is specified, set it in the pattern as
+        #   a string
+        if (self._args.code is not None):
+            # perform first pass parse on the pattern to ensure syntax
+            # call get_pattern_vars from parser, but ignore the result
+            #   this will check the syntax
+
+            codestr = str(self._args.code)
+            # store the code in the pattern
+            quilt_data.pat_spec_set(patternSpec, code=codestr)
+
+            # syntax parsing may be dependent on variables in the pattern, so
+            #   generate the code str after replacing any pattern variables
+            codestr = quilt_data.generate_query_code(patternSpec, None)
+            quilt_parse.get_pattern_src_refs(codestr)
+
 
         # define patternSpec in the query master as a syncronous call
         # return will be the pattern name

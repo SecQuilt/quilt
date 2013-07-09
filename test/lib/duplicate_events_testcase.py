@@ -37,9 +37,9 @@ class DuplicateEventsTestcase(unittest.TestCase):
         followsTemplate = "follows(5, source('$EVEN','grep'),source('$ODD','grep'))"
 
         # replace EVEN and ODD variables in the template with full names
-        replacments = {'EVEN': even_numbers, 'ODD': odd_numbers}
+        replacements = {'EVEN': even_numbers, 'ODD': odd_numbers}
         followsTemplate = Template(followsTemplate)
-        followsPatCode = followsTemplate.safe_substitute(replacments)
+        followsPatCode = followsTemplate.safe_substitute(replacements)
 
 
         # TODO REad the pattern id from the std output then query that one
@@ -54,7 +54,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
 
         # replace EVEN variable in the template with full source name
         concurrentTemplate = Template(concurrentTemplate)
-        concurrentPatCode = concurrentTemplate.safe_substitute(replacments)
+        concurrentPatCode = concurrentTemplate.safe_substitute(replacements)
 
         # TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008

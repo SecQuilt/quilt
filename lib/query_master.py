@@ -228,6 +228,11 @@ class QueryMaster:
             #   parse the pattern text, and get set of variables mentioned
             #   in the pattern code
             if code is not None:
+                # pattern code should be generated to account for any variables
+                #   that will need to be substituted with default value to
+                #   make the code syntacticly correct
+                code = quilt_data.generate_query_code(patternSpec,None)
+                # get the variables mentioned in the pattern code
                 varDict = quilt_parse.get_pattern_src_refs(code)
                 append = False
             else:

@@ -110,7 +110,7 @@ Classes:
             #   of the tuple is the  string that should appear in the results
 
             # for each key and value pair
-                # submit the operators_comparefields query
+                # submit the operators_comparevalue query
                 #   pass key as value for OPERATOR variable
                 #   pass first element of value tuple as VALUE variable
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+from string import Template
 
 STATE_UNINITIALIZED = "UNINITIALIZED"
 STATE_INITIALIZED = "INITIALIZED"
@@ -32,11 +33,11 @@ def spec_name_set(spec, name):
 # Variable Spec functions
 
 def var_spec_get(spec,
-        name=False,
-        value=False,
-        #sourceMapping=False,
-        description=False,
-        default=False
+                 name=False,
+                 value=False,
+                 #sourceMapping=False,
+                 description=False,
+                 default=False
 ):
     """Accessor for information from the variable spec.  Only one parameter 
     should be set to true, otherwise first paramter that evaluates positively 
@@ -50,11 +51,11 @@ def var_spec_get(spec,
 
 
 def var_spec_tryget(spec,
-        name=False,
-        value=False,
-        #sourceMapping=False,
-        description=False,
-        default=False
+                    name=False,
+                    value=False,
+                    #sourceMapping=False,
+                    description=False,
+                    default=False
 ):
     """Accessor for information from the variable spec.  Only one parameter 
     should be set to true, otherwise first paramter that evaluates positively 
@@ -68,11 +69,11 @@ def var_spec_tryget(spec,
 
 
 def var_spec_set(spec,
-        name=None,
-        value=None,
-        #sourceMapping=None,
-        description=None,
-        default=None
+                 name=None,
+                 value=None,
+                 #sourceMapping=None,
+                 description=None,
+                 default=None
 ):
     if spec is None:
         spec = {}
@@ -597,8 +598,8 @@ def src_query_specs_get(srcQuerySpecs, srcQueryName):
 
 
 def src_spec_set(spec,
-        name=None,
-        sourcePatterns=None
+                 name=None,
+                 sourcePatterns=None
 ):
     if spec is None:
         spec = src_spec_create()
@@ -608,8 +609,8 @@ def src_spec_set(spec,
 
 
 def src_spec_get(spec,
-        name=False,
-        sourcePatterns=False
+                 name=False,
+                 sourcePatterns=False
 ):
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
@@ -620,8 +621,8 @@ def src_spec_get(spec,
 
 
 def src_spec_tryget(spec,
-        name=False,
-        sourcePatterns=False
+                    name=False,
+                    sourcePatterns=False
 ):
     """Accessor for information from the spec.  Only one parameter should
     be set to true, otherwise first paramter that evaluates positively is 
@@ -709,5 +710,64 @@ def src_specs_add(srcSpecs, srcSpec):
         srcSpecs = src_specs_create()
     srcSpecs[src_spec_get(srcSpec, name=True)] = srcSpec
     return srcSpecs
-    
+
+
+def generate_var_value_dict(patternSpec, querySpec):
+    """
+    return a dictionary mapping variable names to replacement values using
+    the variable specs in the patternSpec and/or the querySpec.  Either
+    argument may be None.  Variable values are determined in the following
+    order: pattern variavle default, query variable default, query variable
+    value.
+    """
+
+    replacements = {}
+
+    # if a pattern was specified
+    if patternSpec is not None:
+
+        #if this pattern has some variables defined
+        patVars = pat_spec_tryget(patternSpec, variables=True)
+        if patVars is not None:
+
+            # itterate the variables in the list
+            for varName, patVarSpec in patVars.items():
+                value = var_spec_tryget(patVarSpec, default=True)
+                # if a default value is stored in the pattern variable
+                if value is not None:
+                    # record this variable name value mapping
+                    replacements[varName] = value
+
+    # if a query was specified
+    if querySpec is not None:
+        # iterate the query variables if the exist
+        querySpecVars = query_spec_tryget(querySpec, variables=True)
+        if querySpecVars is not None:
+            for varName, queryVarSpec in querySpecVars.items():
+                # record value if a default exists
+                value = var_spec_tryget(queryVarSpec, default=True)
+                if value is not None:
+                    replacements[varName] = value
+                    # record value if a value exists
+                value = var_spec_tryget(queryVarSpec, value=True)
+                if value is not None:
+                    replacements[varName] = value
+
+    return replacements
+
+
+def generate_query_code(patternSpec, querySpec):
+    """
+    Search and replace variables that have a known value from the pattern code
+    """
+    code = pat_spec_get(patternSpec, code=True)
+    # create a variable replacement map from query spec
+    replacements = generate_var_value_dict(patternSpec, querySpec)
+    # create Template based on pattern code
+    codeTemplate = Template(code)
+    # substitute variables in pattern code's template
+    code = codeTemplate.substitute(replacements)
+
+    return code
+
 

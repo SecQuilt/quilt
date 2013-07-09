@@ -62,18 +62,18 @@ class SourceManager(quilt_core.QueryMasterClient):
             # create cmd line for the source
             # use the template in the sourcePatternSpec, and use the values
             #   provided for the variables, and environment variables
-            replacments = {}
-            # replacments = os.environ.copy()
+            replacements = {}
+            # replacements = os.environ.copy()
             for k, v in varNameValueDict.items():
-                replacments[k] = v
+                replacements[k] = v
 
             # "template" was not added as oficial schema member because it is 
             # specific to this command line case
             templateCmd = srcPatSpec['template']
             template = Template(templateCmd)
             logging.info("Ready to use : " + templateCmd +
-                         " with replacments: " + str(replacments))
-            cmdline = template.safe_substitute(replacments)
+                         " with replacements: " + str(replacements))
+            cmdline = template.safe_substitute(replacements)
 
             # setup context for the cmdline stdout callback
             srcQueryId = quilt_data.src_query_spec_get(

@@ -25,14 +25,17 @@ Classes:
 
         void OnRegisterEnd()
 
+            # create a patternSpec dict from arguments (name, PATTERN
+            #   VARIEABLEs, and VARIABLE to SOURCE_VARIABLE mappings)
+
             # parse the input pattern if it is specified
+            #   first generating the pattern code by substituting any
+            #   variables specified in the pattern code who also have
+            #   defaults in the pattern spec
 
             # perform first pass parse on the pattern to ensure syntax
             # call get_pattern_vars from parser, but ignore the result
             #   this will check the syntax
-
-            # create a patternSpec dict from arguments (name, PATTERN
-            #   VARIEABLEs, and VARIABLE to SOURCE_VARIABLE mappings)
 
 
             # define patternSpec in the query master as a syncronous call

@@ -3,7 +3,7 @@ import threading
 import quilt_data
 import itertools
 from string import Template
-# import logging
+import logging
 
 class _rec:
     def __init__(self, eventsId, index, fieldName):
@@ -139,7 +139,7 @@ class _field:
         # elif opFunc == _field.__eq__:
         #     pass
         else:
-            raise Exception("Unhandled operation for fields wrapper: " + opName)
+            raise Exception('Unhandled operation for fields wrapper: ' + opName)
 
 
     def _binary_operator(self, opFunc, opName, rhs):
@@ -554,72 +554,45 @@ def _get_query_spec():
 _interpret_lock = threading.Lock()
 
 
-def get_replacment_dict(querySpec):
+
+def evaluate_query(patternSpec, querySpec, srcResults):
     """
-    return a dictionary mapping variable names to replacement values using
-    the variable specs in the query spec
+    Semantically process the source results according to the pattern
+    code.  Return the results.
+    NOTE: This funciton is non rentrant.
+        Do not call evaluate_query when this is on the callstack
+    NOTE: The srcResults collection may be modified after calling
     """
+    # try to evaluate the query
+    with _interpret_lock:
+        try:
+            # set querySpec and srcResults (as eventDict) into global scope
+            globals()['_querySpec'] = querySpec
+            # we will be adding things to the event pool, this will modify
+            # a colleciton that is named only to have source results, so we
+            # preform a rename here.  The calling context will not use it
+            # anyway. See NOTE in docstring
+            # TODO, figure out if a .copy() would do a deep copy, or think
+            #   manual shallow
+            globals()['_eventPool'] = srcResults
 
-    # create empty dictionary
-    replacements = {}
+            code = quilt_data.generate_query_code(patternSpec, querySpec)
 
-    # for each variable spec in the query spec
-    varspecs = quilt_data.query_spec_get(querySpec, variables=True)
-    for var in varspecs:
-        # set variable value at variable name in dictionary
-        val = quilt_data.var_spec_tryget(var, value=True)
-        if val is not None:
+            # evaluate the pattern code
+            retpattern = eval(code)
 
-        # return replacment dictionary
-            return replacements
+            retobj = _get_events(retpattern.eventsId)
 
+            # logging.debug ("Rsults of interpret are:\n" +
+            # str(type(retobj)) + "\n" + str(dir(retobj)) +"\n" +
+            # pprint.pformat(retobj))
 
-    def evaluate_query(patternSpec, querySpec, srcResults):
-        """
-        Semantically process the source results according to the pattern
-        code.  Return the results.
-        NOTE: This funciton is non rentrant.
-            Do not call evaluate_query when this is on the callstack
-        NOTE: The srcResults collection may be modified after calling
-        """
-        # try to evaluate the query
-        with _interpret_lock:
-            try:
-                # set querySpec and srcResults (as eventDict) into global scope
-                globals()['_querySpec'] = querySpec
-                # we will be adding things to the event pool, this will modify
-                # a colleciton that is named only to have source results, so we
-                # preform a rename here.  The calling context will not use it
-                # anyway. See NOTE in docstring
-                # TODO, figure out if a .copy() would do a deep copy, or think
-                #   manual shallow
-                globals()['_eventPool'] = srcResults
+            # return results
+            return retobj
 
-                code = quilt_data.pat_spec_get(patternSpec, code=True)
-
-                # create a variable replacement map from query spec
-                replacements = get_replacment_dict(querySpec)
-                # create Template based on pattern code
-                codeTemplate = Template(code)
-                # substitute variables in pattern code's template
-                code = codeTemplate.substitute(replacements)
-
-
-                # evaluate the pattern code
-                retpattern = eval(code)
-
-                retobj = _get_events(retpattern.eventsId)
-
-                # logging.debug ("Rsults of interpret are:\n" +
-                # str(type(retobj)) + "\n" + str(dir(retobj)) +"\n" +
-                # pprint.pformat(retobj))
-
-                # return results
-                return retobj
-
-            finally:
-                # remove querySpec and eventDict from globals scope
-                if '_eventPool' in globals():
-                    del globals()['_eventPool']
-                if '_querySpec' in globals():
-                    del globals()['_querySpec']
+        finally:
+            # remove querySpec and eventDict from globals scope
+            if '_eventPool' in globals():
+                del globals()['_eventPool']
+            if '_querySpec' in globals():
+                del globals()['_querySpec']

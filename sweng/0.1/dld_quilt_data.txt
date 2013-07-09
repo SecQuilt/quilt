@@ -96,6 +96,39 @@ Exceptional Functions:
         # with a variable config that has a description attribute and no
         # default value attribute
 
-        
+
+    def generate_var_value_dict(patternSpec, querySpec):
+        """
+        return a dictionary mapping variable names to replacement values using
+        the variable specs in the patternSpec and/or the querySpec.  Either
+        argument may be None.  Variable values are determined in the following
+        order: pattern variavle default, query variable default, query variable
+        value.
+        """
+
+        # if a pattern was specified
+
+            #if this pattern has some variables defined
+
+                # itterate the variables in the list
+                    # if a default value is stored in the pattern variable
+                        # record this variable name value mapping
+
+        # if a query was specified
+            # iterate the query variables if the exist
+                    # record value if a default exists
+                    # record value if a value exists
+        # return replacements
+
+
+    def generate_query_code(patternSpec, querySpec):
+        """
+        Search and replace variables that have a known value from the pattern code
+        """
+        # create a variable replacement map from query spec
+        # create Template based on pattern code
+        # substitute variables in pattern code's template
+        # return generated code
+
     
 
