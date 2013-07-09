@@ -1,4 +1,7 @@
 {'timestamp':1,'holiday':'newyears','major':'True','paradesize':10000}
 {'timestamp':2,'holiday':'valentines','major':'True','paradesize':100}
+{'timestamp':3,'holiday':'stpatricks','major':'False','paradesize':100001}
+{'timestamp':4,'holiday':'independenceday',major:'True','paradesize':100000}
+{'timestamp':5,'holiday':'memorialday',major:'False','paradesize':1000}
 {'timestamp':11,'holiday':'thanksgiving','major':'True','paradesize':10000}
 {'timestamp':12,'holiday':'boxingday','major':'False','paradesize':10}

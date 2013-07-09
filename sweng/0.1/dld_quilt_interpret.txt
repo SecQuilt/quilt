@@ -68,7 +68,14 @@ Classes:
             # return a new _pattern for the new event list
 
         def __lt__(self, rhs):
+        def __ge__(self, rhs):
+        def __gt__(self, rhs):
+        def __le__(self, rhs):
+        def __ne__(self, rhs):
+        def __eq__(self, rhs):
             return results from _binary_operator
+
+
 
         def __str__(self)
             # return a string with patternId, field Name, and then list of

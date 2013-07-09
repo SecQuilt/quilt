@@ -2,6 +2,7 @@
 import threading
 import quilt_data
 import itertools
+from string import Template
 # import logging
 
 class _rec:
@@ -67,29 +68,76 @@ class _field:
 
         # if operation is less than
         if opFunc == _field.__lt__:
-            # set minRHS to None
-            minRHS = None
+            # set rhsLimit to None
+            rhsLimit = None
             # for each value on RHS
             for rhsRec in rhsField:
                 rhsVal = rhsRec.GetRec()
-                # if minRHS is None or cur value is less than minRHS
-                if minRHS is None or rhsVal < minRHS:
-                    # set minRHS to cur value
-                    minRHS = rhsVal
+                # if rhsLimit is None or cur value is less than rhsLimit
+                if rhsLimit is None or rhsVal < rhsLimit:
+                    # set rhsLimit to cur value
+                    rhsLimit = rhsVal
 
-            if minRHS is None:
+            if rhsLimit is None:
                 return retEvents
 
             lhsEvents = _get_events(self.eventsId)
             # for each value on LHS
             for lhsRec in self:
                 lhsVal = lhsRec.GetRec()
-                # if value is less than minRHS
-                if lhsVal < minRHS:
+                # if value is less than rhsLimit
+                if lhsVal < rhsLimit:
                     # append event to returning list
                     retEvents.append(lhsEvents[lhsRec.index])
 
             return retEvents
+        elif opFunc == _field.__ge__:
+            rhsLimit = None
+            for rhsRec in rhsField:
+                rhsVal = rhsRec.GetRec()
+                if rhsLimit is None or rhsVal > rhsLimit:
+                    rhsLimit = rhsVal
+            if rhsLimit is None:
+                return retEvents
+            lhsEvents = _get_events(self.eventsId)
+            for lhsRec in self:
+                lhsVal = lhsRec.GetRec()
+                if lhsVal >= rhsLimit:
+                    retEvents.append(lhsEvents[lhsRec.index])
+            return retEvents
+        elif opFunc == _field.__gt__:
+            rhsLimit = None
+            for rhsRec in rhsField:
+                rhsVal = rhsRec.GetRec()
+                if rhsLimit is None or rhsVal > rhsLimit:
+                    rhsLimit = rhsVal
+            if rhsLimit is None:
+                return retEvents
+            lhsEvents = _get_events(self.eventsId)
+            for lhsRec in self:
+                lhsVal = lhsRec.GetRec()
+                if lhsVal > rhsLimit:
+                    retEvents.append(lhsEvents[lhsRec.index])
+            return retEvents
+        elif opFunc == _field.__le__:
+            rhsLimit = None
+            for rhsRec in rhsField:
+                rhsVal = rhsRec.GetRec()
+                if rhsLimit is None or rhsVal < rhsLimit:
+                    rhsLimit = rhsVal
+            if rhsLimit is None:
+                return retEvents
+            lhsEvents = _get_events(self.eventsId)
+            for lhsRec in self:
+                lhsVal = lhsRec.GetRec()
+                if lhsVal <= rhsLimit:
+                    retEvents.append(lhsEvents[lhsRec.index])
+            return retEvents
+        # no requirments for == and != yet
+        # elif opFunc == _field.__ne__:
+        #     pass
+        # elif opFunc == _field.__eq__:
+        #     pass
         else:
             raise Exception("Unhandled operation for fields wrapper: " + opName)
 
@@ -125,17 +173,36 @@ class _field:
             events = _get_events(self.eventsId)
             returningEvents = []
 
-
+            # if binary operation with the primitive rhs is true
             # iterate the values of this field
-            for lhsValue in events:
-                # if binary operation with the primitive rhs is true
-                if opFunc == _field.__lt__:
-                    # append current record to returning events
+            # append current record to returning events
+            if opFunc == _field.__lt__:
+                for lhsValue in events:
                     if lhsValue[self.fieldName] < rhs:
                         returningEvents.append(lhsValue)
-                else:
-                    raise Exception("Unknown binary operator for primitive "
-                                    "RHS: " + opName)
+            elif opFunc == _field.__ge__:
+                for lhsValue in events:
+                    if lhsValue[self.fieldName] >= rhs:
+                        returningEvents.append(lhsValue)
+            elif opFunc == _field.__gt__:
+                for lhsValue in events:
+                    if lhsValue[self.fieldName] > rhs:
+                        returningEvents.append(lhsValue)
+            elif opFunc == _field.__le__:
+                for lhsValue in events:
+                    if lhsValue[self.fieldName] <= rhs:
+                        returningEvents.append(lhsValue)
+            elif opFunc == _field.__ne__:
+                for lhsValue in events:
+                    if lhsValue[self.fieldName] != rhs:
+                        returningEvents.append(lhsValue)
+            elif opFunc == _field.__eq__:
+                for lhsValue in events:
+                    if lhsValue[self.fieldName] == rhs:
+                        returningEvents.append(lhsValue)
+            else:
+                raise Exception("Unknown binary operator for primitive "
+                                "RHS: " + opName)
 
         # otherwise if rhs is a field wrapper
         elif isinstance(rhs, _field):
@@ -154,31 +221,6 @@ class _field:
         # return a wrapper pattern for the new event list
         return _pattern(returnEventsId, returningEvents)
 
-
-    def __eq__(self, value):
-        # construct a new eventID based on the calling context
-        # NOTE, we assume RHS is a literal currently
-        returnEventsId = (self.eventsId + "." + self.fieldName +
-                          "==" + str(value))
-
-        # if if eventID exist in global event dict
-        if _has_events(returnEventsId):
-            # return those events
-            return _pattern(returnEventsId)
-
-        # get the event list from the global event dict with this id
-        events = _get_events(self.eventsId)
-
-
-        # create new event list with events that have this
-        #   field matching the value
-        returnEvents = [e for e in events if e[self.fieldName] == value]
-
-        # logging.debug("RETUR   " + str(returnEvents))
-        # set new event list into global events dict
-        # return a new _pattern for the new event list
-        return _pattern(returnEventsId, returnEvents)
-
     def __str__(self):
         s = self.eventsId + '.' + self.fieldName + ' ['
         for i in self:
@@ -187,6 +229,21 @@ class _field:
 
     def __lt__(self, rhs):
         return self._binary_operator(_field.__lt__, "<", rhs)
+
+    def __ge__(self, rhs):
+        return self._binary_operator(_field.__ge__, ">=", rhs)
+
+    def __gt__(self, rhs):
+        return self._binary_operator(_field.__gt__, ">", rhs)
+
+    def __le__(self, rhs):
+        return self._binary_operator(_field.__le__, "<=", rhs)
+
+    def __ne__(self, rhs):
+        return self._binary_operator(_field.__ne__, "!=", rhs)
+
+    def __eq__(self, rhs):
+        return self._binary_operator(_field.__eq__, "==", rhs)
 
 
 class _pattern:
@@ -497,44 +554,72 @@ def _get_query_spec():
 _interpret_lock = threading.Lock()
 
 
-def evaluate_query(patternSpec, querySpec, srcResults):
+def get_replacment_dict(querySpec):
     """
-    Semantically process the source results according to the pattern
-    code.  Return the results.
-    NOTE: This funciton is non rentrant.
-        Do not call evaluate_query when this is on the callstack
-    NOTE: The srcResults collection may be modified after calling
+    return a dictionary mapping variable names to replacement values using
+    the variable specs in the query spec
     """
-    # try to evaluate the query
-    with _interpret_lock:
-        try:
-            # set querySpec and srcResults (as eventDict) into global scope
-            globals()['_querySpec'] = querySpec
-            # we will be adding things to the event pool, this will modify
-            # a colleciton that is named only to have source results, so we
-            # preform a rename here.  The calling context will not use it
-            # anyway. See NOTE in docstring
-            # TODO, figure out if a .copy() would do a deep copy, or think
-            #   manual shallow 
-            globals()['_eventPool'] = srcResults
 
-            # evaluate the pattern code
-            code = quilt_data.pat_spec_get(patternSpec, code=True)
+    # create empty dictionary
+    replacements = {}
 
-            retpattern = eval(code)
+    # for each variable spec in the query spec
+    varspecs = quilt_data.query_spec_get(querySpec, variables=True)
+    for var in varspecs:
+        # set variable value at variable name in dictionary
+        val = quilt_data.var_spec_tryget(var, value=True)
+        if val is not None:
 
-            retobj = _get_events(retpattern.eventsId)
+        # return replacment dictionary
+            return replacements
 
-            # logging.debug ("Rsults of interpret are:\n" + 
-            # str(type(retobj)) + "\n" + str(dir(retobj)) +"\n" + 
-            # pprint.pformat(retobj))
 
-            # return results
-            return retobj
+    def evaluate_query(patternSpec, querySpec, srcResults):
+        """
+        Semantically process the source results according to the pattern
+        code.  Return the results.
+        NOTE: This funciton is non rentrant.
+            Do not call evaluate_query when this is on the callstack
+        NOTE: The srcResults collection may be modified after calling
+        """
+        # try to evaluate the query
+        with _interpret_lock:
+            try:
+                # set querySpec and srcResults (as eventDict) into global scope
+                globals()['_querySpec'] = querySpec
+                # we will be adding things to the event pool, this will modify
+                # a colleciton that is named only to have source results, so we
+                # preform a rename here.  The calling context will not use it
+                # anyway. See NOTE in docstring
+                # TODO, figure out if a .copy() would do a deep copy, or think
+                #   manual shallow
+                globals()['_eventPool'] = srcResults
 
-        finally:
-            # remove querySpec and eventDict from globals scope
-            if '_eventPool' in globals():
-                del globals()['_eventPool']
-            if '_querySpec' in globals():
-                del globals()['_querySpec']
+                code = quilt_data.pat_spec_get(patternSpec, code=True)
+
+                # create a variable replacement map from query spec
+                replacements = get_replacment_dict(querySpec)
+                # create Template based on pattern code
+                codeTemplate = Template(code)
+                # substitute variables in pattern code's template
+                code = codeTemplate.substitute(replacements)
+
+
+                # evaluate the pattern code
+                retpattern = eval(code)
+
+                retobj = _get_events(retpattern.eventsId)
+
+                # logging.debug ("Rsults of interpret are:\n" +
+                # str(type(retobj)) + "\n" + str(dir(retobj)) +"\n" +
+                # pprint.pformat(retobj))
+
+                # return results
+                return retobj
+
+            finally:
+                # remove querySpec and eventDict from globals scope
+                if '_eventPool' in globals():
+                    del globals()['_eventPool']
+                if '_querySpec' in globals():
+                    del globals()['_querySpec']
