@@ -330,6 +330,34 @@ c12.compare
     create a test pattern with even and odd numbers, create one test that runs
     through the operators
 
+
+c13.andor
+
+    DESIGN
+    pattern and pattern : union
+        create new pattern from lhs rows + rhs rows
+
+        secular.parade > 100 and christian.parade > 100
+
+        all rows from secular where parade > 100 +
+        all rows from christian where parade > 100 +
+
+        secular.parade > 100 or christian.parade > 100
+        ?? same ghing
+
+
+    pattern or pattern : union
+
+        secularholidays or christian holidays?
+
+    boolean
+
+
+
+
+
+
+
 cX.lessthanBinning
 
     DESIGN
