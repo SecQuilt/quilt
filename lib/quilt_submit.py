@@ -70,7 +70,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
             name='new ' + self._args.pattern,
             state=quilt_data.STATE_UNINITIALIZED,
             patternName=self._args.pattern,
-            notificationEmail=self._args.notifcation_email)
+            notificationEmail=self._args.notification_email)
 
         #   set variables/values from args
         if self._args.variable is not None and len(self._args.variable) > 0:
