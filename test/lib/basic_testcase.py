@@ -9,13 +9,14 @@ import query_master
 import random
 
 
+# noinspection PyUnusedLocal
 class BasicTestcase(unittest.TestCase):
     def test_basic_query(self):
         qstr = 'find me again ' + str(random.random())
         # call quilt_submit "find me again" (check return code)
         quilt_test_core.call_quilt_script('quilt_submit.py',
             [qstr, '-y'], checkCall=False)
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_small()
         # Use QuiltConfig, Call GetSourceManagers, for each one
         # use pyro, create proxy for the smd
@@ -56,7 +57,7 @@ class BasicTestcase(unittest.TestCase):
         # call quilt_submit "find me again" (check return code)
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py',
             [qstr, '-y']))
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_small()
 
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
@@ -83,7 +84,7 @@ class BasicTestcase(unittest.TestCase):
 
         # check qmd to be sure that all quilt_q's have unregistered
         # do this by accessing Config, finding qmd name,
-        # create pyro proxy for qmd, call getRegistedObjects(type(QuiltQ))
+        # create pyro proxy for qmd, call getRegisteredObjects(type(QuiltQ))
         # make sure list is empty
 
         with quilt_core.GetQueryMasterProxy() as qm:

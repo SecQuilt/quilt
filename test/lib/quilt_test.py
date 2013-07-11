@@ -33,6 +33,7 @@ def filename_to_modulename(scriptsHome, filename):
 
 
 class QuiltTest(object):
+    # noinspection PyUnusedLocal
     def main(self, args):
         args = args # reserved for future use pylint!
 
@@ -44,10 +45,8 @@ class QuiltTest(object):
         # the directory containing test scripts        
         quilt_test_lib_dir = quilt_test_core.get_quilt_test_lib_dir()
 
-        # Repeat Forever if necessarry
+        # Repeat Forever if necessary
         while True:
-            # read sleep value again in case user changed
-            cfg = quilt_core.QuiltConfig()
             logging.info("Begin Itegration Testing iteration")
 
             # Read quilt config (should be quilt test config)
@@ -86,10 +85,10 @@ class QuiltTest(object):
             testSuite = unittest.TestSuite(tests)
             myrunner = unittest.TextTestRunner().run(testSuite)
 
-            logging.info("End Itegration Testing iteration")
+            logging.info('End Itegration Testing iteration')
 
             # raise exception if tests failed
-            if (not myrunner.wasSuccessful()):
+            if not myrunner.wasSuccessful():
                 exit(1)
 
 

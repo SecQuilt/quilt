@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import sys
 import unittest
+import re
+
 import quilt_data
 import quilt_test_core
-import re
-from string import Template
+
 
 firstTime = True
 
@@ -13,7 +14,7 @@ class SemanticsTestcase(unittest.TestCase):
     # TODO see ISSUE008  We want to move this to test_core when there is a
     # less hacky way to do it
     def check_query_and_get_results(self, submitStdout):
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_small()
 
         o = submitStdout
@@ -35,14 +36,14 @@ class SemanticsTestcase(unittest.TestCase):
         # ISSUE007
         # TODO, pyunit's bright idea is to call setup before each test.  It
         # was defining multiple patterns which was annoying but not a problem.
-        # The cleaneast way to do things is probably to remove patterns after
+        # The cleanest way to do things is probably to remove patterns after
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
 
         global firstTime
 
-        if firstTime != True:
+        if not firstTime:
             return
         firstTime = False
 
@@ -107,7 +108,7 @@ class SemanticsTestcase(unittest.TestCase):
         """
         This test assures that a simple case of semantics is tested
         where only one thing is referenced, the results of one source
-        query.  Additionally a red herring second varible is specified
+        query.  Additionally a red herring second variable is specified
         in the pattern, but is not mentioned in the pattern's code, only 
         in the query's variables.  We want to make sure quilt is smart
         enough not to make a useless source query.  An additional query
@@ -271,7 +272,7 @@ class SemanticsTestcase(unittest.TestCase):
         # capture stdout, assure good exitcode
         o = self.check_query_and_get_results(o)
 
-        # assure output contains ashednesday
+        # assure output contains ashwednesday
         occurences = (
             len([m.start() for m in re.finditer(
                 "ashwednesday", o)]))
@@ -313,7 +314,7 @@ class SemanticsTestcase(unittest.TestCase):
         # capture stdout, assure good exitcode
         o = self.check_query_and_get_results(o)
 
-        # assure output contains ashednesday
+        # assure output contains ashwednesday
         occurences = (
             len([m.start() for m in re.finditer(
                 "valentines", o)]))

@@ -2,8 +2,7 @@
 import threading
 import quilt_data
 import itertools
-from string import Template
-import logging
+# import logging
 
 class _rec:
     def __init__(self, eventsId, index, fieldName):
@@ -17,8 +16,9 @@ class _rec:
 
         # ISSUE014:  Big mystery here.  If I don't call GetRec or dereference
         #   the event list then an
-        #   infinate loop shows up, I can't figure it out
+        #   infinite loop shows up, I can't figure it out
         eventSpecs = _get_events(self.eventsId)
+        # noinspection PyStatementEffect
         eventSpecs[self.index]
 
     def GetRec(self):
@@ -133,7 +133,7 @@ class _field:
                 if lhsVal <= rhsLimit:
                     retEvents.append(lhsEvents[lhsRec.index])
             return retEvents
-        # no requirments for == and != yet
+        # no requirements for == and != yet
         # elif opFunc == _field.__ne__:
         #     pass
         # elif opFunc == _field.__eq__:
@@ -294,7 +294,7 @@ def source(srcName, srcPatName, srcPatInstance=None):
     """
     # use the global query spec
     srcQuerySpecs = quilt_data.query_spec_get(_get_query_spec(),
-        sourceQuerySpecs=True)
+                                              sourceQuerySpecs=True)
     # logging.debug("srcQuerySpecs:\n" + pprint.pformat(srcQuerySpecs))
 
     # logging.debug("Looking for Source: " + str(srcName) + ", pattern: " + str(srcPatName) 
@@ -307,9 +307,9 @@ def source(srcName, srcPatName, srcPatInstance=None):
         # if None was supplied as one of the parameter, then there
         #   must only be one instance to choose, keyed by 'None'
         curSrc = quilt_data.src_query_spec_get(srcQuerySpec,
-            source=True)
+                                               source=True)
         curSrcPat = quilt_data.src_query_spec_get(srcQuerySpec,
-            srcPatternName=True)
+                                                  srcPatternName=True)
         curSrcPatInst = quilt_data.src_query_spec_tryget(
             srcQuerySpec, srcPatternInstance=True)
 
@@ -317,8 +317,8 @@ def source(srcName, srcPatName, srcPatInstance=None):
         #         ", " + str( curSrcPatInst))
 
         if (srcName == curSrc and
-                srcPatName == curSrcPat and
-                srcPatInstance == curSrcPatInst):
+                    srcPatName == curSrcPat and
+                    srcPatInstance == curSrcPatInst):
             # get the global srcResults for that srcQueryID
             srcResults = _get_events(srcQueryId)
 
@@ -352,18 +352,16 @@ def concurrent(*patterns):
         returnEventsId += curPattern.eventsId + ","
     returnEventsId = returnEventsId.rstrip(',') + ')'
 
-    # if eventlist of generated name exists
+    # if event list of generated name exists
     if _has_events(returnEventsId):
         #   return previously generated event list
         return _pattern(returnEventsId)
 
         # construct a new empty list of fields
-        # itterate the patterns
+        # iterate the patterns
         # call 'at' on the pattern, append to list of fields
     fields = [at(curPattern) for curPattern in patterns]
 
-    # for f in fields:
-    #     logging.debug("CONCURRR Fields " + str(f))
 
     # join all of the field lists using an equality test
     joined = itertools.ifilter(_check_equal, itertools.product(*fields))
@@ -372,9 +370,6 @@ def concurrent(*patterns):
     #   found during the join
     returnEvents = []
     for joinedTuple in joined:
-        # logging.debug("CONCURRR Joined  " + str(type(timestampRecord)))
-        # logging.debug("CONCURRR Joined0 " + str(timestampRecord[0]))
-        # logging.debug("CONCURRR Joined1 " + str(timestampRecord[1]))
 
         for timestampRecord in joinedTuple:
             index = timestampRecord.index
@@ -383,7 +378,6 @@ def concurrent(*patterns):
             if not event in returnEvents:
                 returnEvents.append(event)
 
-    # logging.debug("CONCURRR " + str(returnEvents))
     # record new event list in event dict with this name
     # by returning a _pattern for the new list
     return _pattern(returnEventsId, returnEvents)
@@ -392,7 +386,7 @@ def concurrent(*patterns):
 class _check_follows:
     """
     Object represents a functor.  In the class constructor the delta time
-    ammount is passed.  In the class's check funciton is used as a
+    amount is passed.  In the class's check function is used as a
     callback for pairs of timestamps. 
     """
 
@@ -406,19 +400,19 @@ class _check_follows:
         called to check each tuple created from the cartesian product of
         before and after events given to the follows function.  
         pair is a two element tuple (before record, after record). Returns
-        True if second element occurs within howlong of the first element.
+        True if second element occurs within how long of the first element.
         """
         # set before record to first value of tuple
         before = pair[0]
         # set after record to second value of tuple
         after = pair[1]
-        # set before and after to the value wraped in the record wrapper
+        # set before and after to the value wrapped in the record wrapper
         before = before.GetRec()
         after = after.GetRec()
-        # return true if before is within howlong of after and is not zero
+        # return true if before is within how long of after and is not zero
         #   otherwise return False 
         delta = after - before
-        return delta > 0 and delta <= self.howlong
+        return 0 < delta <= self.howlong
 
         #TODO ISSUE016
 
@@ -481,7 +475,7 @@ def follows(howlong, before, after):
 
 def until(before, after):
     """
-    Determine all of the events in before that occured prior to any event
+    Determine all of the events in before that occurred prior to any event
     in after.  This includes an event in before that occurs at the same
     time as the first event in after
     """
@@ -504,12 +498,11 @@ def until(before, after):
     t = None
     tv = None
     for f in afterFields:
-        # find the earliest occuring time
+        # find the earliest occurring time
         if t is None or f.GetRec() < tv:
             t = f
             tv = t.GetRec()
 
-    # logging.debug("%%%%%% Earlies time in " + after.eventsId + " is " + str(tv))
 
     #  empty list for returning events
     returnEvents = []
@@ -554,12 +547,11 @@ def _get_query_spec():
 _interpret_lock = threading.Lock()
 
 
-
 def evaluate_query(patternSpec, querySpec, srcResults):
     """
     Semantically process the source results according to the pattern
     code.  Return the results.
-    NOTE: This funciton is non rentrant.
+    NOTE: This function is non rentrant.
         Do not call evaluate_query when this is on the callstack
     NOTE: The srcResults collection may be modified after calling
     """
@@ -583,9 +575,6 @@ def evaluate_query(patternSpec, querySpec, srcResults):
 
             retobj = _get_events(retpattern.eventsId)
 
-            # logging.debug ("Rsults of interpret are:\n" +
-            # str(type(retobj)) + "\n" + str(dir(retobj)) +"\n" +
-            # pprint.pformat(retobj))
 
             # return results
             return retobj

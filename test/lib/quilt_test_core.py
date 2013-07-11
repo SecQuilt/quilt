@@ -2,14 +2,14 @@
 import sys
 import os
 import argparse
+import time
+
 import quilt_core
 import sei_core
-import time
-import logging
 
 
 def get_quilt_test_lib_dir():
-    """grab the location of quilt test scritps"""
+    """grab the location of quilt test script's"""
     return os.path.dirname(__file__)
 
 
@@ -34,17 +34,18 @@ def unittest_main_helper(description='', argv=sys.argv):
     parser.add_argument('-l', '--log-level', nargs='?',
         help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
     args, unknown = parser.parse_known_args(argv)
+    # noinspection PyUnusedLocal
     unknown = unknown # pylint thing
 
     level = None
-    if (args.log_level is not None):
+    if args.log_level is not None:
         # if log level was specified, set the log level
         level = args.log_level
 
         # now strip off the log arguments before we pass on to unit 
         # test main
         slot = sys.argv.index('-l')
-        if (slot is -1):
+        if slot is -1:
             slot = sys.argv.index('--log-level')
         sys.argv.pop(slot)
         sys.argv.pop(slot)
@@ -54,7 +55,7 @@ def unittest_main_helper(description='', argv=sys.argv):
 
 def call_quilt_script(scriptName, args=None, checkCall=True):
     """
-    returns the stdoutput of the script, checks for bad error code and
+    returns the standard output of the script, checks for bad error code and
     throws exception
         scriptName          # base filename of the script in the quilt lib
                             #   directory
@@ -94,11 +95,14 @@ def sleep_small():
 
 def sleep_medium():
     for i in range(4):
+        # noinspection PyUnusedLocal
         i = i
         sleep_small()
 
 
 def sleep_large():
     for i in range(4):
+        # noinspection PyUnusedLocal
         i = i
-        sleep_medium() 
+        sleep_medium()
+

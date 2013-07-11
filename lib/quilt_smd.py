@@ -36,7 +36,7 @@ class SourceManager(quilt_core.QueryMasterClient):
             # _sourceName should not change, set at init, so ok to read
             # without lock
             logging.info("Source Manager: " + str(self._sourceName) +
-                         " recieved query: " + str(queryId))
+                         " received query: " + str(queryId))
 
             # get the sourcePatternSpec from the pattern name in the
             #   sourceQuerySpec
@@ -67,7 +67,7 @@ class SourceManager(quilt_core.QueryMasterClient):
             for k, v in varNameValueDict.items():
                 replacements[k] = v
 
-            # "template" was not added as oficial schema member because it is 
+            # "template" was not added as official schema member because it is
             # specific to this command line case
             templateCmd = srcPatSpec['template']
             template = Template(templateCmd)
@@ -163,7 +163,8 @@ class SourceManager(quilt_core.QueryMasterClient):
     def GetSourcePatterns(self):
         """Returns a list of names of defined source patterns"""
         try:
-            # non need to lock because noone shuld be writing to a source spec
+            # non need to lock because no one should be writing to a source
+            # spec
             # after init
 
             # iterate sourceSpec member's patterns
@@ -183,7 +184,7 @@ class SourceManager(quilt_core.QueryMasterClient):
 
     def GetSourcePattern(self, patternName):
         """return the specified source pattern specification dict"""
-        # non need to lock because noone shuld be writing to a source spec
+        # non need to lock because no one should be writing to a source spec
         # after init
 
         # access the source pattern spec with the specified key in the
@@ -202,7 +203,6 @@ class Smd(quilt_core.QuiltDaemon):
         cfg = quilt_core.QuiltConfig()
         smspecs = cfg.GetSourceManagerSpecs()
 
-        # logging.debug("Source manager specs: " + str(smspecs))
 
         objs = {}
         # iterate through source manager configurations
@@ -212,7 +212,6 @@ class Smd(quilt_core.QuiltDaemon):
             sm = SourceManager(self._args, smname, smspec)
             objs[sm.localname] = sm
 
-        # logging.info("Creating source managers: " + str(objs))
 
         # start the client with all the source managers
         quilt_core.query_master_client_main_helper(objs)
@@ -224,7 +223,7 @@ def main(argv):
        daemon""",
         argv)
 
-    # setup argument parser in accordance with funcitonal specification
+    # setup argument parser in accordance with functional specification
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
     args = parser.parse_args()
 

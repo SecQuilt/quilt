@@ -28,7 +28,7 @@ import var_dict
 class SourceVisitor(ast.NodeVisitor):
     """
     Provide virtual callbacks for each appropriate node of the 
-    AST.  Reposnible for collecting sources referenced in pattern
+    AST.  Responsible for collecting sources referenced in pattern
     code
     """
 
@@ -39,7 +39,7 @@ class SourceVisitor(ast.NodeVisitor):
         self.varDict = var_dict.create()
 
     def visit_Call(self, node):
-    # chain call to perent class generic visitor to assure
+    # chain call to parent class generic visitor to assure
         #   recursive operations
         super(SourceVisitor, self).generic_visit(node)
 
@@ -58,11 +58,14 @@ class SourceVisitor(ast.NodeVisitor):
         # collect the next "Str" arguments that follow
         # store these in a sourcePattern Dictionary member
         state = 0
+        source = None
+        pattern = None
+        instance = None
         for n in ast.iter_child_nodes(node):
             if state == 0:
                 if type(n) == ast.Name:
                     for field, value in ast.iter_fields(n):
-                        if (field == 'id' and value == 'source'):
+                        if field == 'id' and value == 'source':
                             state = 1
                             source = None
                             pattern = None
@@ -73,7 +76,7 @@ class SourceVisitor(ast.NodeVisitor):
             elif state == 1:
                 if type(n) == ast.Str:
                     for field, value in ast.iter_fields(n):
-                        if (field == 's'):
+                        if field == 's':
                             # source is specified
                             source = value
                             state = 2
@@ -83,7 +86,7 @@ class SourceVisitor(ast.NodeVisitor):
             elif state == 2:
                 if type(n) == ast.Str:
                     for field, value in ast.iter_fields(n):
-                        if (field == 's'):
+                        if field == 's':
                             pattern = value
                             state = 3
                             break
@@ -92,7 +95,7 @@ class SourceVisitor(ast.NodeVisitor):
             elif state == 3:
                 if type(n) == ast.Str:
                     for field, value in ast.iter_fields(n):
-                        if (field == 's'):
+                        if field == 's':
                             instance = value
                             state = 4
                             break

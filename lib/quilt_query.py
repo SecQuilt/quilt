@@ -42,9 +42,10 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
     def OnRegisterEnd(self):
         """
-        Retrive the querySpec from the query master and issue the
+        Retrieve the querySpec from the query master and issue the
         srcQueries to the source
         """
+        qid = None
         try:
             # use query id passed in arguments
             if self._args.query_id is not None:
@@ -62,13 +63,13 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             self._registrarHost = rhost
 
             #   set the state to ACTIVE by calling BeginQuery
-            # store pattern and query as a data memeber
+            # store pattern and query as a data member
             with self.GetQueryMasterProxy() as qm:
                 self._patternSpec, self._querySpec = qm.BeginQuery(qid)
 
                 # get the query spec from query master
                 queryState = quilt_data.query_spec_get(self._querySpec,
-                    state=True)
+                                                       state=True)
                 if queryState != quilt_data.STATE_ACTIVE:
                     raise Exception("Query: " + qid + ", must be in " +
                                     quilt_data.STATE_ACTIVE +
@@ -89,22 +90,22 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 for srcQuerySpec in srcQuerySpecs.values():
                     # mark the sourceQuery ACTIVE
                     quilt_data.src_query_spec_set(srcQuerySpec,
-                        state=quilt_data.STATE_ACTIVE)
+                                                  state=quilt_data.STATE_ACTIVE)
 
                     # get proxy to the source manager
                     source = quilt_data.src_query_spec_get(
                         srcQuerySpec, source=True)
                     smgrRec = qm.GetClientRec("smd", source)
-                    # TODO make more efficient by recycling proxys to same source
+                    # TODO make more efficient by recycling proxies to same source
                     # in the case when making multi source queries to same source
                     with query_master.get_client_proxy(smgrRec) as smgr:
                         # query the source by sending it the source query specs as
-                        #   asyncronous call
+                        #   asynchronous call
                         Pyro4.async(smgr).Query(
                             qid, srcQuerySpec, self.localname, rhost, rport)
                         # Note: no locking needed 
-                        #   asyncronous call, and returning messages not processe
-                        #   until this funciton exits
+                        #   asynchronous call, and returning messages not
+                        #   processed until this function exits
 
             self._processEvents = True
 
@@ -126,8 +127,10 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         return self._processEvents
 
     def OnSourceQueryError(self, srcQueryId, exception):
-        """Recieve a message from the source manager about a problem that
-        occured when running the source query"""
+        """Receive a message from the source manager about a problem that
+        :param srcQueryId:
+        :param exception:
+        occurred when running the source query"""
 
         try:
             # log the source's exception
@@ -139,13 +142,13 @@ class QuiltQuery(quilt_core.QueryMasterClient):
             #   boundary
             # logging.exception(exception)
 
-            # lock self to modify memeber data
+            # lock self to modify member data
             with self._lock:
                 # mark source query state with ERROR
                 srcQuerySpec = quilt_data.src_query_spec_get(
                     self._srcQuerySpecs, srcQueryId)
                 quilt_data.src_query_spec_set(srcQuerySpec,
-                    state=quilt_data.STATE_ERROR)
+                                              state=quilt_data.STATE_ERROR)
                 qid = quilt_data.query_spec_get(srcQuerySpec, name=True)
 
             # call query Master's Error function
@@ -159,7 +162,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
         finally:
             # set process events flag to false end event loop, allowing
-            # queryter to exit
+            # query to exit
             self.SetProcesssEvents(False)
 
     def AppendSourceQueryResults(self, srcQueryId, sourceResults):
@@ -171,7 +174,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         a source query.
         """
 
-        logging.info("Recieved results for query: " + str(srcQueryId))
+        logging.info("Received results for query: " + str(srcQueryId))
 
         # acquire lock
         with self._lock:
@@ -185,6 +188,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 results = self._srcResults[srcQueryId]
 
             # append the sourceResults at this key
+            # noinspection PyUnusedLocal
             results += sourceResults
 
 
@@ -198,7 +202,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
         try:
             # NOTE:
             #   Because the member data query specs are not entries are not
-            #   modified (Except during intialization) we do not have to lock
+            #   modified (Except during initialization) we do not have to lock
             #   before reading from the list.  Also we assume no results
             #   should be appended after a call to complete query so that we
             #   can sort the list of data outside of a lock.  Also see note 
@@ -219,26 +223,26 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                         results = self._srcResults[srcQueryId]
 
                 if results is not None:
-                    # sort results  by timestamp using interpret's 'at' 
+                    # sort results  by timestamp using interpret's 'at'
                     #   function
                     results.sort(key=lambda rec: at(rec))
 
 
             # acquire lock
             with self._lock:
-                # set srcQuerie's state to COMPLETED
+                # set srcQueries's state to COMPLETED
 
                 # If query is progressing through the system properly it
                 # should be an active state when it gets here
                 srcQueryState = quilt_data.src_query_spec_get(srcQuerySpec,
-                    state=True)
+                                                              state=True)
                 if srcQueryState != quilt_data.STATE_ACTIVE:
                     raise Exception("Source Query is: " + srcQueryState +
                                     ". Can only complete a query that is " +
                                     quilt_data.STATE_ACTIVE)
 
                 quilt_data.src_query_spec_set(srcQuerySpec,
-                    state=quilt_data.STATE_COMPLETED)
+                                              state=quilt_data.STATE_COMPLETED)
 
             try:
 
@@ -248,9 +252,9 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     completed = True
                     for srcQuerySpec in self._srcQuerySpecs.values():
                         srcState = quilt_data.src_query_spec_get(srcQuerySpec,
-                            state=True)
+                                                                 state=True)
                         if (srcState != quilt_data.STATE_COMPLETED and
-                                srcState != quilt_data.STATE_ERROR):
+                                    srcState != quilt_data.STATE_ERROR):
                             completed = False
                             logging.debug("At least " + srcQuerySpec['name'] +
                                           " is still in progress")
@@ -260,7 +264,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                     if completed:
                         # get proxy to self
                         with Pyro4.Proxy(self.uri) as selfProxy:
-                            # asyncronously call self's CompleteQuery
+                            # asynchronously call self's CompleteQuery
                             Pyro4.async(selfProxy).CompleteQuery()
 
             # catch exceptions
@@ -270,7 +274,6 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                 logging.error(
                     "Unable to properly check for last query")
                 logging.exception(error3)
-                completed = True
 
                 # set process events flag to false end event loop, allowing
                 # query client to exit
@@ -326,6 +329,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
     def CompleteQuery(self):
 
+        qid = None
         # try the following
         try:
             # lock self
@@ -345,11 +349,12 @@ class QuiltQuery(quilt_core.QueryMasterClient):
                         qm.CompleteQuery(qid)
 
                 else:
-                    logging.info("Interperting query: " + str(qid))
+                    logging.info("Interpreting query: " + str(qid))
                     # evaluate the query by calling quilt_interpret
                     #   pass the query spec, and source Results
                     result = quilt_interpret.evaluate_query(self._patternSpec,
-                        self._querySpec, self._srcResults)
+                                                            self._querySpec,
+                                                            self._srcResults)
                     # append the returned results to the query master's
                     #   results for this query
                     logging.info("Posting results for query: " + str(qid))
@@ -381,17 +386,17 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 def main(argv):
     # setup command line interface
     parser = quilt_core.main_helper('qury',
-        """
+                                    """
         Quilt Query will run a query.  It will communicate
-        with the query master, recieve the specifications for the
+        with the query master, receive the specifications for the
         query, the issue source queries to sources.
 
         Quilt Query should not be called directly by a user
         """,
-        argv)
+                                    argv)
 
     parser.add_argument('query_id', nargs=1,
-        help="The specification of which query to process")
+                        help="The specification of which query to process")
 
     # parse command line
     args = parser.parse_args(argv)

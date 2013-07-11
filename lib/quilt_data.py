@@ -40,7 +40,7 @@ def var_spec_get(spec,
                  default=False
 ):
     """Accessor for information from the variable spec.  Only one parameter 
-    should be set to true, otherwise first paramter that evaluates positively 
+    should be set to true, otherwise first parameter that evaluates positively
     is returned"""
     if name: return spec_name_get(spec)
     if value: return spec['value']
@@ -58,7 +58,7 @@ def var_spec_tryget(spec,
                     default=False
 ):
     """Accessor for information from the variable spec.  Only one parameter 
-    should be set to true, otherwise first paramter that evaluates positively 
+    should be set to true, otherwise first parameter that evaluates positively
     is returned, if no parameters evaluate positively None is returned"""
     if name: return spec_name_tryget(spec)
     if value and 'value' in spec: return spec['value']
@@ -166,7 +166,7 @@ def src_var_mapping_spec_get(
         sourceVariable=False
 ):
     """Accessor for information from the query spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned"""
     if name: return spec_name_get(spec)
     if sourceName: return spec['sourceName']
@@ -185,7 +185,7 @@ def src_var_mapping_spec_tryget(
         sourceVariable=False
 ):
     """Accessor for information from the query spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned.  If no parameters evaluate positively, or object has not been
     sey, None is returned"""
     if name: return spec_name_tryget(spec)
@@ -247,7 +247,7 @@ def pat_spec_get(
 ):
     """Accessor for information from the pattern spec.  
     Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned"""
     if name: return spec_name_get(spec)
     if mappings: return spec['mappings']
@@ -265,7 +265,7 @@ def pat_spec_tryget(
 ):
     """Accessor for information from the pattern spec.  
     Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned.  If no parameter evaluates to True, None is returned"""
     if name: return spec_name_tryget(spec)
     if mappings and 'mappings' in spec: return spec['mappings']
@@ -297,7 +297,7 @@ def pat_specs_get(patSpecs, patName):
 # Query Spec functions
 # Query's are basically specialized patterns, but I am not trying to reinvent
 # inheritance here.  So all fields are just duplicated rather than trying to 
-# do some complicated chaining to pattern_spec funcitons.
+# do some complicated chaining to pattern_spec functions.
 
 def query_spec_set(
         spec,
@@ -352,7 +352,7 @@ def query_spec_get(
         variables=False
 ):
     """Accessor for information from the query spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned"""
     if name: return spec_name_get(spec)
     if state: return spec['state']
@@ -375,7 +375,7 @@ def query_spec_tryget(
         variables=False
 ):
     """Accessor for information from the query spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned.  If value is not present in spec None is returned"""
     if name: return spec_name_tryget(spec)
     if state and 'state' in spec: return spec['state']
@@ -459,7 +459,7 @@ def src_pat_spec_get(
         variables=False
 ):
     """Accessor for information from the spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned"""
     if name: return spec_name_get(spec)
     if ordered: return spec['ordered']
@@ -474,7 +474,7 @@ def src_pat_spec_tryget(
         variables=False
 ):
     """Accessor for information from the spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned.  If value is not present in spec, None is returned"""
     if name: return spec_name_tryget(spec)
     if ordered and 'ordered' in spec: return spec['ordered']
@@ -544,7 +544,7 @@ def src_query_spec_get(
         variables=False
 ):
     """Accessor for information from the spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned"""
     if name: return spec_name_get(spec)
     if srcPatternName: return spec['srcPatternName']
@@ -567,7 +567,7 @@ def src_query_spec_tryget(
         variables=False
 ):
     """Accessor for information from the spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned.  If value is not present in spec, None is returned"""
     if name: return spec_name_tryget(spec)
     if srcPatternName and 'srcPatternName' in spec: return spec[
@@ -575,7 +575,7 @@ def src_query_spec_tryget(
     if srcPatternInstance and 'srcPatternInstance' in spec: return spec[
         'srcPatternInstance']
     if state and 'state' in spec: return spec['state']
-    if source and 'soruce' in spec: return spec['soruce']
+    if source and 'source' in spec: return spec['source']
     if ordered and 'ordered' in spec: return spec['ordered']
     if variables and 'variables' in spec: return spec['variables']
     return None
@@ -613,7 +613,7 @@ def src_spec_get(spec,
                  sourcePatterns=False
 ):
     """Accessor for information from the spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned"""
     if name: return spec_name_get(spec)
     if sourcePatterns: return spec['sourcePatterns']
@@ -625,7 +625,7 @@ def src_spec_tryget(spec,
                     sourcePatterns=False
 ):
     """Accessor for information from the spec.  Only one parameter should
-    be set to true, otherwise first paramter that evaluates positively is 
+    be set to true, otherwise first parameter that evaluates positively is
     returned.  If no arguments evaluate positively, None will be returned"""
     if name: return spec_name_tryget(spec)
     if sourcePatterns and 'sourcePatterns' in spec: return spec[
@@ -653,9 +653,9 @@ def src_spec_create(cfgStr=None, cfgSection=None):
             # to the key value
             srcPatSpecName = src_pat_spec_tryget(srcPatSpec, name=True)
             if srcPatSpecName is not None and srcPatSpecName != srcPatName:
-                # user has specified inconsistant names for a source pattern
+                # user has specified inconsistent names for a source pattern
                 # throw an error
-                raise Exception("Inconsitant names specified for source" +
+                raise Exception("Inconstant names specified for source" +
                                 " pattern ( " + srcPatName + ", " + srcPatSpecName + " )")
             src_pat_spec_set(srcPatSpec, name=srcPatName)
 
@@ -684,7 +684,7 @@ def src_spec_create(cfgStr=None, cfgSection=None):
                     # user may have specified conflicting name for key and 
                     # actual name, guard against this stupidity
                     if srcVarName is not None and srcVarName != name:
-                        raise Exception("Inconsitant names specified for " +
+                        raise Exception("Inconstant names specified for " +
                                         "source pattern variable: ( " + str(
                             srcVarName) +
                                         ", " + str(name) + " )")
@@ -717,7 +717,7 @@ def generate_var_value_dict(patternSpec, querySpec):
     return a dictionary mapping variable names to replacement values using
     the variable specs in the patternSpec and/or the querySpec.  Either
     argument may be None.  Variable values are determined in the following
-    order: pattern variavle default, query variable default, query variable
+    order: pattern variable default, query variable default, query variable
     value.
     """
 
@@ -730,7 +730,7 @@ def generate_var_value_dict(patternSpec, querySpec):
         patVars = pat_spec_tryget(patternSpec, variables=True)
         if patVars is not None:
 
-            # itterate the variables in the list
+            # iterate the variables in the list
             for varName, patVarSpec in patVars.items():
                 value = var_spec_tryget(patVarSpec, default=True)
                 # if a default value is stored in the pattern variable

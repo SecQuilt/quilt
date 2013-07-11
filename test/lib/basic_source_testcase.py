@@ -16,14 +16,14 @@ class BasicSourceTestcase(unittest.TestCase):
         # ISSUE007
         # TODO, pyunit's bright idea is to call setup before each test.  It
         # was defining multiple patterns which was annoying but not a problem.
-        # The cleaneast way to do things is probably to remove patterns after
+        # The cleanest way to do things is probably to remove patterns after
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
 
         global firstTime
 
-        if firstTime != True:
+        if not firstTime:
             return
         firstTime = False
 
@@ -48,7 +48,7 @@ class BasicSourceTestcase(unittest.TestCase):
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]
         self.assertTrue(len(qid) > 0)
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_medium()
         return qid
 
@@ -64,7 +64,7 @@ class BasicSourceTestcase(unittest.TestCase):
     def test_status(self):
         # check for the query pattern
         # call quilt_status 
-        # check errorcode and output contains 
+        # check error code and output contains
         #   "test_pattern" and "syslog"
         o = quilt_test_core.call_quilt_script('quilt_status.py')
         self.assertTrue('test_pattern' in o)

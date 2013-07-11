@@ -83,7 +83,7 @@ class OperatorsTestcase(unittest.TestCase):
         #   define a variable for which binary operator to use
         #   define a variable for what value to use on RHS
         #   defaults are required when modifying code with search/replace
-        #   variables because themplate code will not parse
+        #   variables because template code will not parse
         quilt_test_core.call_quilt_script('quilt_define.py',
             ['-n', 'operators_comparevalue', patCode, '-v', 'OPERATOR',
              'operator to use in the comparison', '==', '-v', 'VALUE',
@@ -123,7 +123,7 @@ class OperatorsTestcase(unittest.TestCase):
                     search_string is None or search_string == ''):
             raise Exception("Invalid string for use in contains")
 
-        # use regular expression to count the number of occurences
+        # use regular expression to count the number of occurrences
         # assert an error if it did not occur n times
         occurences = (
             len([m.start() for m in re.finditer(
