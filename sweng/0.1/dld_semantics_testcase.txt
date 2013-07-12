@@ -68,16 +68,18 @@ Classes:
             #        source('christian_holidays_smd1234','grep') )
             #   -n semantics_until
 
+            # get the full name for small and medium number sources
+
             # call quilt_define
             #   qand(
-            #        source('secular_holidays_smd1234','grep'),
-            #        source('christian_holidays_smd1234','grep') )
+            #        source('smallnumbers_smd1234','grep'),
+            #        source('mednumbers_smd1234','grep') )
             #   -n semantics_quand
 
             # call quilt_define
             #   qor(
-            #        source('secular_holidays_smd1234','grep'),
-            #        source('christian_holidays_smd1234','grep') )
+            #        source('smallnumbers_smd1234','grep'),
+            #        source('mednumbers_smd1234','grep') )
             #   -n semantics_qor
 
         def test_one_source():

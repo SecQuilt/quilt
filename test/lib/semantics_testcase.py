@@ -103,6 +103,29 @@ class SemanticsTestcase(unittest.TestCase):
             '-n', 'semantics_until'
         ])
 
+        small_numbers = quilt_test_core.get_source_name(
+            "small_numbers")
+        med_numbers = quilt_test_core.get_source_name(
+            "med_numbers")
+
+        #TODO REad the pattern id from the std output then query that one
+        # See ISSUE007 and ISSUE008
+        quilt_test_core.call_quilt_script('quilt_define.py', [
+            'qand(' +
+            "source('" + small_numbers + "','grep')," +
+            "source('" + med_numbers + "','grep'))",
+            '-n', 'semantics_qand'
+        ])
+
+        #TODO REad the pattern id from the std output then query that one
+        # See ISSUE007 and ISSUE008
+        quilt_test_core.call_quilt_script('quilt_define.py', [
+            'qor(' +
+            "source('" + small_numbers + "','grep')," +
+            "source('" + med_numbers + "','grep'))",
+            '-n', 'semantics_qor'
+        ])
+
     def test_one_source(self):
         """
         This test assures that a simple case of semantics is tested
@@ -336,6 +359,62 @@ class SemanticsTestcase(unittest.TestCase):
             len([m.start() for m in re.finditer(
                 "boxingday", o)]))
         self.assertTrue(occurences == 0)
+
+
+    def test_qand(self):
+        """
+        This test assures the operation of the 'qand' quilt language
+        and function.  It uses a pattern which selects small and medium
+        number sources.  it 'quand's' them together which takes the
+        intersection.  The result should be the only number where the two
+        sets of numbers intersect
+        """
+
+        # issue the query using the qand pattern
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
+            'semantics_qand', '-y'
+        ]))
+        # assure the query is successfull, and get results
+        o = self.check_query_and_get_results(o)
+
+        # check that results contain one correct number
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "10", o)]))
+        self.assertTrue(occurences == 1)
+
+    def test_qor(self):
+        """
+        This test assures the operation of the 'qor' quilt language
+        or function.  It uses a pattern which selects small and medium
+        number sources.  it 'qor's' them together which takes the
+        union.  The result should be the contents of the union of the
+        two input sets
+        """
+
+        # issue the query using the qor pattern
+        o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
+            'semantics_qor', '-y'
+        ]))
+        # assure the query is successfull, and get results
+        o = self.check_query_and_get_results(o)
+
+        # check that results contain one number only in small
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "9", o)]))
+        self.assertTrue(occurences == 1)
+
+        # check that results contain one number only in med
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "20", o)]))
+        self.assertTrue(occurences == 1)
+        # check that results contain one number only from both
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "10", o)]))
+        self.assertTrue(occurences == 1)
 
 
 if __name__ == "__main__":
