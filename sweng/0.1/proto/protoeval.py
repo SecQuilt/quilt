@@ -114,6 +114,18 @@ def tree_print(node, depth):
 #A: ------------+------+---++----------------+---+-----------+
 #B: -+--------+---++------+--------+----+--------+---+--------
 
+def qand(a,b):
+    ans = []
+    for ai in a:
+        if ai in b:
+            ans.append(ai)
+    return ans
+
+
+
+
+
+
 def until(a, b):
     return a < b
 
@@ -248,7 +260,7 @@ class fieldwrapper:
 
         print str(type(self)), opName, str(type(rhs))
         myevents = getEvents(self.name)
-        name = self.name + "[" + self.key + "]" + opName
+
 
         if type(rhs) == int or type(rhs) == str or type(rhs) == float:
             name += str(rhs)
@@ -261,7 +273,8 @@ class fieldwrapper:
 
             return wrapper(name, newe)
         elif type(rhs) == type(fieldwrapper):
-            pass
+
+            name = self.name + "[" + self.key + "]" + opName
             # bin left
             self._binned()
 

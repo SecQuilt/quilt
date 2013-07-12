@@ -88,6 +88,8 @@ $QUILT_HOME/test/etc/even_numbers
 $QUILT_HOME/test/etc/odd_numbers
 $QUILT_HOME/test/etc/big_numbers
 $QUILT_HOME/test/etc/out_of_order_numbers
+$QUILT_HOME/test/etc/small_numbers
+$QUILT_HOME/test/etc/med_numbers
 
 Scripts:
     Prototpe:

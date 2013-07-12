@@ -68,6 +68,18 @@ Classes:
             #        source('christian_holidays_smd1234','grep') )
             #   -n semantics_until
 
+            # call quilt_define
+            #   qand(
+            #        source('secular_holidays_smd1234','grep'),
+            #        source('christian_holidays_smd1234','grep') )
+            #   -n semantics_quand
+
+            # call quilt_define
+            #   qor(
+            #        source('secular_holidays_smd1234','grep'),
+            #        source('christian_holidays_smd1234','grep') )
+            #   -n semantics_qor
+
         def test_one_source():
             """
             This test assures that a simple case of semantics is tested
@@ -180,8 +192,8 @@ Classes:
         def test_until():
             """
             This test assures the operation of the 'until' quilt language
-            function.  It uses a pattern which selects secular holidays 
-            until a christian holiday occurs.  We expect to see newyears, 
+            function.  It uses a pattern which selects secular holidays
+            until a christian holiday occurs.  We expect to see newyears,
             and valentines
             """
 
@@ -191,6 +203,38 @@ Classes:
 
             # check that results contain no easter, boxingday
             # check that results contain valentines, newwyears
+
+        def test_qand():
+            """
+            This test assures the operation of the 'qand' quilt language
+            and function.  It uses a pattern which selects small and medium
+            number sources.  it 'quand's' them together which takes the
+            intersection.  The result should be the only number where the two
+            sets of numbers intersect
+            """
+
+            # issue the query using the qand pattern
+
+            # assure the query is successfull, and get results
+
+            # check that results contain one correct number
+
+        def test_qor():
+            """
+            This test assures the operation of the 'qor' quilt language
+            or function.  It uses a pattern which selects small and medium
+            number sources.  it 'qor's' them together which takes the
+            union.  The result should be the contents of the union of the
+            two input sets
+            """
+
+            # issue the query using the qand pattern
+
+            # assure the query is successfull, and get results
+
+            # check that results contain one number only in small
+            # check that results contain one number only in med
+            # check that results contain one number only from both
 
 
 

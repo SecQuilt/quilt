@@ -532,6 +532,12 @@ def until(before, after):
     #   newly determined events
     return _pattern(returnEventsId, returnEvents)
 
+def quand (*patterns):
+    """
+
+    :param patterns:
+    """
+    pass
 
 def _get_events(eventsId):
 #   logging.debug("accessing " + str(eventsId))

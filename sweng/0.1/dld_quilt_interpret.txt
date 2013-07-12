@@ -216,6 +216,8 @@ Classes:
 
 Functions:
 
+    def qor(*patterns):
+
     def all_equal(iterator:
         # http://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
         # See prototype iteration.py
@@ -392,6 +394,54 @@ Functions:
                 # return result events
             # finally
                 # remove querySpec and eventDict from globals scope
+
+
+    def qand(lhs, rhs):
+        """
+        The Quilt and operator.  This
+        intersects the rows of lhs that occur in the rows of rhs
+        :param lhs: left hand side pattern
+        :param rhs: right hand side pattern
+        """
+
+        # generate a name for a new pattern like:
+        #   qand( name of before pattern, name of after pattern)
+
+        # if events can be found with the generated name
+            # return previously generated event list
+
+        # create returning event list
+        # Get lists of lhs and rhs events
+        # itterate through list of lhs events
+            #if lhs element is in rhs
+                append to returning list
+
+        # return a new pattern wrapper with the generated name and the
+        #   newly determined events
+
+    def qor(lhs, rhs):
+        """
+        The Quilt or operator.  This
+        unions the rows of lhs that occur in the rows of rhs
+        :param lhs: left hand side pattern
+        :param rhs: right hand side pattern
+        """
+
+        # generate a name for a new pattern like:
+        #   qor( name of before pattern, name of after pattern)
+
+        # if events can be found with the generated name
+            # return previously generated event list
+
+        # Get lists of lhs and rhs events
+        # create returning event list as copy of lhs
+        # itterate through list of rhs events
+            #if rhs element is not in returning list
+                append to returning list
+        # sort returning list by at function (by timestamp)
+
+        # return a new pattern wrapper with the generated name and the
+        #   newly determined events
 
 
 Notepad:

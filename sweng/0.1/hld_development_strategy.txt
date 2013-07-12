@@ -346,6 +346,18 @@ c13.andor
 
 
 
+    add "qand" and "qor" functions to globals in interperet.
+
+    TEST
+    add small and medium number sources
+    small: [1-10]
+    med: [10-100]
+
+    perform tests over these lists
+
+
+
+
 
 
 
