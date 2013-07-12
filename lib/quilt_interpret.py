@@ -549,7 +549,6 @@ def _set_events(eventsId, events):
 
 
 def _has_events(eventsId):
-    # logging.debug("Looking for " + str(eventsId) + " in " + str(globals()['_eventPool'].keys()))
     return eventsId in globals()['_eventPool']
 
 
@@ -602,3 +601,75 @@ def evaluate_query(patternSpec, querySpec, srcResults):
                 del globals()['_eventPool']
             if '_querySpec' in globals():
                 del globals()['_querySpec']
+
+
+def qand(lhs, rhs):
+    """
+    The Quilt and operator.  This
+    intersects the rows of lhs that occur in the rows of rhs
+    :param lhs: left hand side pattern
+    :param rhs: right hand side pattern
+    """
+
+    # generate a name for a new pattern like:
+    returnEventsId = "qand(" + lhs.eventsId + "," + rhs.eventsId + ')'
+
+    # if events can be found with the generated name
+    if _has_events(returnEventsId):
+        # return previously generated event list
+        return _pattern(returnEventsId)
+
+    # create returning event list
+    returnEvents = []
+    # Get lists of lhs and rhs events
+    lhsEvents = _get_events(lhs.eventsId)
+    rhsEvents = _get_events(rhs.eventsId)
+
+    # itterate through list of lhs events
+    for lhsEvent in lhsEvents:
+        #if lhs element is in rhs
+        if lhsEvent in rhsEvents:
+            returnEvents.append(lhsEvent)
+
+    # return a new pattern wrapper with the generated name and the
+    #   newly determined events
+    return _pattern(returnEventsId, returnEvents)
+
+
+def qor(lhs, rhs):
+    """
+    The Quilt or operator.  This
+    unions the rows of lhs that occur in the rows of rhs
+    :param lhs: left hand side pattern
+    :param rhs: right hand side pattern
+    """
+
+    # generate a name for a new pattern like:
+    returnEventsId = "qor(" + lhs.eventsId + "," + rhs.eventsId + ')'
+
+    # if events can be found with the generated name
+    if _has_events(returnEventsId):
+        # return previously generated event list
+        return _pattern(returnEventsId)
+
+
+    # Get lists of lhs and rhs events
+    lhsEvents = _get_events(lhs.eventsId)
+    rhsEvents = _get_events(rhs.eventsId)
+
+    # create returning event list as copy of lhs
+    returnEvents = lhsEvents[:]
+
+    # itterate through list of rhs events
+    for rhsEvent in rhsEvents:
+        #if rhs element is not in returning list
+        if rhsEvent not in returnEvents:
+            # append to returning list
+            returnEvents.append(rhsEvent)
+
+    # sort returning list by at function (by timestamp)
+    returnEvents.sort(key=lambda rec: at(rec))
+
+    # return a new pattern wrapper with the generated name and the
+    #   newly determined events
+    return _pattern(returnEventsId, returnEvents)

@@ -216,8 +216,6 @@ Classes:
 
 Functions:
 
-    def qor(*patterns):
-
     def all_equal(iterator:
         # http://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
         # See prototype iteration.py
@@ -437,7 +435,7 @@ Functions:
         # create returning event list as copy of lhs
         # itterate through list of rhs events
             #if rhs element is not in returning list
-                append to returning list
+                # append to returning list
         # sort returning list by at function (by timestamp)
 
         # return a new pattern wrapper with the generated name and the

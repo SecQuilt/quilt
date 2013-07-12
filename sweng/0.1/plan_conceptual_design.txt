@@ -13,8 +13,4 @@ Existing:
 
 New:
 
-M 1
-L 2
-VL 2
-S 1
-VS 1
+L 4
