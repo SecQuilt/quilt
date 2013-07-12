@@ -57,7 +57,7 @@ class QuiltConfig:
             valueName, # [in] string, name of value
             default):        # [in] value of default
         """
-        Access a configuration value.  Configuraiton values can be
+        Access a configuration value.  Configuration values can be
         specified with a section and a name.  The configuration value is
         returned.  If the specified value is not present the passed in
         default is returned.
@@ -86,7 +86,6 @@ class QuiltConfig:
         smdcfgs = [f for f in listdir(smdcfgdir)
             if isfile(join(smdcfgdir, f))]
 
-        #logging.debug("Source manager config files: " + str(smdcfgs))
 
         # read all sections from all config file sin the smd directory
         names = which == 'names'
@@ -162,7 +161,7 @@ class QuiltDaemon(object):
         self.pidfile_timeout = 5
 
     def main(self, argv):
-        argv = argv
+        logging.debug('"' + '" "'.join(argv) + '"')
         try:
             daemon_runner = runner.DaemonRunner(self)
             daemon_runner.do_action()
@@ -211,7 +210,7 @@ class QueryMasterClient:
 
 
     def GetType(self):
-        raise Exception("""Abstract function is rquired to be implemented by
+        raise Exception("""Abstract function is required to be implemented by
             subclass""")
 
     def RegisterWithQueryMaster(self):
@@ -254,7 +253,7 @@ class QueryMasterClient:
 
     def OnEventLoopBegin(self):
         """
-        funciton called when client's owning daemon begins an event loop
+        function called when client's owning daemon begins an event loop
         iteration, function called in event loop main thread
         return False to end participation in event loop
         """
@@ -263,7 +262,7 @@ class QueryMasterClient:
 
     def OnEventLoopEnd(self):
         """
-        funciton called when client's owning daemon ends an event loop
+        function called when client's owning daemon ends an event loop
         iteration, function called in event loop main thread
         return False to end participation in event loop
         """
@@ -286,7 +285,7 @@ class QueryMasterClient:
         #   assignment is not atomic
         if self._config is None:
             # I may be paranoid, but I am constructing config object outside
-            # of the lock becuse it might take a while
+            # of the lock because it might take a while
             c = QuiltConfig()
             with self._lock:
                 if self._config is None:
@@ -379,7 +378,7 @@ def query_master_client_main_helper(
             firstTime = False
             delDaemonObjs = {}
             # iterate the names and objects in clientObjectDic
-            # this funciton will return false if it wants to be
+            # this function will return false if it wants to be
             # removed
             for name, obj in daemonObjs.items():
                 if not obj.OnFirstEventLoop():
@@ -395,7 +394,7 @@ def query_master_client_main_helper(
 
         delDaemonObjs = {}
         # iterate the names and objects in clientObjectDic
-        # this funciton will return false if it wants to be
+        # this function will return false if it wants to be
         # removed
         for name, obj in daemonObjs.items():
             if not obj.OnEventLoopBegin():
@@ -426,7 +425,7 @@ def query_master_client_main_helper(
 
         delDaemonObjs = {}
         # iterate the names and objects in clientObjectDic
-        # this funciton will return false if it wants to be
+        # this function will return false if it wants to be
         # removed
         for name, obj in daemonObjs.items():
             if not obj.OnEventLoopEnd():
@@ -444,7 +443,7 @@ def query_master_client_main_helper(
 def common_init(name, strlevel):
     """
     Common site for logging configuration, always call as first function
-    from main and other initializeation
+    from main and other initialization
     """
     # TODO eval security issue
     if strlevel is None:
@@ -470,7 +469,7 @@ def main_helper(name, description, argv):
         help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
 
     args, unknownArgs = argparser.parse_known_args(argv)
-    unknownArgs = unknownArgs # its a pylint thing
+    # noinspection PyUnusedLocal
 
     common_init(name, args.log_level)
 
@@ -479,36 +478,12 @@ def main_helper(name, description, argv):
 
 def exception_to_string(error):
     """
-    Display a stirng with information about an exeception
-    Usefull for logging exceptions that come from other proceses who do not
+    Display a string with information about an exception
+    Useful for logging exceptions that come from other processes who do not
     have a stack trace
     """
-    return (str(type(error)) + " : " + str(error))
+    return str(type(error)) + " : " + str(error)
 
-#   DHK: Commented out 2013.05.30.  Remove if no one needs it around
-#
-#   get_uri_lock = threading.Lock()
-
-#   def get_uri_safe(registrarHost, registrarPort, objName):
-#       """
-#       Get a string that specifies the absolute location of an object
-#       """
-#       # NOTE: See ISSUE012
-#       # use a global mutex lock
-#       global _get_uri_lock
-#       # acquire the lock
-#       with _get_uri_lock:
-
-#           # use a lockfile
-#           uri_filelock = lockfile.LockFile('/tmp/quiltnameserver.lock')
-#           # acquire the file lock
-#           with uri_filelock:
-#               # locate the nameserver at given host and port
-#               with Pyro4.locateNS(registrarHost, registrarPort) as ns:
-#                   # lookupt the URI for the given object name
-#                   uri = ns.lookup(objName)
-#                   # return the uri
-#                   return uri
 
 def get_uri(registrarHost, registrarPort, objName):
     """
@@ -516,7 +491,7 @@ def get_uri(registrarHost, registrarPort, objName):
     """
     # locate the nameserver at given host and port
     with Pyro4.locateNS(registrarHost, registrarPort) as ns:
-        # lookupt the URI for the given object name
+        # lookup the URI for the given object name
         uri = ns.lookup(objName)
         # return the uri
         return uri

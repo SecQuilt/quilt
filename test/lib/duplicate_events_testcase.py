@@ -16,14 +16,14 @@ class DuplicateEventsTestcase(unittest.TestCase):
         # ISSUE007
         # TODO, pyunit's bright idea is to call setup before each test.  It
         # was defining multiple patterns which was annoying but not a problem.
-        # The cleaneast way to do things is probably to remove patterns after
+        # The cleanest way to do things is probably to remove patterns after
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
 
         global firstTime
 
-        if firstTime != True:
+        if not firstTime:
             return
         firstTime = False
 
@@ -78,7 +78,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
             raise Exception("Invalid string for use in contains_once")
 
 
-        # use regular expression to count the number of occurences
+        # use regular expression to count the number of occurrences
         # assert an error if it did not occur once
         occurences = (
             len([m.start() for m in re.finditer(
@@ -89,7 +89,7 @@ class DuplicateEventsTestcase(unittest.TestCase):
     # TODO see ISSUE008  We want to move this to test_core when there is a
     # less hacky way to do it
     def check_query_and_get_results2(self, submitStdout):
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_small()
 
         o = submitStdout

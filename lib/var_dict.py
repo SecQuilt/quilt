@@ -10,7 +10,7 @@ def _set(outerDict, key, append):
         return None
     if key in outerDict:
         innerDict = outerDict[key]
-    elif append == False:
+    elif not append:
         return None
     else:
         innerDict = {}

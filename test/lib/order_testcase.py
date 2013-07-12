@@ -15,14 +15,14 @@ class OrderTestcase(unittest.TestCase):
         # ISSUE007
         # TODO, pyunit's bright idea is to call setup before each test.  It
         # was defining multiple patterns which was annoying but not a problem.
-        # The cleaneast way to do things is probably to remove patterns after
+        # The cleanest way to do things is probably to remove patterns after
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
 
         global firstTime
 
-        if firstTime != True:
+        if not firstTime:
             return
         firstTime = False
 
@@ -35,14 +35,14 @@ class OrderTestcase(unittest.TestCase):
         # call quilt_define with the pattern code and name query
         #   dups_follows
         quilt_test_core.call_quilt_script('quilt_define.py', ['-n',
-            'out_of_order',
-            'source("' + out_of_order_numbers + '","grep")'])
+                                                              'out_of_order',
+                                                              'source("' + out_of_order_numbers + '","grep")'])
 
 
     # TODO see ISSUE008  We want to move this to test_core when there is a
     # less hacky way to do it
     def check_query_and_get_results3(self, submitStdout):
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_small()
 
         o = submitStdout
@@ -62,7 +62,7 @@ class OrderTestcase(unittest.TestCase):
         This test queries a source whose data is out fo order.  The
         configuration of the source pattern indicates that the data is out
         of order and quilt should transform it to ordered behind the
-        scenes.  We simply performa  query in the normal matter and assure
+        scenes.  We simply perform a query in the normal matter and assure
         result is sorted
         """
 
@@ -89,6 +89,7 @@ class OrderTestcase(unittest.TestCase):
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(
-        "Run integration test for assuring unorderd sorces are ordered by the system",
+        "Run integration test for assuring unordered sources are ordered by "
+        "the system",
         sys.argv)
     unittest.main()

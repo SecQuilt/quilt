@@ -16,14 +16,14 @@ class BasicSourcesTestcase(unittest.TestCase):
         # ISSUE007
         # TODO, pyunit's bright idea is to call setup before each test.  It
         # was defining multiple patterns which was annoying but not a problem.
-        # The cleaneast way to do things is probably to remove patterns after
+        # The cleanest way to do things is probably to remove patterns after
         # the test, but we don't have that functionality.  For now just create
         # one pattern to avoid confusion, but do it by hacking in a global
         # variable
 
         global firstTime
 
-        if firstTime != True:
+        if not firstTime:
             return
         firstTime = False
 
@@ -33,7 +33,7 @@ class BasicSourcesTestcase(unittest.TestCase):
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
         quilt_test_core.call_quilt_script('quilt_define.py', [
-            '-n', 'bigpattern',
+            '-n', "bigpattern",
             '-v', 'SEARCHSTRING1', 'the Search string1',
             '-v', 'SEARCHSTRING2', 'the Search string2',
             '-v', 'SEARCHSTRING3', 'the Search string3',
@@ -63,7 +63,7 @@ class BasicSourcesTestcase(unittest.TestCase):
             '-v', 'SEARCHSTRING3', "word-regexp",
             '-v', 'SEARCHSTRING5', "word-regexp"
         ]))
-        # sleep a small ammount
+        # sleep a small amount
         quilt_test_core.sleep_large()
 
         # capture query_id from std out 

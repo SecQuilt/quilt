@@ -14,7 +14,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
     def OnRegisterEnd(self):
         """Create a patternSpec dict from arguments (name, 
-        VARIABLEs, and VARIABLE to SOURCE_VARIABLE mappings), register
+        VARIABLES, and VARIABLE to SOURCE_VARIABLE mappings), register
         this pattern with the query master"""
 
         # create the spec with it's requested name
@@ -64,7 +64,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
 
                 # query variables are allowed to map to multiple
-                # source variables.  Initalize a blank list if it isn't present
+                # source variables.  Initialize a blank list if it isn't present
                 # then append the new mapping information
 
                 srcVarMappingSpec = quilt_data.src_var_mapping_spec_create(
@@ -83,7 +83,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
 
         # if the pattern code is specified, set it in the pattern as
         #   a string
-        if (self._args.code is not None):
+        if self._args.code is not None:
             # perform first pass parse on the pattern to ensure syntax
             # call get_pattern_vars from parser, but ignore the result
             #   this will check the syntax
@@ -98,7 +98,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             quilt_parse.get_pattern_src_refs(codestr)
 
 
-        # define patternSpec in the query master as a syncronous call
+        # define patternSpec in the query master as a synchronous call
         # return will be the pattern name
         with self.GetQueryMasterProxy() as qm:
             patName = qm.DefinePattern(patternSpec)
@@ -121,7 +121,7 @@ def main(argv):
         query.  The specified name of the pattern may be modified so as to
         become unique.  The official name of the pattern will be displayed.
         quilt_define will not return until pattern is defined or an error has
-        occured.  It will output the finalized (unique) name for the pattern
+        occurred.  It will output the finalized (unique) name for the pattern
         """,
         argv)
 
@@ -134,7 +134,7 @@ def main(argv):
     parser.add_argument('-v', '--variable', nargs='+', action='append',
         help="""VARIABLE [DESCRIPTION [DEFAULT]]]  The variables that are
             part of the pattern, and an optional text description of the 
-            purpose of the variable, and the oprional default value of the 
+            purpose of the variable, and the optional default value of the
             variable""")
 
     parser.add_argument('-m', '--mapping', nargs='+', action='append',

@@ -8,7 +8,7 @@ import time
 
 
 def log_line(line, prefix='', postfix='', seperator=' ',
-        loglevel='logging.DEBUG'):
+             loglevel='logging.DEBUG'):
     """Output a line to the log"""
     o = []
     if prefix:
@@ -23,7 +23,7 @@ def log_line(line, prefix='', postfix='', seperator=' ',
 
 
 def log_stream(stream, prefix='', postfix='', seperator=' ',
-        loglevel='logging.DEBUG'):
+               loglevel='logging.DEBUG'):
     """output the specified stream to the log"""
     for line in stream:
         log_line(line, prefix, postfix, seperator, loglevel)
@@ -36,9 +36,10 @@ EXITCODE = 2
 def log_process(
         process, prefix='', postfix='', seperator=' ', loglevel='logging.DEBUG',
         whichReturn=STDOUT, logToPython=True, outFunc=None, outObj=None):
-    """perform nonblocking streaming of output from stderr and stdout of the specified process to the log"""
+    """perform non blocking streaming of output from stderr and stdout of the
+     specified process to the log"""
 
-    # because it needs to be conenient to grab the stdout of a process (like for
+    # because it needs to be convenient to grab the stdout of a process (like for
     # short cmd line tools) and because we wanted the calling function's logic
     # to be simpler, when not requesting to log through python, we still run through
     # this function.
@@ -46,7 +47,7 @@ def log_process(
     # TODO
     # Wow, it was a it of a pain to get streaming IO to work.  The correct way to do it is probably
     # to start a thread.  But if you ask me the python io api is misleading.  This solution was
-    # gleaned from stack overflow, it reliese on catching exceptions, which is always a sign of
+    # gleaned from stack overflow, it relies on catching exceptions, which is always a sign of
     # a bad design, but it is working, and it took several hours
 
     out = process.stdout
@@ -75,7 +76,7 @@ def log_process(
             if lineos:
                 if logToPython:
                     log_line(lineos, prefix + ':stdout', postfix, seperator,
-                        loglevel)
+                             loglevel)
                     handled = True
 
                 if outFunc is not None:
@@ -87,8 +88,8 @@ def log_process(
 
                 somethingHappened = True
 
-        except IOError, e:
-            e = e
+        except IOError:
+            pass
 
         try:
             err.flush()
@@ -96,15 +97,15 @@ def log_process(
             if linees:
                 if logToPython:
                     log_line(linees, prefix + ':stderr', postfix, seperator,
-                        loglevel)
+                             loglevel)
                 else:
                     print >> sys.stderr, linees[:-1]
 
                 somethingHappened = True
 
 
-        except IOError, e:
-            e = e
+        except IOError:
+            pass
 
         exitCode = process.poll()
         if (exitCode is not None) and (not somethingHappened):
@@ -123,7 +124,7 @@ def log_process(
 
 
 def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True,
-        logToPython=True, outFunc=None, outObj=None):
+                logToPython=True, outFunc=None, outObj=None):
     """run the specified process and wait for completion, throw exception if nonzero exit occurs, log output of process to the logging module, return stdout as string"""
     if type(cmd) != str:
         logging.debug("Executing: " + str(cmd)[1:-1].replace(',', ''))
@@ -131,9 +132,9 @@ def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True,
         logging.debug("Executing: " + cmd)
 
     p = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+                         stderr=subprocess.PIPE)
     o = log_process(p, whichReturn=whichReturn,
-        logToPython=logToPython, outFunc=outFunc, outObj=outObj)
+                    logToPython=logToPython, outFunc=outFunc, outObj=outObj)
     exitCode = p.poll()
     if checkCall and exitCode != 0:
         raise RuntimeError(
@@ -144,10 +145,11 @@ def run_process(cmd, shell=False, whichReturn=EXITCODE, checkCall=True,
 
 
 def run_process_lite(cmd, shell=False, checkCall=True,
-        outFunc=None, outObj=None):
+                     outFunc=None, outObj=None):
     logging.debug('run_process {begin}' + str(cmd) + '{end}')
     p = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE)
 
+    exitCode = None
     while True:
         exitCode = p.poll()
         p.stdout.flush()
@@ -167,7 +169,8 @@ def run_process_lite(cmd, shell=False, checkCall=True,
 
 def shell_cmd_output_iter(command):
     p = subprocess.Popen(command, shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT)
-    for line in iter(proc.stdout.readline, ''):
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT)
+    # noinspection PyUnusedLocal
+    for line in iter(p.stdout.readline, ''):
         return iter(p.stdout.readline, b'')
