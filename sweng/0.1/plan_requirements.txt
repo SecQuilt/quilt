@@ -55,10 +55,10 @@ Semantic Behavior:
 * The expression field >= factor means all rows on LHS with LHS field value >= factor on RHS
 * The expression field == factor means all rows on LHS with LHS field value == factor on RHS
 
-* The expression field1 and field2 means all rows where the values for field1
-    and field2 intersect
-* The expression field1 or field2 means all rows where the values for field1
-    and field2 intersect
+* The expression pattern1 and pattern2 means all rows where the values for
+    pattern1 and pattern 2 intersect
+* The expression pattern1 or pattern2 means all rows where the values for
+    pattern1 and pattern2 intersect
 
 Results:
 * results of query will be presented to the user as a collection of unique 
