@@ -380,8 +380,14 @@ class SemanticsTestcase(unittest.TestCase):
         # check that results contain one correct number
         occurences = (
             len([m.start() for m in re.finditer(
-                "10", o)]))
+                "{'timestamp': 10}", o)]))
         self.assertTrue(occurences == 1)
+        # check than number from LHS is not in intersection
+
+        occurences = (
+            len([m.start() for m in re.finditer(
+                "{'timestamp': 9}", o)]))
+        self.assertTrue(occurences == 0)
 
     def test_qor(self):
         """
@@ -402,18 +408,18 @@ class SemanticsTestcase(unittest.TestCase):
         # check that results contain one number only in small
         occurences = (
             len([m.start() for m in re.finditer(
-                "9", o)]))
+                "{'timestamp': 9}", o)]))
         self.assertTrue(occurences == 1)
 
         # check that results contain one number only in med
         occurences = (
             len([m.start() for m in re.finditer(
-                "20", o)]))
+                "{'timestamp': 20}", o)]))
         self.assertTrue(occurences == 1)
         # check that results contain one number only from both
         occurences = (
             len([m.start() for m in re.finditer(
-                "10", o)]))
+                "{'timestamp': 10}", o)]))
         self.assertTrue(occurences == 1)
 
 
