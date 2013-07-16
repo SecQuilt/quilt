@@ -84,3 +84,6 @@ Tasks:
 * Mine log files for events of interest
     ** using regular expressions
 * All functionality shall be easily verifiable via automated testing
+
+Deployment:
+* All process communicaiton should be configurable by port

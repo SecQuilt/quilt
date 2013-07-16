@@ -375,7 +375,7 @@ class SemanticsTestcase(unittest.TestCase):
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_qand', '-y'
         ]))
-        # assure the query is successfull, and get results
+        # assure the query is successful, and get results
         o = self.check_query_and_get_results(o)
 
         # check that results contain one correct number
@@ -403,7 +403,7 @@ class SemanticsTestcase(unittest.TestCase):
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py', [
             'semantics_qor', '-y'
         ]))
-        # assure the query is successfull, and get results
+        # assure the query is successful, and get results
         o = self.check_query_and_get_results(o)
 
         # check that results contain one number only in small

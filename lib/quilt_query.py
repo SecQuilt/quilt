@@ -55,7 +55,7 @@ class QuiltQuery(quilt_core.QueryMasterClient):
 
             # Access the QuiltQuery's registrar's host and port from the config
             config = quilt_core.QuiltConfig()
-            rport = config.GetValue("registrar", "port", None)
+            rport = config.GetValue("registrar", "port", None, int)
             if rport is not None:
                 rport = int(rport)
             rhost = config.GetValue("registrar", "host", None)

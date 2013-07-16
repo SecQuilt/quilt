@@ -228,7 +228,8 @@ Classes:
             #   throw error if query not found in history, otherwise return the 
             #   query's record
             # else
-            #   return complete history summary
+            #   return complete history summary, only the keys of the history
+            #       dictionary
 
         querySpec BeginQuery(
             string queryId          # the query we are interested in

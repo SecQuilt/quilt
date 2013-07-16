@@ -460,7 +460,7 @@ class QueryMaster:
                         self._history, queryId))
                 else:
                     # return complete history summary
-                    results = pprint.pformat(self._history)
+                    results = pprint.pformat(self._history.keys())
 
             return results
 

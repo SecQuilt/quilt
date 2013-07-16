@@ -13,4 +13,6 @@ Existing:
 
 New:
 
-L 4
+6 VS
+1 S
+

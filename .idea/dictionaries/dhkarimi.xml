@@ -37,13 +37,16 @@
       <w>pylint</w>
       <w>pyro</w>
       <w>pyunit's</w>
+      <w>qand</w>
       <w>qdef</w>
       <w>qhist</w>
+      <w>qor's</w>
       <w>qque</w>
       <w>qreg</w>
       <w>qstat</w>
       <w>qsub</w>
       <w>qtst</w>
+      <w>quand's</w>
       <w>queries's</w>
       <w>qury</w>
       <w>rentrant</w>

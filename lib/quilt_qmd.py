@@ -18,7 +18,7 @@ class Qmd(quilt_core.QuiltDaemon):
         cfg = quilt_core.QuiltConfig()
         # access the registrar's host and port number from config
         registrarHost = cfg.GetValue('registrar', 'host', None)
-        registrarPort = cfg.GetValue('registrar', 'port', None)
+        registrarPort = cfg.GetValue('registrar', 'port', None, int)
 
         # access the query master's name from the config file
         qmname = cfg.GetValue(

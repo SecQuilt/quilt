@@ -56,12 +56,19 @@ Classes:
         # Access a configuration value.  Configuraiton values can be
         # specified with a section and a name.  The configuration value is
         # returned.  If the specified value is not present the passed in
-        # default is returned.
+        # default is returned.  If no return type is supplied the generic type
+        # passed through from the config parser is used
         def GetValue(        # [out] string
             self,
             sectionName,     # [in] string, name of section
             valueName,       # [in] string, name of value
-            default)         # [in] string, value of default
+            default,         # [in] string, value of default
+            retType=None)    # [in] type, returned type of value
+
+            # perform casting logic
+            # get the variable from config in the generic type,
+            # if value is not present return None
+            # Otherwise convert to the return type and return
 
         # iterate through the source managers defined in the configuration
         # these will be the files inside of $QUILT_CFG/smd.d

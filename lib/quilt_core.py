@@ -55,20 +55,35 @@ class QuiltConfig:
             self,
             sectionName, # [in] string, name of section
             valueName, # [in] string, name of value
-            default):        # [in] value of default
+            default,        # [in] value of default
+            retType=None):    # [in] type, returned type of value
         """
         Access a configuration value.  Configuration values can be
         specified with a section and a name.  The configuration value is
         returned.  If the specified value is not present the passed in
-        default is returned.
+        default is returned.  If no return type is supplied the generic type
+        # passed through from the config parser is used
+
         """
 
-        if (    self._config is None or
+        if (self._config is None or
             not self._config.has_section(sectionName) or
             not self._config.has_option(sectionName, valueName)):
-            return default
+            val = default
+        else:
+            # get the variable from config in the generic type,
+            val = self._config.get(sectionName, valueName)
 
-        return self._config.get(sectionName, valueName)
+        # if value is not present return None
+        if val is None:
+            return val
+
+        # perform casting logic
+        if retType is not None:
+            #  convert to the return type and return
+            return retType(val)
+
+        return val
 
     def GetSourceManagersUtil(self, which):
         """get list of all defined source managers"""
@@ -124,7 +139,7 @@ def GetQueryMasterProxyDEPRECATED(config=None):
     if config is None:
         config = QuiltConfig()
     qmhost = config.GetValue("query_master", "registrar_host", None)
-    qmport = config.GetValue("query_master", "registrar_port", None)
+    qmport = config.GetValue("query_master", "registrar_port", None, int)
 
     # access the Query Master's instance name, create a proxy to it
     qmname = config.GetValue("query_master", "name", "QueryMaster")
@@ -180,7 +195,7 @@ def GetQueryMasterProxy(config=None):
     qmhost = config.GetValue(
         "query_master", "registrar_host", None)
     qmport = config.GetValue(
-        "query_master", "registrar_port", None)
+        "query_master", "registrar_port", None, int)
 
     # access the Query Master's instance name, 
     #   create a proxy to it
@@ -222,7 +237,7 @@ class QueryMasterClient:
 
         # register the client with the query master, record the name
         # record the name the master assigned us as a member variable
-        rport = config.GetValue("registrar", "port", None)
+        rport = config.GetValue("registrar", "port", None, int)
         if rport is not None:
             rport = int(rport)
         rhost = config.GetValue("registrar", "host", None)
@@ -306,7 +321,7 @@ class QueryMasterClient:
                     qmhost = config.GetValue(
                         "query_master", "registrar_host", None)
                     qmport = config.GetValue(
-                        "query_master", "registrar_port", None)
+                        "query_master", "registrar_port", None, int)
 
                     # access the Query Master's instance name, 
                     #   create a proxy to it
@@ -342,7 +357,7 @@ def query_master_client_main_helper(
     registrarHost = cfg.GetValue(
         'registrar', 'host', None)
     registrarPort = cfg.GetValue(
-        'registrar', 'port', None)
+        'registrar', 'port', None, int)
 
     #TODO Hardening, make sure when exceptions are thrown that clients are removed
     daemon = Pyro4.Daemon()

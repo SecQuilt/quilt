@@ -359,6 +359,23 @@ c13.andor
 
 
 
+c14.portbug
+
+    DESIGN
+
+    Replace all occurnces that access port with new config function.
+    Pass type to convert to as new argument
+
+    update all occurrances
+
+
+    Also convert history display to show only keys if no object type is
+    specified
+
+    TESTING.
+
+    Regresison tests run + manual change to an arbitrary port,
+    and run regressions
 
 
 

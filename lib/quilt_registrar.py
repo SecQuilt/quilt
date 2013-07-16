@@ -2,6 +2,8 @@
 import sys
 import quilt_core
 import Pyro4
+import logging
+
 
 
 class Registrar(quilt_core.QuiltDaemon):
@@ -16,7 +18,7 @@ class Registrar(quilt_core.QuiltDaemon):
         registrarHost = cfg.GetValue(
             'registrar', 'host', None)
         registrarPort = cfg.GetValue(
-            'registrar', 'port', None)
+            'registrar', 'port', None, int)
 
         # start the name server
         Pyro4.naming.startNSloop(registrarHost, registrarPort)

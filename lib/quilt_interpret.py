@@ -607,7 +607,7 @@ def qand(lhs, rhs):
     lhsEvents = _get_events(lhs.eventsId)
     rhsEvents = _get_events(rhs.eventsId)
 
-    # itterate through list of lhs events
+    # iterate through list of lhs events
     for lhsEvent in lhsEvents:
         #if lhs element is in rhs
         if lhsEvent in rhsEvents:
@@ -642,7 +642,7 @@ def qor(lhs, rhs):
     # create returning event list as copy of lhs
     returnEvents = lhsEvents[:]
 
-    # itterate through list of rhs events
+    # iterate through list of rhs events
     for rhsEvent in rhsEvents:
         #if rhs element is not in returning list
         if rhsEvent not in returnEvents:
