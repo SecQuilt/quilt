@@ -311,6 +311,11 @@ class QueryMaster:
                         # effect to keep the source manager connection a
                         # might longer while doing the below processing
 
+                        # skip the creation of source queries for source 
+                        #   patterns not references in the query
+                        if patternName not in varDict[source]:
+                            continue
+
                         # get the sourcePatternSpec from the proxy 
                         srcPatSpec = srcMgr.GetSourcePattern(patternName)
 

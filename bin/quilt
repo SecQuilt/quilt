@@ -14,9 +14,12 @@ popd  > /dev/null
 
 source $SCRIPT_PATH/quiltenv.rc
 
+LOGMODE=DEBUG
 dostop()
 {
     echo "Stopping quilt"
+    quilt_smd stop
+    sleep 1
     quilt_qmd stop
     sleep 1
     quilt_registrar stop
@@ -26,13 +29,11 @@ dostart()
 {
     echo "Starting quilt"
     
-    mkdir -p $QUILT_LOG_DIR
-
-    quilt_registrar start -l INFO &> $QUILT_LOG_DIR/quilt_registrar.log
+    quilt_registrar start -l $LOGMODE 
     sleep 1
-    quilt_qmd start -l INFO &> $QUILT_LOG_DIR/quilt_qmd.log
+    quilt_qmd start -l $LOGMODE 
     sleep 1
-    # quilt_smd start -l INFO &> $QUILT_LOG_DIR/quilt_smd.log
+    quilt_smd start -l $LOGMODE 
 }
 
 case "$1" in
