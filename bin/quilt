@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Path to your own script
+# http://stackoverflow.com/questions/4774054/reliable-way-for-a-bash-script-to-get-the-full-path-to-itself
+pushd . > /dev/null
+SCRIPT_PATH="${BASH_SOURCE[0]}";
+  while([ -h "${SCRIPT_PATH}" ]) do 
+    cd "`dirname "${SCRIPT_PATH}"`"
+    SCRIPT_PATH="$(readlink "`basename "${SCRIPT_PATH}"`")"; 
+  done
+cd "`dirname "${SCRIPT_PATH}"`" > /dev/null
+SCRIPT_PATH="`pwd`";
+popd  > /dev/null
+
+source $SCRIPT_PATH/quiltenv.rc
+
+dostop()
+{
+    echo "Stopping quilt"
+    quilt_qmd stop
+    sleep 1
+    quilt_registrar stop
+}
+
+dostart()
+{
+    echo "Starting quilt"
+    
+    mkdir -p $QUILT_LOG_DIR
+
+    quilt_registrar start -l INFO &> $QUILT_LOG_DIR/quilt_registrar.log
+    sleep 1
+    quilt_qmd start -l INFO &> $QUILT_LOG_DIR/quilt_qmd.log
+    sleep 1
+    # quilt_smd start -l INFO &> $QUILT_LOG_DIR/quilt_smd.log
+}
+
+case "$1" in
+  install)
+    echo "Installing quilt"
+    ln -s $SCRIPT_PATH/quilt /etc/init.d/quilt 
+    chkconfig quilt on
+    dostart
+    ;;
+
+  uninstall)
+    dostop 
+    echo "Uninstalling quilt"
+    rm /etc/init.d/quilt
+    ;;
+  start)
+    dostart
+    ;;
+  stop)
+    dostop
+    ;;
+  *)
+    # Refuse to do other stuff
+    echo "Usage: $0 {start|stop|install|uninstall}"
+    exit 1
+    ;;
+esac
+
+exit 0
