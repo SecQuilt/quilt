@@ -37,6 +37,9 @@ dostart()
 
 case "$1" in
   install)
+    echo "Checking Dependencies"
+    cat /etc/redhat-release && yum install -y python-pyro python-daemon python-argparse
+
     echo "Installing quilt"
     ln -s $SCRIPT_PATH/quilt /etc/init.d/quilt 
     chkconfig quilt on
