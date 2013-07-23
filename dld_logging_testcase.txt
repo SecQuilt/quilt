@@ -1,0 +1,49 @@
+quilt 0.1 operator tests
+------------------------
+
+
+Module: logging_testcase
+
+Type: Integration Test
+
+Internal Dependencies:
+    *All classes
+    configuration setup from quilt_test
+
+
+External Dependencies:
+    python-unittest
+
+Prototype:
+    Adhoc experimentations with log files
+
+Responsibilities:
+    Verrify quilt's logging capabilities
+
+Classes:
+
+    class LoggingTestcase()
+
+            
+        def test_logging():
+            """
+            calls quilt_status with an invalid key and a specification
+            for a log file, then Checks that the log file exists
+            """
+
+            # create a randomize log file name in /tmp
+
+
+            # call quilt submit -y logging_not_a_pattern -l DEBUG --log-file
+            #   random_log_file
+
+
+            # check resulting log file contains "logging_not_a_pattern"
+            # delete the templ log file
+
+
+def main:
+
+    call unitest core main helper to deal with arguments
+    call unittest.main()    
+

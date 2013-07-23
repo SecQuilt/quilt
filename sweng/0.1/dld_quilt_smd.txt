@@ -117,10 +117,8 @@ Classes:
             manager collection level.  We don't have the use case yet
             when we do, redesign a bit
 
+
 Functions:
-
-    def main():
-        # call the quilt core main helper
-        # setup argument parser in accordance with funcitonal specification
-
-           
+    def main(argv)
+        # get parsed arguments from call to common daemon main helper
+        # create daemon with parsed arguments

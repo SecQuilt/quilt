@@ -21,14 +21,34 @@ Classes:
     class QuiltDaemon:
         setup_process(name)
             # perform common daemon setup stuff
-            # set stdin, stdout, stderr to TTY or to null if no TTY
+            # set stdin, stdout, stderr to /dev/null
+            # if arguments are specfied, and arguments have pid file
+                # set pid file name to value from command line
+            # otherwise generate a pid file path
+                # get the path to this python file
+                # convert all of the '/' to '_'
+                # append '.pid'
+                # preppend '/tmp'
+
             # set the pid file path and the pid timeout
 
-        main(self, argv)
-            # setup argument parser
-            # setup loggging 
+
+        main(self)
+            # Create daemon runner, which helps daemonize
+
+            # setup loggging for the daemon
+            # get the currently configured logger
+            # if daemon has arguments and has log file
+                # create a logging file handler
+                # add the logging file handler to the logger
+                # initialze the context of the daemon runner with the logger's
+                #   file handler
+            # otherwise
+                # add a syslog log handler to the logger
+
             # run the daemon
-            # capture common exceptions and provide helopful error msg
+
+            # capture common exceptions and provide helpful error msg
 
     # Responsible for access to quilt configuration
     class QuiltConfig():
@@ -219,15 +239,32 @@ Functions:
         # return global pyro proxy
 
     # Quilt helper function for main, do common things
-    def quilt_main_helper(
+    def main_helper(
         description                 # prose description of functionality
         argv                        # input arguments
         )
         # create a new argument parser 
         # setup specificaiton for logging parameter
+        # setup specification for the logging file
         # attempt to read logging parameter from argv
-        # pass parsed logging info to quilt_core configure logging
+        # pass parsed arguments to quilt_core for common initialization
         # return the argument parser
+
+
+    def daemon_main_helper(description, argv)
+        """
+        common initialization for daemon processes
+        @description the description of the process shown when accessing the
+        cmd line help for the process
+        @argv the cmd line arguments for the process, starting with the first
+        argument
+        """
+        # get parser by calling the regular main helper
+        # add specification of the start, stop, and restart actions
+        # add specification of the pid file
+        # parse the comd line arguments with the parser
+        # return the parsed arguments
+
 
     # Used to publish the client as a remote object, and complete the
     #   connection with the query master
@@ -306,7 +343,7 @@ Functions:
     
     def common_init(
         name                # name of program
-        loglevel            # string representing log level as per functional
+        args                # the parsed arguments from the command line
                             # specification desctription)
     """Common site for logging configuration, always call as first function
 from main and other initializeation"""
@@ -314,7 +351,11 @@ from main and other initializeation"""
 
     Notes:
         This functionality will grow as needed, but have common site for
-        logging config here   
+        logging config here
+
+    # Set logging level, logging file, logging format
+    # Set pyro's HMAC key
+
         
     #REVIEW (ISSUE008)
     def ui_show(outputMsg)

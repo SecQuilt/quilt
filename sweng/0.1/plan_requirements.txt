@@ -80,6 +80,7 @@ Data:
 * Intimate knowledge of a type of data's native query system need not be known
     to the central system
 
+
 Tasks:
 * Mine log files for events of interest
     ** using regular expressions
@@ -87,3 +88,9 @@ Tasks:
 
 Deployment:
 * All process communicaiton should be configurable by port
+* Multiple instances of quilt should be configurable on a machine
+* Components should be able to run on same or differnt machines
+
+Misc:
+* Logging should be configurable by level and logfile.
+* If no logfile is specified, logging should go to syslog
