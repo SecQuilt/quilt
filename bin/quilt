@@ -29,10 +29,10 @@ dostart()
 {
     echo "Starting quilt"
     
-    quilt_registrar start -l $LOGMODE 
-    sleep 1
-    quilt_qmd start -l $LOGMODE 
-    sleep 1
+    # quilt_registrar start -l $LOGMODE 
+    # sleep 1
+    # quilt_qmd start -l $LOGMODE 
+    # sleep 1
     quilt_smd start -l $LOGMODE 
 }
 
