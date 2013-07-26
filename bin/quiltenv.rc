@@ -19,4 +19,8 @@ export QUILT_LOG_DIR=$QUILT_HOME/var/log
 export PYTHONPATH=$QUILT_HOME/lib
 export PATH=$PATH:$QUILT_HOME/bin
 
+sourcename()
+{
+    $QUILT_HOME/bin/quilt_status | grep $1 | head -n 1 | awk '{print $1}' | sed  -e "s/{'//" -e "s/'://" -e "s/'//g"
+}
 
