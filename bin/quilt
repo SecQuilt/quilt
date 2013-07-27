@@ -15,6 +15,15 @@ popd  > /dev/null
 source $SCRIPT_PATH/quiltenv.rc
 
 LOGMODE=DEBUG
+openport()
+{
+    iptables -L | grep "tcp dpt:$1" || sudo iptables -I INPUT -p tcp -m tcp --dport $1 -j ACCEPT
+}
+closeport()
+{
+    local rnum=$(iptables -L --line-numbers | grep "tcp dpt:$1" | awk '{print $1'})
+    if [ "$rnum" ] ; then iptables -D INPUT $rnum; fi
+}
 dostop()
 {
     echo "Stopping quilt"
@@ -23,11 +32,15 @@ dostop()
     quilt_qmd stop
     sleep 1
     quilt_registrar stop
+
+    closeport 4242
+    closeport 4243
 }
 
 dostart()
 {
-    echo "Starting quilt"
+    openport 4242
+    openport 4243
     
     # quilt_registrar start -l $LOGMODE 
     # sleep 1
