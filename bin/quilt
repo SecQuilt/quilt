@@ -29,9 +29,9 @@ dostop()
     echo "Stopping quilt"
     quilt_smd stop
     sleep 1
-    quilt_qmd stop
+    # quilt_qmd stop
     sleep 1
-    quilt_registrar stop
+    # quilt_registrar stop
 
     closeport 4242
     closeport 4243
