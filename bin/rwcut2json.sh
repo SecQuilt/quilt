@@ -1,4 +1,7 @@
 #!/bin/sh
+f=/tmp/quilthack_
+f+=$(date +%s)
+f+=_${RANDOM}
 sed 's/|/ /g' | \
 awk "{print \"echo \
 \"\$1\" \
@@ -12,9 +15,9 @@ awk "{print \"echo \
 \"\$9\" \
 \"\$10\" \
 \"\$11\" \
-  \" }" > /tmp/foo
+  \" }" > $f
 
-sh /tmp/foo | 
+sh $f | 
 awk \
 "{print \"{\" \
 \"'sIP':\" \"'\"\$1\"',\" \
@@ -32,3 +35,4 @@ awk \
 # sed "s/timestamp/foo/"
 
 
+rm -f $f

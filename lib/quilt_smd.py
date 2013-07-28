@@ -154,7 +154,12 @@ class SourceManager(quilt_core.QueryMasterClient):
         # only one source will be writing to the source event list at a
         #   time, so we can do so outside of the lock
         #TODO fix security problem with eval
-        srcRes.append(eval(line))
+        try:
+            srcRes.append(eval(line))
+            # logging.debug("Good  Syntax: " + str(line))
+        except:
+            logging.error("Bad Syntax: " + str(line))
+            pass
 
     def GetType(self):
         return "smd"
