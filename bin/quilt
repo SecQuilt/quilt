@@ -21,7 +21,7 @@ openport()
 }
 closeport()
 {
-    local rnum=$(iptables -L --line-numbers | grep "tcp dpt:$1" | awk '{print $1'})
+    local rnum=$(iptables -L --line-numbers | grep "tcp dpt:$1" | head -n 1 | awk '{print $1'})
     if [ "$rnum" ] ; then iptables -D INPUT $rnum; fi
 }
 dostop()
