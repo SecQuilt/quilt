@@ -39,7 +39,7 @@ Classes:
 
 
             # check resulting log file contains "logging_not_a_pattern"
-            # delete the templ log file
+            # delete the temp log file
 
 
 def main:

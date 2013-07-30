@@ -52,11 +52,11 @@ class QuiltConfig:
             self._config.read(quiltcfg)
 
     def GetValue(# [out] string
-            self,
-            sectionName, # [in] string, name of section
-            valueName, # [in] string, name of value
-            default,        # [in] value of default
-            retType=None):    # [in] type, returned type of value
+                 self,
+                 sectionName, # [in] string, name of section
+                 valueName, # [in] string, name of value
+                 default, # [in] value of default
+                 retType=None):    # [in] type, returned type of value
         """
         Access a configuration value.  Configuration values can be
         specified with a section and a name.  The configuration value is
@@ -67,8 +67,8 @@ class QuiltConfig:
         """
 
         if (self._config is None or
-            not self._config.has_section(sectionName) or
-            not self._config.has_option(sectionName, valueName)):
+                not self._config.has_section(sectionName) or
+                not self._config.has_option(sectionName, valueName)):
             val = default
         else:
             # get the variable from config in the generic type,
@@ -90,7 +90,7 @@ class QuiltConfig:
 
         # iterate through the source managers defined in the configuration
         smdcfgdir = self.GetValue('source_managers', 'config_dir',
-            os.path.join(self.GetCfgDir(), 'smd.d'))
+                                  os.path.join(self.GetCfgDir(), 'smd.d'))
 
         smdcfgdir = os.path.expandvars(smdcfgdir)
         if not os.path.exists(smdcfgdir):
@@ -99,7 +99,7 @@ class QuiltConfig:
                 smdcfgdir)
 
         smdcfgs = [f for f in listdir(smdcfgdir)
-            if isfile(join(smdcfgdir, f))]
+                   if isfile(join(smdcfgdir, f))]
 
 
         # read all sections from all config file sin the smd directory
@@ -121,8 +121,8 @@ class QuiltConfig:
                 else:
                     specStr = c.get(s, 'sourceSpec')
                     quilt_data.src_specs_add(smds,
-                        quilt_data.src_spec_create(
-                            cfgStr=specStr, cfgSection=s))
+                                             quilt_data.src_spec_create(
+                                                 cfgStr=specStr, cfgSection=s))
 
         return smds
 
@@ -164,12 +164,8 @@ class QuiltDaemon(object):
 
     def setup_process(self, name):
         self.name = name
-        if sys.stdin.isatty():
-            outdev = '/dev/tty'
-        else:
-            outdev = '/dev/null'
-
-        self.stdin_path = '/dev/null'
+        outdev = '/dev/null'
+        self.stdin_path = outdev
         self.stdout_path = outdev
         self.stderr_path = outdev
         self.pidfile_path = '/tmp/' + name + '.pid'
@@ -455,18 +451,19 @@ def query_master_client_main_helper(
             break
 
 
-def common_init(name, strlevel):
+def common_init(name, args):
     """
     Common site for logging configuration, always call as first function
     from main and other initialization
     """
-    # TODO eval security issue
+    strlevel = args.log_level
+    logfile = args.log_file
+    strformat = '%(asctime)s:' + name + '%(process)d:%(levelname)s:%(message)s'
     if strlevel is None:
         strlevel = 'WARN'
     strlevel = 'logging.' + strlevel
-    logging.basicConfig(level=eval(strlevel),
-        format='%(asctime)s:' + name + '%(process)d:%(levelname)s:%(message)s')
-
+    logging.basicConfig(level=eval(strlevel), filename=logfile,
+                        format=strformat)
     # common init stuff together
     Pyro4.config.HMAC_KEY = "Itsnotmuchofacheeshopisit"
 
@@ -481,12 +478,16 @@ def main_helper(name, description, argv):
     argparser = argparse.ArgumentParser(description)
 
     argparser.add_argument('-l', '--log-level', nargs='?',
-        help='logging level (DEBUG,INFO,WARN,ERROR) default: WARN')
+                           help='logging level (DEBUG,INFO,WARN,'
+                                'ERROR) default: WARN')
+    argparser.add_argument('-lf', '--log-file', nargs='?',
+                           help='path to log file, default will be syslog or '
+                                'stderr')
 
     args, unknownArgs = argparser.parse_known_args(argv)
     # noinspection PyUnusedLocal
 
-    common_init(name, args.log_level)
+    common_init(name, args)
 
     return argparser
 
@@ -519,3 +520,27 @@ def debug_obj(obj, prefix='Object Info'):
     logging.debug(prefix + ":\n" +
                   str(type(obj)) + "\n" +
                   pprint.pformat(obj))
+
+
+def daemon_main_helper(description, argv):
+    """
+    common initialization for daemon processes
+    @description the description of the process shown when accessing the
+    cmd line help for the process
+    @argv the cmd line arguments for the process, starting with the first
+    argument
+    """
+    # get parser by calling the regular main helper
+    # setup command line interface
+    parser = quilt_core.main_helper("qmd", "Query master daemon", argv)
+
+    # add specification of the start, stop, and restart actions
+    parser.add_argument('action', choices=['start', 'stop', 'restart'])
+
+    # add specification of the pid file
+    parser.add_argument('-p', '--pid-file', nargs='?',
+                        help='Path to file used to make sure only one '
+                             'instance of the daemon is created')
+
+    # return the  argument oarser
+    return parser

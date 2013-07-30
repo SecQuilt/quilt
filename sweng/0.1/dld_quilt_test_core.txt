@@ -41,7 +41,11 @@ Functions:
     def call_quilt_script(  # returns the stdoutput of the script
         scriptName          # base filename of the script in the quilt lib
                             #   directory
-        args                # arguments to pass to the script):
+        args                # arguments to pass to the script),
+        whichReturn         # what kind of information this function should
+                            #   return
+        checkCall           # pass true to throw a funciton if process
+                            #   returns a non-zero error code
         
         # get the quilt lib directory
         # create file path to the script

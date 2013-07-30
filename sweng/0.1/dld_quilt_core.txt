@@ -263,7 +263,7 @@ Functions:
         # add specification of the start, stop, and restart actions
         # add specification of the pid file
         # parse the comd line arguments with the parser
-        # return the parsed arguments
+        # return the argument parser
 
 
     # Used to publish the client as a remote object, and complete the
