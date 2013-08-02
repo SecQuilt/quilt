@@ -33,14 +33,14 @@ dostop()
     sleep 1
     quilt_registrar stop
 
-    closeport 4242
-    closeport 4243
+    # closeport 4242
+    # closeport 4243
 }
 
 dostart()
 {
-    openport 4242
-    openport 4243
+    # openport 4242
+    # openport 4243
     
     quilt_registrar start -l $LOGMODE 
     sleep 1
