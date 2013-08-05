@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # set python path for modules under test and test modules
 # set config dir to test config
