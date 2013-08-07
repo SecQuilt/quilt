@@ -217,7 +217,11 @@ class QueryMasterClient:
         use user name and pid in the name of the object
         to generate a unique enough name for this machine
         """
-        self.localname = basename + str(os.getpid())
+        hostStr=''
+        if 'HOSTNAME' in os.environ:
+            hostStr = os.environ['HOSTNAME']
+
+        self.localname = basename + '_' + hostStr + str(os.getpid())
         self._remotename = None
         self._config = None
         self._qmuri = None
