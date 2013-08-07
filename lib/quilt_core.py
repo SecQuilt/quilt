@@ -364,7 +364,13 @@ def query_master_client_main_helper(
         'registrar', 'port', None, int)
 
     #TODO Hardening, make sure when exceptions are thrown that clients are removed
-    daemon = Pyro4.Daemon(Pyro4.socketutil.getIpAddress())
+    # HACK FIXME, need to specify this from config
+    try:
+        daemon = Pyro4.Daemon(Pyro4.socketutil.getIpAddress())
+    except:
+        daemon = Pyro4.Daemon()
+
+
     with Pyro4.locateNS(registrarHost, registrarPort) as ns:
         # iterate the names and objects in clientObjectDict
         for name, obj in clientObjectDict.items():
