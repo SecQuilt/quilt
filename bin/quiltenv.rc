@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Path to your own script
 # http://stackoverflow.com/questions/4774054/reliable-way-for-a-bash-script-to-get-the-full-path-to-itself
