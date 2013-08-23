@@ -240,6 +240,7 @@ Functions:
 
     # Quilt helper function for main, do common things
     def main_helper(
+        name                        # name of initializeing proces    
         description                 # prose description of functionality
         argv                        # input arguments
         )
@@ -247,11 +248,11 @@ Functions:
         # setup specificaiton for logging parameter
         # setup specification for the logging file
         # attempt to read logging parameter from argv
-        # pass parsed arguments to quilt_core for common initialization
+        # pass name and parsed arguments to quilt_core for common initialization
         # return the argument parser
 
 
-    def daemon_main_helper(description, argv)
+    def daemon_main_helper(name, description, argv)
         """
         common initialization for daemon processes
         @description the description of the process shown when accessing the
