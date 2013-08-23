@@ -6,9 +6,9 @@ source $(dirname ${BASH_SOURCE[0]})/testenv.rc
 
 
 # start up quilt daemons
-$QUILT_HOME/lib/quilt_registrar.py   start -l DEBUG
-$QUILT_HOME/lib/quilt_qmd.py         start -l DEBUG
-$QUILT_HOME/lib/quilt_smd.py         start -l DEBUG
+$QUILT_HOME/lib/quilt_registrar.py   start -l DEBUG -lf $QUILT_HOME/test/var/log/quilt.log
+$QUILT_HOME/lib/quilt_qmd.py         start -l DEBUG -lf $QUILT_HOME/test/var/log/quilt.log
+$QUILT_HOME/lib/quilt_smd.py         start -l DEBUG -lf $QUILT_HOME/test/var/log/quilt.log
 
 
 

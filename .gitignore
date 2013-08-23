@@ -1,3 +1,4 @@
 *~
 *.pyc
 .idea/workspace.xml
+test/var/log/quilt.log
