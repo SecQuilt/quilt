@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 relativedir=$(dirname ${BASH_SOURCE[0]})
 export QUILT_TEST_BIN=$(cd $relativedir && pwd)
 export QUILT_HOME=$(dirname $(dirname $QUILT_TEST_BIN))
