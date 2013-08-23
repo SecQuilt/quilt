@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import ConfigParser
 import logging
 import logging.handlers
@@ -162,13 +163,22 @@ class QuiltDaemon(object):
 
     name = ''
 
+
     def setup_process(self, name):
         self.name = name
         outdev = '/dev/null'
+# if having trouble debugging exceptions happenign very early in initialization
+# you may want to uncomment this
+#       if sys.stdin.isatty():
+#           outdev = '/dev/tty'
+#       else:
+#           outdev = '/dev/null'
         self.stdin_path = outdev
         self.stdout_path = outdev
         self.stderr_path = outdev
         self.pidfile_timeout = 5
+
+
         # if arguments are specfied, and arguments have pid file
         if self.args is not None and self.args.pid_file is not None:
             # set pid file name to value from command line
@@ -177,9 +187,9 @@ class QuiltDaemon(object):
         else:
             # get the path to this python file
             # convert all of the '/' to '_'
-            f = __file__.replace('/','_')
-            # append '.pid'
-            f += '.pid'
+            f = os.path.dirname(os.path.dirname(__file__)).replace('/','_')
+            # append name and '.pid'
+            f += "_" + name + '.pid'
             # preppend '/tmp'
             self.pidfile_path = os.path.join('/tmp',f)
 
@@ -194,6 +204,8 @@ class QuiltDaemon(object):
             # setup loggging for the daemon
             # get the currently configured logger
             logger = logging.getLogger()
+            handle = None
+
             # if daemon has arguments and has log file
             if self.args is not None and self.args.log_file is not None:
                 # NOTE special treatment is needed.  We want logging before and
@@ -202,20 +214,49 @@ class QuiltDaemon(object):
                 # running the daemon
                 # http://stackoverflow.com/questions/13180720/maintaining-logging-and-or-stdout-stderr-in-python-daemon
 
-                # create a logging file handler
-                fh = logging.FileHandler(self.args.log_file)
-                # add the logging file handler to the logger
-                logger.addHandler(fh)
-
-                # initialze the context of the daemon runner with the logger's
-                #   file handler
-                daemon_runner.daemon_context.files_preserve.append(fh.stream)
+                # We have already set a handler in common_init, guaranteed to
+                # be called before this, so grab the file handle
+                handler = logger.handlers[0]
+                handle = handler.stream
             # otherwise
             else:
+                # NOTE: logging is setup here trying to copy what is done in 
+                # common_init, when changing logging, you may want to look in
+                # bothplaces
+
+                # NOTE: Before you go crazy, no DEBUG level is not going to syslog
+                # I do not know why, I can only guess it is by that log handler's
+                # design.  Makes sense, if you want to debug, point it to a file
+
                 # add a syslog log handler to the logger
-                handler = logging.handlers.SysLogHandler(address='/dev/log')
+                handler = logging.handlers.SysLogHandler()
+
+                format = self.name + '%(process)d:%(levelname)s:%(message)s'
+
+                # preserve the logging file handle
+                # http://bugs.python.org/issue17981
+                handle = handler.socket.fileno()
+
+                # set logging format
+                if format is not None:
+                    formatter = logging.Formatter(format)
+                    handler.setFormatter(formatter)
+
+                # set the logging level for the handler
+                strlevel = 'WARN'
+                if self.args is not None and self.args.log_level is not None:
+                    strlevel = self.args.log_level
+                logger.setLevel(eval('logging.' + strlevel))
+
+                # add the logging file handler to the logger
                 logger.addHandler(handler)
 
+            # initialze the context of the daemon runner with the logger's
+            #   file handler
+            if daemon_runner.daemon_context.files_preserve is None:
+                daemon_runner.daemon_context.files_preserve = []
+            daemon_runner.daemon_context.files_preserve.append(handle)
+        
             daemon_runner.do_action()
 
 
@@ -509,14 +550,15 @@ def common_init(name, args):
     Common site for logging configuration, always call as first function
     from main and other initialization
     """
+    # NOTE: Daemon's have a special case when using the system log, any changes to
+    # defualt logging should also be canidates to be made in QuiltDaemon.main
     strlevel = args.log_level
     logfile = args.log_file
     strformat = '%(asctime)s:' + name + '%(process)d:%(levelname)s:%(message)s'
     if strlevel is None:
         strlevel = 'WARN'
     strlevel = 'logging.' + strlevel
-    logging.basicConfig(level=eval(strlevel), filename=logfile,
-                        format=strformat)
+    logging.basicConfig(level=eval(strlevel), filename=logfile, format=strformat)
     # common init stuff together
     Pyro4.config.HMAC_KEY = "Itsnotmuchofacheeshopisit"
 

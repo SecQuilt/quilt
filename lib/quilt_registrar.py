@@ -13,6 +13,7 @@ class Registrar(quilt_core.QuiltDaemon):
         self.setup_process("reg")
 
     def run(self):
+
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()
         # access the registrar's host and port number from config
@@ -22,6 +23,7 @@ class Registrar(quilt_core.QuiltDaemon):
             'registrar', 'port', None, int)
 
         # start the name server
+        logging.info("Begin nameserver message loop")
         Pyro4.naming.startNSloop(registrarHost, registrarPort)
 
 

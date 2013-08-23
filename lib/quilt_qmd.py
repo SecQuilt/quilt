@@ -14,6 +14,7 @@ class Qmd(quilt_core.QuiltDaemon):
         self.setup_process("qmd")
 
     def run(self):
+
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()
         # access the registrar's host and port number from config

@@ -39,16 +39,22 @@ Classes:
             # setup loggging for the daemon
             # get the currently configured logger
             # if daemon has arguments and has log file
-                # create a logging file handler
-                # add the logging file handler to the logger
-                # initialze the context of the daemon runner with the logger's
-                #   file handler
+                # get the log handler that was setup in common_init
+                # get the file handle from that logger
             # otherwise
+             
                 # add a syslog log handler to the logger
+                # capture the file handle of the syslogger
+                # set the logging format
+                # set the logging level
+                # add the logging handler
+
+            # initialze the context of the daemon runner with the logger's
+            #   file handler so it preserved
 
             # run the daemon
 
-            # capture common exceptions and provide helpful error msg
+            # pture common exceptions and provide helpful error msg
 
     # Responsible for access to quilt configuration
     class QuiltConfig():
