@@ -168,14 +168,57 @@ class QuiltDaemon(object):
         self.stdin_path = outdev
         self.stdout_path = outdev
         self.stderr_path = outdev
-        self.pidfile_path = '/tmp/' + name + '.pid'
         self.pidfile_timeout = 5
+        # if arguments are specfied, and arguments have pid file
+        if self.args is not None and self.args.pid_file is not None:
+            # set pid file name to value from command line
+            self.pidfile_path = self.args.pid_file
+        # otherwise generate a pid file path
+        else:
+            # get the path to this python file
+            # convert all of the '/' to '_'
+            f = __file__.replace('/','_')
+            # append '.pid'
+            f += '.pid'
+            # preppend '/tmp'
+            self.pidfile_path = os.path.join('/tmp',f)
+
+        logging.info('pid path is ' + str(self.pidfile_path))
 
     def main(self, argv):
         logging.debug('"' + '" "'.join(argv) + '"')
         try:
             daemon_runner = runner.DaemonRunner(self)
+
+            
+            # setup loggging for the daemon
+            # get the currently configured logger
+            logger = logging.getLogger()
+            # if daemon has arguments and has log file
+            if self.args is not None and self.args.log_file is not None:
+                # NOTE special treatment is needed.  We want logging before and
+                # after we daemonize, so though this was setup in common_init
+                # we do it again because all filehandles get closed for us by
+                # running the daemon
+                # http://stackoverflow.com/questions/13180720/maintaining-logging-and-or-stdout-stderr-in-python-daemon
+
+                # create a logging file handler
+                fh = logging.FileHandler(self.args.log_file)
+                # add the logging file handler to the logger
+                logger.addHandler(fh)
+
+                # initialze the context of the daemon runner with the logger's
+                #   file handler
+                daemon_runner.daemon_context.files_preserve.append(fh.stream)
+            # otherwise
+            else:
+                # add a syslog log handler to the logger
+                handler = SysLogHandler(address='/dev/log')
+                logger.addHandler(handler)
+
             daemon_runner.do_action()
+
+
         except lockfile.LockTimeout as e:
             logging.warning(self.name + " Lockfile exists: " + str(e))
         except runner.DaemonRunnerStopFailureError as e:
@@ -532,7 +575,7 @@ def debug_obj(obj, prefix='Object Info'):
                   pprint.pformat(obj))
 
 
-def daemon_main_helper(description, argv):
+def daemon_main_helper(name, description, argv):
     """
     common initialization for daemon processes
     @description the description of the process shown when accessing the
@@ -542,7 +585,7 @@ def daemon_main_helper(description, argv):
     """
     # get parser by calling the regular main helper
     # setup command line interface
-    parser = quilt_core.main_helper("qmd", "Query master daemon", argv)
+    parser = main_helper(name, description, argv)
 
     # add specification of the start, stop, and restart actions
     parser.add_argument('action', choices=['start', 'stop', 'restart'])
