@@ -384,6 +384,10 @@ class QueryMaster:
                 queryCmd.append("--log-level")
                 queryCmd.append(self._args.log_level)
 
+            if self._args.log_file is not None:
+                queryCmd.append("--log-file")
+                queryCmd.append(self._args.log_file)
+
                 # use subprocess module to fork off the process
                 # script, pass the query ID
             #           sei_core.run_process("sleep 5 && " + ' '.join(queryCmd) + " &",shell=True)
