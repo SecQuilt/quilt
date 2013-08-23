@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
-import sys
 import ConfigParser
 import logging
+import logging.handlers
 import Pyro4
 from os import listdir
 from os.path import isfile, join
@@ -213,7 +213,7 @@ class QuiltDaemon(object):
             # otherwise
             else:
                 # add a syslog log handler to the logger
-                handler = SysLogHandler(address='/dev/log')
+                handler = logging.handlers.SysLogHandler(address='/dev/log')
                 logger.addHandler(handler)
 
             daemon_runner.do_action()
