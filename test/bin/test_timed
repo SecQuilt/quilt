@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ "$1" ] ; then sleepytime=$1; else sleepytime=60; fi
 testbin=$(cd $(dirname $0) && pwd)
 $testbin/test_start

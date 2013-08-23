@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Path to your own script
+# http://stackoverflow.com/questions/4774054/reliable-way-for-a-bash-script-to-get-the-full-path-to-itself
+pushd . > /dev/null
+SCRIPT_PATH="${BASH_SOURCE[0]}";
+  while([ -h "${SCRIPT_PATH}" ]) do 
+    cd "`dirname "${SCRIPT_PATH}"`"
+    SCRIPT_PATH="$(readlink "`basename "${SCRIPT_PATH}"`")"; 
+  done
+cd "`dirname "${SCRIPT_PATH}"`" > /dev/null
+SCRIPT_PATH="`pwd`";
+popd  > /dev/null
+
+export QUILT_BIN=$SCRIPT_PATH
+export QUILT_HOME=$(dirname $QUILT_BIN)
+export QUILT_CFG_DIR=$QUILT_HOME/etc/quilt
+export QUILT_LOG_DIR=$QUILT_HOME/var/log
+export PYTHONPATH=$QUILT_HOME/lib
+export PATH=$PATH:$QUILT_HOME/bin
+
+sourcename()
+{
+    $QUILT_HOME/bin/quilt_status | grep $1 | head -n 1 | awk '{print $1}' | sed  -e "s/{'//" -e "s/'://" -e "s/'//g"
+}
+
