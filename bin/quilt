@@ -50,11 +50,11 @@ dostart()
     # openport 4243
     
     set -x
-    quilt_smd $(daemonargs start smd)
+    quilt_registrar $(daemonargs start registrar)
     sleep 1
     quilt_qmd $(daemonargs start qmd)
     sleep 1
-    quilt_registrar $(daemonargs start registrar)
+    quilt_smd $(daemonargs start smd)
     set +x
 }
 
