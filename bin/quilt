@@ -35,11 +35,6 @@ dostop()
 {
     echo "Stopping quilt"
     quilt_smd $(daemonargs stop smd)
-    #sleep 1
-    #quilt_qmd $(daemonargs stop qmd)
-    #sleep 1
-    #quilt_registrar $(daemonargs stop registrar)
-
     # closeport 4242
     # closeport 4243
 }
@@ -51,10 +46,6 @@ dostart()
     
     set -x
     quilt_smd $(daemonargs start smd)
-    #sleep 1
-    #quilt_qmd $(daemonargs start qmd)
-    #sleep 1
-    #quilt_registrar $(daemonargs start registrar)
     set +x
 }
 
