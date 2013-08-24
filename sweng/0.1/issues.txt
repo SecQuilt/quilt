@@ -59,6 +59,11 @@ So it is hopefully fixable the way it is designed, where we centralize the log i
     Why are we returning true if StopIteration exception comes?
     quilt_interpret::_check_equal
 
+    ISSUE017
+    quilt_query will not log to syslog when it's parent quilt master is
+    logging to syslog instead of a file.  This is because syslog suppurt was
+    only added for daemon's and not clients.  This could be fixed with some
+    mild refactoring
 
 Closed:
 

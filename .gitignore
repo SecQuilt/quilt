@@ -1,3 +1,7 @@
 *~
 *.pyc
 .idea/workspace.xml
+test/var/log/quilt.log
+sweng/0.1/quilt_0.1.*
+var/log/*
+var/lock/*

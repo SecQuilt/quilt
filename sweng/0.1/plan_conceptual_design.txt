@@ -13,6 +13,6 @@ Existing:
 
 New:
 
-6 VS
-1 S
+7 VS
+3 S
 

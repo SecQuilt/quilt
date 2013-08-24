@@ -131,6 +131,10 @@ Classes:
             # formulate the command line for quilt_query
             # use subprocess module to fork off the process
 
+            # SEE ISSUE017
+            # print warning if logging to syslog, because quilt_query log will
+            # currently be lost
+
             # script, pass the query ID
 
 

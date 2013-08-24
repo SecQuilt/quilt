@@ -10,10 +10,11 @@ import query_master
 class Qmd(quilt_core.QuiltDaemon):
     def __init__(self, args):
         quilt_core.QuiltDaemon.__init__(self)
-        self.setup_process("qmd")
         self.args = args
+        self.setup_process("qmd")
 
     def run(self):
+
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()
         # access the registrar's host and port number from config
@@ -43,9 +44,8 @@ class Qmd(quilt_core.QuiltDaemon):
 
 def main(argv):
     # setup command line interface
-    parser = quilt_core.main_helper("qmd", "Query master daemon", argv)
+    parser = quilt_core.daemon_main_helper("qmd", "Query master daemon", argv)
 
-    parser.add_argument('action', choices=['start', 'stop', 'restart'])
     args = parser.parse_args()
 
     # start the daemon

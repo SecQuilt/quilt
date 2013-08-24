@@ -201,8 +201,8 @@ class SourceManager(quilt_core.QueryMasterClient):
 class Smd(quilt_core.QuiltDaemon):
     def __init__(self, args):
         quilt_core.QuiltDaemon.__init__(self)
+        self.args = args
         self.setup_process("smd")
-        self._args = args
 
     def run(self):
         cfg = quilt_core.QuiltConfig()
@@ -214,7 +214,7 @@ class Smd(quilt_core.QuiltDaemon):
         for smname, smspec in smspecs.items():
             logging.debug(smname + " specified from configuration")
             # create each source manager object
-            sm = SourceManager(self._args, smname, smspec)
+            sm = SourceManager(self.args, smname, smspec)
             objs[sm.localname] = sm
 
 
@@ -224,12 +224,10 @@ class Smd(quilt_core.QuiltDaemon):
 
 def main(argv):
     # setup command line interface
-    parser = quilt_core.main_helper('smd', """Source manager
+    parser = quilt_core.daemon_main_helper('smd', """Source manager
        daemon""",
         argv)
 
-    # setup argument parser in accordance with functional specification
-    parser.add_argument('action', choices=['start', 'stop', 'restart'])
     args = parser.parse_args()
 
     # start the daemon

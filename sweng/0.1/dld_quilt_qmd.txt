@@ -38,3 +38,7 @@ Classes:
     
         
 
+Functions:
+    def main(argv)
+        # get parsed arguments from call to common daemon main helper
+        # create daemon with parsed arguments

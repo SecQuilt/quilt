@@ -16,8 +16,10 @@ export QUILT_BIN=$SCRIPT_PATH
 export QUILT_HOME=$(dirname $QUILT_BIN)
 export QUILT_CFG_DIR=$QUILT_HOME/etc/quilt
 export QUILT_LOG_DIR=$QUILT_HOME/var/log
+export QUILT_LOCK_DIR=$QUILT_HOME/var/lock
 export PYTHONPATH=$QUILT_HOME/lib
 export PATH=$PATH:$QUILT_HOME/bin
+
 
 sourcename()
 {
