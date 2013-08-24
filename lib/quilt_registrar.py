@@ -7,11 +7,13 @@ import logging
 
 
 class Registrar(quilt_core.QuiltDaemon):
-    def __init__(self):
+    def __init__(self, args):
         quilt_core.QuiltDaemon.__init__(self)
-        self.setup_process("registrar")
+        self.args = args
+        self.setup_process("reg")
 
     def run(self):
+
         # Use QuiltConfig to read in configuration
         cfg = quilt_core.QuiltConfig()
         # access the registrar's host and port number from config
@@ -21,21 +23,20 @@ class Registrar(quilt_core.QuiltDaemon):
             'registrar', 'port', None, int)
 
         # start the name server
+        logging.info("Begin nameserver message loop")
         Pyro4.naming.startNSloop(registrarHost, registrarPort)
 
 
 def main(argv):
     # setup command line interface
-    parser = quilt_core.main_helper("qreg",
+    parser = quilt_core.daemon_main_helper("qreg",
         "a meta server for quilt objects",
         argv)
 
-    parser.add_argument('action', choices=['start', 'stop', 'restart'])
-    parser.parse_args()
-    parser.parse_args(argv)
+    args = parser.parse_args(argv)
 
     # start the daemon
-    Registrar().main(argv)
+    Registrar(args).main(argv)
 
 
 if __name__ == "__main__":

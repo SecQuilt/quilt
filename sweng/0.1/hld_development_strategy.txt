@@ -378,7 +378,31 @@ c14.portbug
     and run regressions
 
 
+c15.daemonize
 
+    DESIGN
+
+    Log files.
+        prototype expirement to find if multiple pyro daemons can append to
+        the same file
+
+    Add cmd line option for logging file in the common init
+
+    add cmd line option for lock file to daemons
+
+    Verify registrar strategy
+
+
+
+
+    TEST
+
+    create temp log file
+        debug log level dumped to a file, check the file appends
+
+    Convert all unit test quilt daemons to log to a directory, manually check
+
+    adhock test for syslog supporut
 
 cX.lessthanBinning
 

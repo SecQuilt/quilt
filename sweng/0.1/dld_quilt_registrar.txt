@@ -35,9 +35,14 @@ class Registrar : QuiltDaemon
     def __init__():
         chain to call parent init function
         setup daemon pid/io stuff with QuiltDaemon.setup_process
-    def Run():
+    def run():
         # Use QuiltConfig to read in configuration 
         # access the registrar's port number from config
         # start the pyro nameserver
         
 
+
+Functions:
+    def main(argv)
+        # get parsed arguments from call to common daemon main helper
+        # create daemon with parsed arguments
