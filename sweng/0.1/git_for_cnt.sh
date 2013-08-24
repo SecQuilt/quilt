@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 tag=$1
 
 if [ -z "$tag" ] ; then
@@ -15,7 +16,7 @@ rm -rf quilt quilt_${tag}
 git clone git@romano:quilt
 mv quilt quilt_${tag}
 cd quilt_${tag}
-git checkout -b $tag
+git checkout $tag
 cntdir=$(pwd)
 
 echo Removing soft links
@@ -26,6 +27,8 @@ echo Removing text files
 find . -name "*.txt" -exec rm -f {} \;
 echo Removing test data files
 rm -rf test/var/log
+echo "Removing git files"
+rm -rf .git
 echo "Performing raw line count"
 wc -l $(find . -type f) | tail -n 1
 echo moving from counting location $cntdir to running location $oldir
