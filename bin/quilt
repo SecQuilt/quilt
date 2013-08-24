@@ -14,7 +14,11 @@ popd  > /dev/null
 
 source $SCRIPT_PATH/quiltenv.rc
 
-LOGMODE=DEBUG
+
+LOGMODE=INFO
+DAEMONARGS="-lf $QUILT_LOG_DIR/quilt.log -p $QUILT_LOCK_DIR/quilt_registrar.pid"
+
+
 openport()
 {
     iptables -L | grep "tcp dpt:$1" || sudo iptables -I INPUT -p tcp -m tcp --dport $1 -j ACCEPT
@@ -27,11 +31,11 @@ closeport()
 dostop()
 {
     echo "Stopping quilt"
-    quilt_smd stop
+    quilt_smd stop $DAEMONARGS
     sleep 1
-    quilt_qmd stop
+    quilt_qmd stop $DAEMONARGS
     sleep 1
-    quilt_registrar stop
+    quilt_registrar stop $DAEMONARGS
 
     # closeport 4242
     # closeport 4243
@@ -42,28 +46,89 @@ dostart()
     # openport 4242
     # openport 4243
     
-    quilt_registrar start -l $LOGMODE 
+    quilt_registrar start $DAEMONARGS
     sleep 1
-    quilt_qmd start -l $LOGMODE 
+    quilt_qmd start $DAEMONARGS
     sleep 1
-    quilt_smd start -l $LOGMODE 
+    quilt_smd start $DAEMONARGS
+}
+
+doinstall_rhel()
+{
+    yum install -y python-pyro python-daemon python-argparse
+    chkconfig quilt on
+}
+
+doinstall_pyro_deb()
+{
+    mkdir -p /tmp/quilt_install
+    # download, extract, install Pyro4
+    cd /tmp/quilt_install
+    wget https://pypi.python.org/packages/source/P/Pyro4/Pyro4-4.20.tar.gz --no-check-certificate
+    tar -xzvf Pyro4-4.20.tar.gz
+    cd Pyro4-4.20
+    sudo python setup.py install
+    rm -rf /tmp/quilt_install
+}
+
+doinstall_serpent_deb()
+{
+    mkdir -p /tmp/quilt_install
+    # download, extract, install python serpent parser
+    cd /tmp/quilt_install
+    wget https://pypi.python.org/packages/source/s/serpent/serpent-1.2.tar.gz --no-check-certificate
+    tar -xzvf serpent-1.2.tar.gz
+    cd serpent-1.2
+    python setup.py install
+    rm -rf /tmp/quilt_install
+}
+
+doinstall_deb()
+{
+    #install python installer
+    apt-get install pip wget python-argparse python-daemon -y
+
+    python -c "import Pyro4" &> /dev/null || doinstall_pyro_deb
+    python -c "import serpent" &> /dev/null || doinstall_serpent_deb
+
+    update-rc.d quilt defaults
 }
 
 case "$1" in
   install)
-    echo "Checking Dependencies"
-    cat /etc/redhat-release && yum install -y python-pyro python-daemon python-argparse
 
     echo "Installing quilt"
+
+    if [ -e /etc/redhat-release ] ; then
+        doinstall_rhel
+    else
+        doinstall_deb
+    fi
+
     ln -s $SCRIPT_PATH/quilt /etc/init.d/quilt 
-    chkconfig quilt on
+    ln -s $SCRIPT_PATH/quiltenv.rc /etc/profile.d/quiltenv.sh
+
+    mkdir -p $QUILT_LOG_DIR
+    mkdir -p $QUILT_LOCK_DIR
+
     dostart
+
+    echo "All daemons are now configured
+    Manually edit $SCRIPT_PATH/quilt change whiech daemons are started.
+    Also, optionally set the port used for the name server in $QUILT_CFG_DIR/quilt.cfg
+
+    profile has has been updated with modifications to PATH and PYTHONPATH, but for this shell you should:
+    
+    source $SCRIPT_PATH/quiltenv.rc"
+
     ;;
 
   uninstall)
+    chkconfig quilt off
     dostop 
     echo "Uninstalling quilt"
     rm /etc/init.d/quilt
+    rm /etc/profile.d/quiltenv.sh
     ;;
   start)
     dostart
