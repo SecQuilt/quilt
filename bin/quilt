@@ -18,7 +18,7 @@ source $SCRIPT_PATH/quiltenv.rc
 LOGMODE=INFO
 daemonargs()
 {
-    echo $1 -lf $QUILT_LOG_DIR/quilt.log -p $QUILT_LOCK_DIR/quilt_${2}.pid
+    echo $1 -l $LOGMODE -lf $QUILT_LOG_DIR/quilt.log -p $QUILT_LOCK_DIR/quilt_${2}.pid
 }
 
 
