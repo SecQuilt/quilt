@@ -16,7 +16,10 @@ source $SCRIPT_PATH/quiltenv.rc
 
 
 LOGMODE=INFO
-DAEMONARGS="-lf $QUILT_LOG_DIR/quilt.log -p $QUILT_LOCK_DIR/quilt_registrar.pid"
+daemonargs()
+{
+    echo $1 -lf $QUILT_LOG_DIR/quilt.log -p $QUILT_LOCK_DIR/quilt_${2}.pid
+}
 
 
 openport()
@@ -31,11 +34,11 @@ closeport()
 dostop()
 {
     echo "Stopping quilt"
-    quilt_smd stop $DAEMONARGS
+    quilt_smd $(daemonargs stop smd)
     sleep 1
-    quilt_qmd stop $DAEMONARGS
+    quilt_qmd $(daemonargs stop qmd)
     sleep 1
-    quilt_registrar stop $DAEMONARGS
+    quilt_registrar $(daemonargs stop registrar)
 
     # closeport 4242
     # closeport 4243
@@ -46,11 +49,13 @@ dostart()
     # openport 4242
     # openport 4243
     
-    quilt_registrar start $DAEMONARGS
+    set -x
+    quilt_smd $(daemonargs start smd)
     sleep 1
-    quilt_qmd start $DAEMONARGS
+    quilt_qmd $(daemonargs start qmd)
     sleep 1
-    quilt_smd start $DAEMONARGS
+    quilt_registrar $(daemonargs start registrar)
+    set +x
 }
 
 doinstall_rhel()
@@ -86,7 +91,7 @@ doinstall_serpent_deb()
 doinstall_deb()
 {
     #install python installer
-    apt-get install pip wget python-argparse python-daemon -y
+    apt-get install python-pip wget python-argparse python-daemon -y
 
     python -c "import Pyro4" &> /dev/null || doinstall_pyro_deb
     python -c "import serpent" &> /dev/null || doinstall_serpent_deb
@@ -94,10 +99,23 @@ doinstall_deb()
     update-rc.d quilt defaults
 }
 
+root_check()
+{
+      # Make sure only root can run our script
+      if [ $(id -u) -ne 0 ]; then
+         echo "command must be run as root" 1>&2
+            exit 1
+       fi
+}
 case "$1" in
   install)
 
+    root_check
+
     echo "Installing quilt"
+
+    ln -s $SCRIPT_PATH/quilt /etc/init.d/quilt 
+    ln -s $SCRIPT_PATH/quiltenv.rc /etc/profile.d/quiltenv.sh
 
     if [ -e /etc/redhat-release ] ; then
         doinstall_rhel
@@ -105,8 +123,6 @@ case "$1" in
         doinstall_deb
     fi
 
-    ln -s $SCRIPT_PATH/quilt /etc/init.d/quilt 
-    ln -s $SCRIPT_PATH/quiltenv.rc /etc/profile.d/quiltenv.sh
 
     mkdir -p $QUILT_LOG_DIR
     mkdir -p $QUILT_LOCK_DIR
@@ -114,7 +130,7 @@ case "$1" in
     dostart
 
     echo "All daemons are now configured
-    Manually edit $SCRIPT_PATH/quilt change whiech daemons are started.
+    Manually edit $SCRIPT_PATH/quilt change which daemons are started.
     Also, optionally set the port used for the name server in $QUILT_CFG_DIR/quilt.cfg
 
     profile has has been updated with modifications to PATH and PYTHONPATH, but for this shell you should:
@@ -124,7 +140,12 @@ case "$1" in
     ;;
 
   uninstall)
-    chkconfig quilt off
+    root_check
+    if [ -e /etc/redhat-release ] ; then
+        chkconfig quilt off
+    else
+        update-rc.d -f quilt remove
+    fi
     dostop 
     echo "Uninstalling quilt"
     rm /etc/init.d/quilt
@@ -136,9 +157,12 @@ case "$1" in
   stop)
     dostop
     ;;
+  status)
+    quilt_status
+    ;;
   *)
     # Refuse to do other stuff
-    echo "Usage: $0 {start|stop|install|uninstall}"
+    echo "Usage: $0 {start|stop|status|install|uninstall}"
     exit 1
     ;;
 esac
