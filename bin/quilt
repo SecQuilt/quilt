@@ -18,7 +18,7 @@ source $SCRIPT_PATH/quiltenv.rc
 LOGMODE=INFO
 daemonargs()
 {
-    echo $1 -lf $QUILT_LOG_DIR/quilt.log -p $QUILT_LOCK_DIR/quilt_${2}.pid
+    echo $1 -l $LOGMODE -lf $QUILT_LOG_DIR/quilt.log -p $QUILT_LOCK_DIR/quilt_${2}.pid
 }
 
 
@@ -34,8 +34,8 @@ closeport()
 dostop()
 {
     echo "Stopping quilt"
-    quilt_smd $(daemonargs stop smd)
-    sleep 1
+    #quilt_smd $(daemonargs stop smd)
+    #sleep 1
     quilt_qmd $(daemonargs stop qmd)
     sleep 1
     quilt_registrar $(daemonargs stop registrar)
@@ -53,8 +53,8 @@ dostart()
     quilt_registrar $(daemonargs start registrar)
     sleep 1
     quilt_qmd $(daemonargs start qmd)
-    sleep 1
-    quilt_smd $(daemonargs start smd)
+    #sleep 1
+    #quilt_smd $(daemonargs start smd)
     set +x
 }
 
