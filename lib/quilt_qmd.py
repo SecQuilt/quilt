@@ -28,7 +28,7 @@ class Qmd(quilt_core.QuiltDaemon):
         logging.debug("Creating query master")
         qm = query_master.QueryMaster(self.args)
 
-        with Pyro4.Daemon() as daemon:
+        with Pyro4.Daemon(Pyro4.socketutil.getIpAddress()) as daemon:
             # register the query master with the local PyRo Daemon with
             uri = daemon.register(qm)
 
