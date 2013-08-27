@@ -46,6 +46,15 @@ class BasicSourceTestcase(unittest.TestCase):
         o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
             '-y', '-v', 'SEARCHSTRING', searchString, 'test_pattern']))
         # capture query_id from std out 
+        print "     "
+        print "     "
+        print "     "
+        print "     "
+        print " in query(), o = " + str(o)
+        print "     "
+        print "     "
+        print "     "
+        print "     "
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]
         self.assertTrue(len(qid) > 0)
@@ -55,6 +64,15 @@ class BasicSourceTestcase(unittest.TestCase):
 
     def check(self,qid):
         o = quilt_test_core.call_quilt_script('quilt_history.py')
+        print "     "
+        print "     "
+        print "     "
+        print "     "
+        print " in check(), o = " + str(o)
+        print "     "
+        print "     "
+        print "     "
+        print "     "
         # check it contains query_id
         self.assertTrue(qid in o)
         # call quilt_history query_id
@@ -62,7 +80,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # check it shows good state (completed)
         self.assertTrue(quilt_data.STATE_COMPLETED in o)
 
-    def test_status(self):
+    def test_status(self): #PASSING
         # check for the query pattern
         # call quilt_status 
         # check errorcode and output contains 
@@ -70,7 +88,7 @@ class BasicSourceTestcase(unittest.TestCase):
         o = quilt_test_core.call_quilt_script('quilt_status.py')
         self.assertTrue('test_pattern' in o)
             
-    def test_valid_query_one_result(self):
+    def test_valid_query_one_result(self): #FAILING
         # issue a valid query
         # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_1_time
         qid = self.query("Occurs_1_time")
@@ -91,7 +109,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # and src query spec
         self.assertTrue(occurences == 1 + 2)
         
-    def test_valid_query_multi_result(self):
+    def test_valid_query_multi_result(self): #FAILING
 
 
         # issue a valid query
@@ -114,7 +132,7 @@ class BasicSourceTestcase(unittest.TestCase):
         self.assertTrue(occurences == 3 + 2)
 
 
-    def test_valid_query_no_results(self):
+    def test_valid_query_no_results(self): #FAILING
         # issue a valid query
         # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_1_time
         qid = self.query("Occurs_no_times")
@@ -134,7 +152,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # and src query spec
         self.assertTrue(occurences == 0 + 2)
 
-    def test_valid_query_all_results(self):
+    def test_valid_query_all_results(self): #FAILING
         # issue a valid query
         # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_1_time
         qid = self.query(".")

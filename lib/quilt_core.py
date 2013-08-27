@@ -21,7 +21,11 @@ class EquivalenceClass:
         self.equivalent_things = equivalent_things
 
 def ui_show(to_be_displayed):
-    print pprint.pformat(to_be_displayed)
+    output = ""
+    for item in to_be_displayed:
+        output = output + str(item)
+    #     output = output + pprint.pformat(item).lstrip("'")
+    print output
 
 # returns the _symbol of the first EquivalenceClass in the list valid_inputs 
 # that has a member found in what's read from stdin
@@ -556,4 +560,4 @@ def debug_obj(obj, prefix='Object Info'):
     """
     logging.debug (prefix +":\n" + 
         str(type(obj)) + "\n" + 
-            pprint.pformat(obj))
+            obj)

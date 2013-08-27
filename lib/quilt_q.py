@@ -14,9 +14,9 @@ class QuiltQueue(quilt_core.QueryMasterClient):
         
         with self.GetQueryMasterProxy() as qm:
             if self._args.query_id == None:
-                o = qm.GetQueryQueueStats()
+                o = qm.GetQueryQueue()
             else:
-                o = qm.TryGetQueryStats(self._args.query_id)
+                o = qm.TryGetQuery(self._args.query_id)
             
         if o != None:
             quilt_core.ui_show(o)

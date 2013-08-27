@@ -88,43 +88,52 @@ class QueryMaster:
             return
 
 
-    def GetSourceManagerStats(self):
+    def GetSourceManagers(self):
         """
-        format a string with information about all source managers
-        describe all of the source managers, and return as string 
+        return all source managers
         """
-        # Get Clients is thread safe
-        smgrs = self.GetClients("smd")
-            
-        if smgrs == None:
-            return "0 source managers"
 
-        # oterate source managers, gather nfo
-        s = str(len(smgrs)) + " source manager(s): \n" + pprint.pformat(smgrs)
+        try:
+            # Get Clients is thread safe
+            smgrs = self.GetClients("smd")
+            return smgrs
 
-        return s
+        except Exception, e:
+            logging.exception(e)
+            raise
 
     def GetClients(self,objType):
         """return the list of registered clients matching the specified
         type"""
         
-        clients = []
-        with self.lock:
-            if objType in self.clients:
-                clients = self.clients[objType].copy()
+        try:
+            clients = []
+            with self.lock:
+                if objType in self.clients:
+                    clients = self.clients[objType].copy()
 
-        return clients
+            return clients
+
+        except Exception, e:
+            logging.exception(e)
+            raise
 
     def GetClientRec(self,objType,clientName):
         """return the master's client record for the specified client"""
-        with self.lock:
-            return self.clients[objType][clientName].copy()
+        try:
+            with self.lock:
+                return self.clients[objType][clientName].copy()
+
+        except Exception, e:
+            logging.exception(e)
+            raise
 
     def DefinePattern(self, patternSpec):
         """Define the specified pattern in the query master, return
         the finalized (unique) name of the pattern"""
 
         try:
+            logging.debug("patternSpec = " + str(patternSpec))
             # determine unique name for the pattern based off suggested name
             #   in the spec
             rootName = quilt_data.pat_spec_tryget(patternSpec, name=True)
@@ -163,11 +172,15 @@ class QueryMaster:
         """
 
         
+        logging.debug("querySpec = " + str(querySpec))
+
         # qid must be set because we use it when reporting the error
         if submitterNameKey != None:
             qid = str(submitterNameKey) + " unnamed query"
         else:
             qid = "Unknown query"
+
+        logging.debug("qid = " + qid)
 
         # try the following 
         try:
@@ -187,8 +200,15 @@ class QueryMaster:
             # acquire lock
             with self.lock:
                 # copy the patternSpec the query references
+                
+                logging.debug("patternName = " + str(patternName))
+                logging.debug("self._patterns = " + str(self._patterns))
+
                 patternSpec = quilt_data.pat_specs_get(
                     self._patterns, patternName).copy()
+
+                logging.debug("patternSpec = " + str(patternSpec));
+
                 # generate a query id
                 baseqid = submitterNameKey + "_" + patternName
                 i = 0
@@ -228,10 +248,13 @@ class QueryMaster:
             #   parse the pattern text, and get set of variables mentioned
             #   in the pattern code
             if code != None:
+                logging.debug("code = " + str(code))
                 varDict = quilt_parse.get_pattern_src_refs(code)
+                logging.debug("varDict = " + str(varDict))
                 append = False
             else:
                 varDict = var_dict.create()
+                logging.debug("creating varDict = " + str(varDict))
                 append = True
 
             patVarSpecs = quilt_data.pat_spec_tryget(
@@ -239,6 +262,8 @@ class QueryMaster:
                 
             mappings = quilt_data.pat_spec_tryget(
                 patternSpec, mappings=True)
+            
+            logging.debug("mappings = " + str(mappings))
 
 
             #logging.info("got patVarSpecs: " + str(patVarSpecs))
@@ -258,6 +283,7 @@ class QueryMaster:
                     if varName not in patVars:
                         continue
                     
+                    logging.debug("mapping = " + str(m))
                     src = quilt_data.src_var_mapping_spec_get(
                         m, sourceName=True)
                     pat = quilt_data.src_var_mapping_spec_get(
@@ -271,6 +297,12 @@ class QueryMaster:
                             str(varName))
                     # set append to appropriate value so that the varDict does
                     # not grow from mappings alone
+                    logging.debug("src = " + str(src));
+                    logging.debug("pat = " + str(pat));
+                    logging.debug("ins = " + str(ins));
+                    logging.debug("var = " + str(var));
+                    logging.debug("varName = " + str(varName));
+                    logging.debug("append = " + str(append));
                     var_dict.set_var(varDict, src, pat, ins, var, varName,
                             append=append)
 
@@ -279,7 +311,7 @@ class QueryMaster:
                 append = append # prevents pylint warning
 
 
-            logging.info("got varDict:\n " + pprint.pformat(varDict))
+            logging.info("got varDict:\n " + str(varDict))
 
             varSpecs = quilt_data.query_spec_tryget(
                 querySpec, variables=True)
@@ -292,6 +324,8 @@ class QueryMaster:
             # iterate the collection of sources, and build collection of 
             # srcQuerySpecs for each source
             for source in varDict.keys():
+
+                logging.info("clientName = " + str(source))
                 
                 # use variable mapping's source name to get proxy to 
                 #   that source manager
@@ -334,7 +368,7 @@ class QueryMaster:
             msg['Query to run'] = querySpec
             msg['Sources to be queried'] = varDict.keys()
 
-            validStr = pprint.pformat(msg)
+            validStr = msg
             
             
             # ask submitter to validate the source Queries
@@ -419,30 +453,39 @@ class QueryMaster:
                 logging.exception(error2)
                 
 
-    def GetQueryQueueStats(self):
+    def GetQueryQueue(self):
         """
-        format a string with information about all the Query's in the q   
+        return the keys for all the Query's in the q   
         """
-        with self.lock:
-            return pprint.pformat(self._queries.keys())
+        try:
+            with self.lock:
+                return self._queries.keys()
 
-    def TryGetQueryStats(self, queryId):
+        except Exception, e:
+            logging.exception(e)
+            raise
+
+    def TryGetQuery(self, queryId):
         """
-        format a string with information about the specified query
+        return the specified query
         return None if not found
         """
         
-        with self.lock:
-            if queryId not in self._queries:
-                return None
-            else:
-                return pprint.pformat(self._queries[queryId])
+        try:
+            with self.lock:
+                if queryId not in self._queries:
+                    return None
+                else:
+                    return self._queries[queryId]
 
-    def GetQueryHistoryStats(self, queryId=None):
+        except Exception, e:
+            logging.exception(e)
+            raise
+
+    def GetQueryHistory(self, queryId=None):
         """
-        format a string with information about the specified query
-        from the history, or provide stats for all if no queryId is 
-        specified
+        return the specified query from the history, 
+        or return all if no queryId is specified
         """
         try:
             # acquire lock
@@ -454,11 +497,11 @@ class QueryMaster:
                     if queryId not in self._history:
                         raise Exception("query id: " + str(queryId) + 
                             " is not present in history")
-                    results = pprint.pformat(quilt_data.query_specs_get(
-                        self._history, queryId))
+                    results = quilt_data.query_specs_get(
+                        self._history, queryId)
                 else:
                     # return complete history summary
-                    results = pprint.pformat(self._history)
+                    results = self._history
 
             return results
 
@@ -466,12 +509,18 @@ class QueryMaster:
             logging.exception(e)
             raise
     
-    def GetPatternStats(self):
-        """Return a string describing the patterns defined in the query
-        master"""
+    def GetPatterns(self):
+        """
+        Return the patterns defined in the query master
+        """
 
-        with self.lock:
-            return pprint.pformat(self._patterns)
+        try:
+            with self.lock:
+                return self._patterns
+
+        except Exception, e:
+            logging.exception(e)
+            raise
 
     def _try_move_query_to_hist(self, queryId, state):
         """Private function, only call with self_lock engaged"""
@@ -626,19 +675,31 @@ def get_client_proxy( clientRec):
     """
     return a pyro proxy object to the specified by the client record
     """
-    pyroname = clientRec["clientName"]
-    nshost = clientRec["registrarHost"]
-    nsport = clientRec["registrarPort"]
+    try:
+        pyroname = clientRec["clientName"]
+        nshost = clientRec["registrarHost"]
+        nsport = clientRec["registrarPort"]
     
-    uri = quilt_core.get_uri(nshost, nsport, pyroname)
+        uri = quilt_core.get_uri(nshost, nsport, pyroname)
 
-    return Pyro4.Proxy(uri)
+        return Pyro4.Proxy(uri)
+
+    except Exception, e:
+        logging.exception(e)
+        raise
 
 def get_client_proxy_from_type_and_name( qm, clientType, clientName):
-    # lock access to the clients of the query masteter
-    with qm.lock:
-        rec = qm.clients[clientType][clientName].copy()
-    return get_client_proxy(rec)
+    try:
+        # lock access to the clients of the query master
+        with qm.lock:
+            logging.debug("clientType = " + str(clientType))
+            logging.debug("clientName = " + str(clientName))
+            logging.debug("qm.clients = " + str(qm.clients))
+            rec = qm.clients[clientType][clientName].copy()
+        return get_client_proxy(rec)
+    except Exception, e:
+        logging.exception(e)
+        raise
     
 def create_src_query_specs(
     srcPatSpec, varDict, varSpecs, patVarSpecs, qid, source, patternName):

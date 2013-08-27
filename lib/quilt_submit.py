@@ -34,7 +34,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
                                  the query
         """
         try:
-            quilt_core.ui_show(["Query ID is:", queryId])
+            quilt_core.ui_show(["Query ID is: ", queryId])
 
             logging.info("Reciving validation request for query: " + 
                 str(queryId))
@@ -76,10 +76,11 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
                     quilt_data.var_spec_create( name=vname, value=vval))
             quilt_data.query_spec_set(querySpec, variables=variables)
             
-        logging.info('Submiting query: ' + pprint.pformat(querySpec))
+        logging.info('Submiting query: ' + str(querySpec))
 
         # call remote method asyncronysly, this will return right away
         with self.GetQueryMasterProxy() as qm:
+            logging.debug("self._remotename = " + str(self._remotename))
             Pyro4.async(qm).Query( self._remotename, querySpec)
 
         logging.info('Query Submitted')

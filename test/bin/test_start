@@ -4,19 +4,21 @@
 # set config dir to test config
 source $(dirname ${BASH_SOURCE[0]})/testenv.rc
 
+env
 
 # stop old daemons if they exist, capture all the output, we
 # don't care if we called it an extra time
-$QUILT_HOME/test/bin/quilt_stop.py   &> /dev/null
-sleep 4
-ps aux | grep quilt
+#$QUILT_HOME/test/bin/quilt_stop.py   &> /dev/null
+#sleep 4
+#ps aux | grep quilt
 
 
 # start up quilt daemons
-$QUILT_HOME/test/bin/daemons_start
-sleep 1
+#$QUILT_HOME/test/bin/daemons_start #1,2>./daemon.log
+#sleep 1
 
 # run the quilt tests, exit with same failure code
 $QUILT_HOME/test/lib/quilt_test.py   -l DEBUG || exit $?
+#$QUILT_HOME/bin/quilt_status || exit $?
 
 

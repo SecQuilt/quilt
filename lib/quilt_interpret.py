@@ -141,7 +141,7 @@ def source(srcName,srcPatName,srcPatInstance=None):
     # use the global query spec
     srcQuerySpecs = quilt_data.query_spec_get(_get_query_spec(), 
             sourceQuerySpecs=True)
-    # logging.debug("srcQuerySpecs:\n" + pprint.pformat(srcQuerySpecs))
+    # logging.debug("srcQuerySpecs:\n" + srcQuerySpecs)
 
     # logging.debug("Looking for Source: " + str(srcName) + ", pattern: " + str(srcPatName) 
     #         + ". instance: " + str(srcPatInstance) )
@@ -368,7 +368,7 @@ def evaluate_query(patternSpec, querySpec, srcResults):
 
             # logging.debug ("Rsults of interpret are:\n" + 
             # str(type(retobj)) + "\n" + str(dir(retobj)) +"\n" + 
-            # pprint.pformat(retobj))
+            # retobj)
 
             # return results
             return retobj

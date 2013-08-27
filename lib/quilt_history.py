@@ -12,7 +12,7 @@ class QuiltHistory(quilt_core.QueryMasterClient):
     def OnRegisterEnd(self):
         
         with self.GetQueryMasterProxy() as qm:
-            o = qm.GetQueryHistoryStats(self._args.query_id)
+            o = qm.GetQueryHistory(self._args.query_id)
             
         if o != None:
             quilt_core.ui_show(o)

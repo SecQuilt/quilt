@@ -14,6 +14,15 @@ class SemanticsTestcase(unittest.TestCase):
         quilt_test_core.sleep_small()
 
         o = submitStdout
+        print "    "
+        print "    "
+        print "    "
+        print "    "
+        print "o = " + str(o)
+        print "    "
+        print "    "
+        print "    "
+        print "    "
         # capture query_id from std out 
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]
@@ -92,7 +101,7 @@ class SemanticsTestcase(unittest.TestCase):
             '-n', 'semantics_follows'
             ])
 
-    def test_one_source(self):
+    def test_one_source(self): #FAILING
         """
         This test assures that a simple case of semantics is tested
         where only one thing is referenced, the results of one source
@@ -149,7 +158,7 @@ class SemanticsTestcase(unittest.TestCase):
                 "thanksgiving", o)]))
         self.assertTrue(occurences == 1)
 
-    def test_equals_literal(self):
+    def test_equals_literal(self): #FAILING
         """
         This test assures a case where a results list is matched against
         a literal string.  
@@ -179,7 +188,7 @@ class SemanticsTestcase(unittest.TestCase):
                 "boxingday", o)]))
         self.assertTrue(occurences == 0)
 
-    def test_concurrent(self):
+    def test_concurrent(self): #FAILING
         """
         This test covers the simplest case for a temporal operator
         function call.  Also covers case where pattern has no mapped
@@ -212,7 +221,7 @@ class SemanticsTestcase(unittest.TestCase):
         self.assertTrue(occurences == 0)
 
 
-    def test_nested_concurrent(self):
+    def test_nested_concurrent(self): #FAILING
         """
         This test covers a nested case where operator operates on
         results of a literal comparison.
@@ -243,7 +252,7 @@ class SemanticsTestcase(unittest.TestCase):
                 "christmass", o)]))
         self.assertTrue(occurences == 0)
 
-    def test_follows(self):
+    def test_follows(self): #FAILING
         """
         This test assures the operation of the 'follows' quilt language
         function.  It uses a pattern which selects christian holidays that

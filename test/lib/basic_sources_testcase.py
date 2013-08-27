@@ -52,7 +52,7 @@ class BasicSourcesTestcase(unittest.TestCase):
 
 
             
-    def test_multi_sources(self):
+    def test_multi_sources(self): #ERRORING OUT
         """
         check multiple variables, and multiple patterns are functioning
         """
@@ -70,6 +70,15 @@ class BasicSourcesTestcase(unittest.TestCase):
         quilt_test_core.sleep_large()
 
         # capture query_id from std out 
+        print "     "
+        print "     "
+        print "     "
+        print "     "
+        print " o = " + str(o)
+        print "     "
+        print "     "
+        print "     "
+        print "     "
         a = o.index("Query ID is: ") + len(str("Query ID is: "))
         qid = o[a:]
 

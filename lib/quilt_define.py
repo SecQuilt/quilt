@@ -4,6 +4,7 @@ import sys
 import quilt_core
 import quilt_data
 import quilt_parse
+import logging
 
 class QuiltDefine(quilt_core.QueryMasterClient):
 
@@ -11,6 +12,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         # chain to call super class constructor 
         quilt_core.QueryMasterClient.__init__(self,self.GetType())
         self._args = args
+        logging.debug("argv in QuiltDefine(args) = " + str(args))
 
     def OnRegisterEnd(self):
         """Create a patternSpec dict from arguments (name, 
@@ -25,6 +27,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
             requestedName = self._args.name[0]
 
         patternSpec=quilt_data.pat_spec_create(name=requestedName)
+        logging.debug("1. patternSpec = " + str(patternSpec));
 
         # if the pattern code is specified, set it in the pattern as 
         #   a string
@@ -63,6 +66,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         mappings = None
         # create the specs for the variable mappings
         if self._args.mapping != None:
+            logging.debug("self._args.mapping = " + str(self._args.mapping))
             for m in self._args.mapping:
                 varName = m[0]
                 src = m[1]
@@ -85,10 +89,12 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                     sourceVariable=srcVar,
                     sourcePatternInstance=srcPatInstance)
             
+                logging.debug("1. mappings = " + str(mappings));
                 mappings = quilt_data.src_var_mapping_specs_add(
                     mappings, srcVarMappingSpec)
 
         if mappings != None:
+            logging.debug("2. patternSpec = " + str(patternSpec));
             quilt_data.pat_spec_set(patternSpec,mappings=mappings)
             
         # define patternSpec in the query master as a syncronous call
