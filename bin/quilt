@@ -66,12 +66,13 @@ doinstall_rhel()
 
 doinstall_pyro_deb()
 {
+    local PYRO_VER=4.14
     mkdir -p /tmp/quilt_install
     # download, extract, install Pyro4
     cd /tmp/quilt_install
-    wget https://pypi.python.org/packages/source/P/Pyro4/Pyro4-4.20.tar.gz --no-check-certificate
-    tar -xzvf Pyro4-4.20.tar.gz
-    cd Pyro4-4.20
+    wget https://pypi.python.org/packages/source/P/Pyro4/Pyro4-$PYRO_VER.tar.gz --no-check-certificate
+    tar -xzvf Pyro4-$PYRO_VER.tar.gz
+    cd Pyro4-$PYRO_VER
     sudo python setup.py install
     rm -rf /tmp/quilt_install
 }
