@@ -15,6 +15,7 @@ class QuiltDefine(quilt_core.QueryMasterClient):
         logging.debug("argv in QuiltDefine(args) = " + str(args))
 
     def OnRegisterEnd(self):
+        logging.debug("----- entering OnRegisterEnd")
         """Create a patternSpec dict from arguments (name, 
         VARIABLEs, and VARIABLE to SOURCE_VARIABLE mappings), register
         this pattern with the query master"""
@@ -92,21 +93,27 @@ class QuiltDefine(quilt_core.QueryMasterClient):
                 logging.debug("1. mappings = " + str(mappings));
                 mappings = quilt_data.src_var_mapping_specs_add(
                     mappings, srcVarMappingSpec)
+        else:
+            logging.debug("------- self._args.mapping == None")
 
         if mappings != None:
             logging.debug("2. patternSpec = " + str(patternSpec));
             quilt_data.pat_spec_set(patternSpec,mappings=mappings)
+        else:
+            logging.debug("------- mappings == None")
             
         # define patternSpec in the query master as a syncronous call
         # return will be the pattern name
         with self.GetQueryMasterProxy() as qm:
+            logging.debug("---------- calling qm.DefinePattern()")
             patName = qm.DefinePattern(patternSpec)
 
         # print out pattern Name
-        quilt_core.ui_show('Pattern' + patName + ' defined')
+        quilt_core.ui_show([ 'Pattern' + patName + ' defined' ])
     
         # return false (prevent event loop from beginning)
 
+        logging.debug("----- exiting OnRegisterEnd")
         return False
 
     def GetType(self):

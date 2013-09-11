@@ -5,6 +5,7 @@ import unittest
 import quilt_test_core
 import quilt_data
 import re
+import marshal
 
 firstTime=True
 
@@ -31,7 +32,7 @@ class BasicSourceTestcase(unittest.TestCase):
         # call quilt status and parse out the name of the syslog source
         srcName = quilt_test_core.get_source_name("syslog")
         
-#        logging.debug("Determined source name as: " + srcName)
+        logging.debug("Determined source name as: " + srcName)
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
@@ -43,20 +44,17 @@ class BasicSourceTestcase(unittest.TestCase):
 
 
     def query(self,searchString):
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
-            '-y', '-v', 'SEARCHSTRING', searchString, 'test_pattern']))
+        o = quilt_test_core.call_quilt_script('quilt_submit.py',[
+            '-y', '-v', 'SEARCHSTRING', searchString, 'test_pattern'])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("query:quilt_submit.py", objs)
+        #self.assertTrue(o != None)
+        #self.assertTrue(o != None and len(o) > 1)
+
         # capture query_id from std out 
-        print "     "
-        print "     "
-        print "     "
-        print "     "
-        print " in query(), o = " + str(o)
-        print "     "
-        print "     "
-        print "     "
-        print "     "
-        a = o.index("Query ID is: ") + len(str("Query ID is: "))
-        qid = o[a:]
+        #a = o.index("Query ID is: ") + len(str("Query ID is: "))
+        #qid = o[a:]
+        qid = objs[1]
         self.assertTrue(len(qid) > 0)
         # sleep a small ammount
         quilt_test_core.sleep_medium()
@@ -64,21 +62,21 @@ class BasicSourceTestcase(unittest.TestCase):
 
     def check(self,qid):
         o = quilt_test_core.call_quilt_script('quilt_history.py')
-        print "     "
-        print "     "
-        print "     "
-        print "     "
-        print " in check(), o = " + str(o)
-        print "     "
-        print "     "
-        print "     "
-        print "     "
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("check:quilt_history.py1", objs)
+
         # check it contains query_id
-        self.assertTrue(qid in o)
+        self.assertTrue(quilt_test_core.pattern_found(qid, dict(objs[0])))
+
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("check:quilt_history.py2", objs)
+
         # check it shows good state (completed)
-        self.assertTrue(quilt_data.STATE_COMPLETED in o)
+        self.assertTrue(quilt_test_core.pattern_found("state", dict(objs[0])))
+        pattern = quilt_test_core.get_pattern("state", dict(objs[0]))
+        self.assertTrue(pattern == quilt_data.STATE_COMPLETED)
 
     def test_status(self): #PASSING
         # check for the query pattern
@@ -86,8 +84,11 @@ class BasicSourceTestcase(unittest.TestCase):
         # check errorcode and output contains 
         #   "test_pattern" and "syslog"
         o = quilt_test_core.call_quilt_script('quilt_status.py')
-        self.assertTrue('test_pattern' in o)
-            
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("test_status:quilt_status.py", objs)
+        patterns = dict(objs[3])
+        self.assertTrue(quilt_test_core.pattern_found("test_pattern", patterns))
+
     def test_valid_query_one_result(self): #FAILING
         # issue a valid query
         # call quilt_submit test_pattern -y -v SEARCHSTRING Occurs_1_time
@@ -98,16 +99,20 @@ class BasicSourceTestcase(unittest.TestCase):
 
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("test_valid_query_one_result:quilt_history.py", objs)
+        obj = objs[0]
+
         # check it shows good state (completed)
-        self.assertTrue(quilt_data.STATE_COMPLETED in o)
+        self.assertTrue(quilt_test_core.pattern_found("state", dict(objs[0])))
+        pattern = quilt_test_core.get_pattern("state", dict(objs[0]))
+        self.assertTrue(pattern == quilt_data.STATE_COMPLETED)
+
         #   text "Occurs_1_time"
         #   assure only one result
-        occurences = (
-            len([m.start() for m in re.finditer('Occurs_1_time', o)]))
-
-        # have to +2 because the search variable is also in the stdout
-        # and src query spec
-        self.assertTrue(occurences == 1 + 2)
+        occurrences = quilt_test_core.get_pattern_occurrences('Occurs_1_time', dict(obj))
+        logging.debug("Occurs_1_time should = 1 and = " + str(occurrences))
+        self.assertTrue(occurrences == 1)
         
     def test_valid_query_multi_result(self): #FAILING
 
@@ -121,16 +126,20 @@ class BasicSourceTestcase(unittest.TestCase):
 
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("test_valid_query_multi_result:quilt_history.py", objs)
+        obj = objs[0]
+
         # check it shows good state (completed)
-        self.assertTrue(quilt_data.STATE_COMPLETED in o)
+        self.assertTrue(quilt_test_core.pattern_found("state", dict(obj)))
+        pattern = quilt_test_core.get_pattern("state", dict(obj))
+        self.assertTrue(pattern == quilt_data.STATE_COMPLETED)
+
         #   text "Occurs_3_times"
         #   assure only three results
-        occurences = (
-            len([m.start() for m in re.finditer('Occurs_3_times', o)]))
-        # have to +2 because the search variable is also in the stdout
-        # and src query spec
-        self.assertTrue(occurences == 3 + 2)
-
+        occurrences = quilt_test_core.get_pattern_occurrences('Occurs_3_times', dict(obj))
+        logging.debug("Occurs_3_times should = 3 and = " + str(occurrences))
+        self.assertTrue(occurrences == 3)
 
     def test_valid_query_no_results(self): #FAILING
         # issue a valid query
@@ -142,15 +151,20 @@ class BasicSourceTestcase(unittest.TestCase):
 
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("test_valid_query_no_results:quilt_history.py", objs)
+        obj = objs[0]
+
         # check it shows good state (completed)
-        self.assertTrue(quilt_data.STATE_COMPLETED in o)
+        self.assertTrue(quilt_test_core.pattern_found("state", dict(obj)))
+        pattern = quilt_test_core.get_pattern("state", dict(obj))
+        self.assertTrue(pattern == quilt_data.STATE_COMPLETED)
+
         #   text "Occurs_no_times"
         #   assure no results
-        occurences = (
-            len([m.start() for m in re.finditer('Occurs_no_times', o)]))
-        # have to +2 because the search variable is also in the stdout
-        # and src query spec
-        self.assertTrue(occurences == 0 + 2)
+        occurrences = quilt_test_core.get_pattern_occurrences('Occurs_no_times', dict(obj))
+        logging.debug("Occurs_no_times should = 0 and = " + str(occurrences))
+        self.assertTrue(occurrences == 0)
 
     def test_valid_query_all_results(self): #FAILING
         # issue a valid query
@@ -162,12 +176,19 @@ class BasicSourceTestcase(unittest.TestCase):
 
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("test_valid_query_all_results:quilt_history.py", objs)
+        obj = objs[0]
+
         # check it shows good state (completed)
-        self.assertTrue(quilt_data.STATE_COMPLETED in o)
+        self.assertTrue(quilt_test_core.pattern_found("state", dict(obj)))
+        pattern = quilt_test_core.get_pattern("state", dict(obj))
+        self.assertTrue(pattern == quilt_data.STATE_COMPLETED)
+
         #   assure there are many results
-        occurences = (
-            len([m.start() for m in re.finditer('\n', o)]))
-        self.assertTrue(occurences > 4 + 2)
+        occurrences = quilt_test_core.get_pattern_occurrences('times', dict(obj))
+        logging.debug("times should > 1 and = " + str(occurrences))
+        self.assertTrue(occurrences > 1)
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(

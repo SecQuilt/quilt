@@ -7,8 +7,17 @@ import sei_core
 import quilt_core
 import query_master
 import random
+import pickle
+import logging
 
 class BasicTestcase(unittest.TestCase):
+
+    # check qmd to be sure that all quilt_status's 
+    # have unregistered when process exits
+    def verify_unregistration(self, clientType, cfg):
+        with quilt_core.GetQueryMasterProxy(cfg) as qm:
+            qs = qm.GetClients(clientType)
+            self.assertTrue( len(qs) == 0 )
 
     #just make sure that the scripts execute at all
     #without throwing an exception
@@ -44,11 +53,11 @@ class BasicTestcase(unittest.TestCase):
                     # TODO see ISSUE004
         #            self.assertTrue(lastQuery != qstr )
 
-            verify_unregistration(self, 'QuiltSubmit')
+            #self.verify_unregistration('QuiltSubmit', cfg)
             
         except Exception, e:
-            self.fail(self, 'Exception thrown when calling quilt_submit.py')
-
+            logging.exception(e)
+            self.fail('Exception thrown when calling quilt_submit.py')
         
     # test submitting a query by making sure:
     # (1) that you can run the query, and 
@@ -60,29 +69,21 @@ class BasicTestcase(unittest.TestCase):
 
             # define the query
             argv = [ '-n', qstr ]
-            #o = quilt_test_core.call_quilt_script('quilt_define.py', argv)
-            args = parser.parse_args(argv)
-            client = QuiltDefine(args)
-            quilt_core.query_master_client_main_helper({
-                client.localname : client})
+            quilt_test_core.call_quilt_script('quilt_define.py', argv)
 
             # call quilt_submit "find me" (check return code)
             argv = [ qstr, '-y' ]
-            args = parser.parse_args(argv)
-            #o = str(quilt_test_core.call_quilt_script('quilt_submit.py', argv))
-
-            # create the object and begin its life
-            client = QuiltSubmit(args)
-
-            # start the client
-            quilt_core.query_master_client_main_helper({
-                client.localname : client})
+            o = quilt_test_core.call_quilt_script('quilt_submit.py', argv)
+            objs = quilt_test_core.retrieve_objects(o)
+            quilt_test_core.log_objs("test_submit:quilt_submit.py", objs)
 
             # sleep a small ammount
             quilt_test_core.sleep_small()
-            a = o.index("Query ID is: ") + len(str("Query ID is: "))
-            qid = o[a:]
-            print qid
+
+            #self.assertTrue(o != None and len(o) > 1)
+            #a = o.index("Query ID is: ") + len(str("Query ID is: "))
+            #qid = o[a:]
+            qid = objs[1]
 
             # make sure that we get a good query id back from the submit
             self.assertTrue(len(qid) > 0)
@@ -93,51 +94,18 @@ class BasicTestcase(unittest.TestCase):
         
             # call quilt_q -q query_id (check return code, capture output)
             o = quilt_test_core.call_quilt_script('quilt_q.py',[qid])
+            objs = quilt_test_core.retrieve_objects(o)
+            quilt_test_core.log_objs("test_submit:quilt_q.py", objs)
 
             # ensure output isn't empty 
-            self.assertTrue(len(o) > 0)        
+            self.assertTrue(o != None and len(o) > 0)
 
-            verify_unregistration(self, 'QuiltSubmit')
-
-        except Exception, e:
-            self.fail(self, 'Exception thrown when calling quilt_submit.py')
-
-
-    # make sure that a fake qid does not return any data
-    def test_incorrect_qid(self): #PASSING
-
-        try:
-            qstr = 'find me again ' + str(random.random())
-
-            # define the query
-            o = quilt_test_core.call_quilt_script('quilt_define.py',
-                [ '-n', qstr ] )
-
-            # call quilt_submit "find me again" (check return code)
-            str(quilt_test_core.call_quilt_script('quilt_submit.py',
-                [ qstr, '-y' ]))
-
-            # sleep a small ammount
-            quilt_test_core.sleep_small()
-
-            # call quilt_q -q FAKEid (check return code, capture output)
-            o = quilt_test_core.call_quilt_script('quilt_q.py',[
-                qid + 'FAKE'])
-
-            # make sure that there is no output when a fake id is supplied 
-            self.assertTrue(o == None or len(o)==0)
-
-            # check qmd to be sure that all quilt_q's have unregistered
-            # do this by accessing Config, finding qmd name,
-            # create pyro proxy for qmd, call getRegistedObjects(type(QuiltQ))
-            # make sure list is empty
-
-            verify_unregistration(self, 'QuiltQueue')
+            #self.verify_unregistration('QuiltSubmit', cfg)
 
         except Exception, e:
-            self.fail(self, 'Exception thrown when calling quilt_submit.py')
+            logging.exception(e)
+            self.fail('Exception thrown when calling quilt_submit.py')
 
-        
     def test_basic_status(self): #PASSING
 
         quilt_lib_dir = quilt_test_core.get_quilt_lib_dir()
@@ -146,24 +114,57 @@ class BasicTestcase(unittest.TestCase):
         quilt_status_file = os.path.join(quilt_lib_dir,'quilt_status.py')
 
         # call quilt_status (check return code, capture output)
-        out = sei_core.run_process([quilt_status_file,'-l','DEBUG'],
+        o = sei_core.run_process([quilt_status_file,'-l','DEBUG'],
             whichReturn=sei_core.STDOUT, logToPython=False)
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("+++++test_basic_status:quilt_status.py", objs)
         
         # ensure that all of the registered source managers specified in
         # testing config smd.d dir appear in the output of the quilt_status call
         cfg = quilt_core.QuiltConfig()
         smgrs = cfg.GetSourceManagers()
         for smgr in smgrs:
-            self.assertTrue(smgr in out)
+            logging.debug("+++++smgr = " + str(smgr))
+            self.assertTrue(quilt_test_core.pattern_found(str(smgr), objs[1]))
 
-        verify_unregistration(self, 'QuiltStatus')
+        self.verify_unregistration('QuiltStatus', cfg)
         
-    # check qmd to be sure that all quilt_status's 
-    # have unregistered when process exits
-    def verify_unregistration(self, clientType):
-        with quilt_core.GetQueryMasterProxy(cfg) as qm:
-            qs = qm.GetClients(clientType)
-            self.assertTrue( len(qs) == 0 )
+
+    # make sure that a fake qid does not return any data
+    def test_incorrect_qid(self): #PASSING
+
+        try:
+            qstr = 'find me again ' + str(random.random())
+
+            # define the query
+            quilt_test_core.call_quilt_script('quilt_define.py',
+                [ '-n', qstr ] )
+
+            # call quilt_submit "find me again" (check return code)
+            quilt_test_core.call_quilt_script('quilt_submit.py',
+                [ qstr, '-y' ])
+
+            # sleep a small ammount
+            quilt_test_core.sleep_small()
+
+            # call quilt_q -q FAKEid (check return code, capture output)
+            o = quilt_test_core.call_quilt_script('quilt_q.py',['FAKE'])
+            objs = quilt_test_core.retrieve_objects(o)
+            quilt_test_core.log_objs("test_incorrect_qid:quilt_q.py", objs)
+
+            # make sure that there is no output when a fake id is supplied 
+            self.assertTrue(objs == None or len(objs)==0)
+
+            # check qmd to be sure that all quilt_q's have unregistered
+            # do this by accessing Config, finding qmd name,
+            # create pyro proxy for qmd, call getRegistedObjects(type(QuiltQ))
+            # make sure list is empty
+            cfg = quilt_core.QuiltConfig()
+            self.verify_unregistration('QuiltQueue', cfg)
+
+        except Exception, e:
+            logging.exception(e)
+            self.fail('Exception thrown when calling quilt_submit.py')
 
         
 if __name__ == "__main__":

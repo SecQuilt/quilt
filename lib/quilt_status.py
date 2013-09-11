@@ -15,8 +15,8 @@ class QuiltStatus(quilt_core.QueryMasterClient):
         with self.GetQueryMasterProxy() as qm:
             smgrs = qm.GetSourceManagers()
             prefix = str(len(smgrs)) + ' source manager(s):'
-            quilt_core.ui_show([prefix, smgrs])
-            quilt_core.ui_show(['Patterns', qm.GetPatterns()])
+            quilt_core.ui_show([ prefix, smgrs ])
+            quilt_core.ui_show([ 'Patterns', qm.GetPatterns() ])
         # return false (prevent event loop from beginning)
         return False
         

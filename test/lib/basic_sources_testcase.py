@@ -5,6 +5,8 @@ import unittest
 import quilt_test_core
 import quilt_data
 import re
+import pickle
+import logging
 
 firstTime=True
 
@@ -30,6 +32,8 @@ class BasicSourcesTestcase(unittest.TestCase):
 
         syslog = quilt_test_core.get_source_name("syslog")
         multisource = quilt_test_core.get_source_name("multipattern")
+        logging.debug("Determined syslog source name as: " + syslog)
+        logging.debug("Determined multisource source name as: " + multisource)
 
         #TODO REad the pattern id from the std output then query that one
         # See ISSUE007 and ISSUE008
@@ -48,9 +52,6 @@ class BasicSourcesTestcase(unittest.TestCase):
             '-m', 'SEARCHSTRING5', multisource, 'pat2', 'PAT2SRCVAR1', 
             '-m', 'SEARCHSTRING6', multisource, 'pat2', 'PAT2SRCVAR2'
             ])
-
-
-
             
     def test_multi_sources(self): #ERRORING OUT
         """
@@ -58,65 +59,58 @@ class BasicSourcesTestcase(unittest.TestCase):
         """
 
         # defaults specified in source patterns for SEARCHSTRING[4,6]
-        o = str(quilt_test_core.call_quilt_script('quilt_submit.py',[
+        o = quilt_test_core.call_quilt_script('quilt_submit.py',[
             'bigpattern',
             '-y', 
             '-v', 'SEARCHSTRING1', "Occurs_1_time",
             '-v', 'SEARCHSTRING2', "Occurs_3_times",
             '-v', 'SEARCHSTRING3', "word-regexp",
             '-v', 'SEARCHSTRING5', "word-regexp"
-            ]))
+            ])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("test_multi_sources:quilt_submit.py", objs)
+
         # sleep a small ammount
         quilt_test_core.sleep_large()
 
-        # capture query_id from std out 
-        print "     "
-        print "     "
-        print "     "
-        print "     "
-        print " o = " + str(o)
-        print "     "
-        print "     "
-        print "     "
-        print "     "
-        a = o.index("Query ID is: ") + len(str("Query ID is: "))
-        qid = o[a:]
+        qid = objs[1]
+        self.assertTrue(qid != None and len(qid) > 1)
 
         # issue a valid query
 
         # call quilt_history query_id
         o = quilt_test_core.call_quilt_script('quilt_history.py',[qid])
+        objs = quilt_test_core.retrieve_objects(o)
+        quilt_test_core.log_objs("test_multi_sources:quilt_history.py", objs)
+        obj = objs[0]
+
         # check it shows good state (completed)
-        self.assertTrue(quilt_data.STATE_COMPLETED in o)
+        self.assertTrue(quilt_test_core.pattern_found("state", dict(obj)))
+        pattern = quilt_test_core.get_pattern("state", dict(obj))
+        quilt_test_core.log_objs("test_equals_literal:quilt_submit.py", obj)
+        logging.debug("pattern = " + str(pattern))
+        self.assertTrue(pattern == quilt_data.STATE_COMPLETED)
 
         # find some particulars in the results
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "Occurs_1_time", o)]))
+        # assure output contains "Occurs_1_time"
+        occurrences = quilt_test_core.get_pattern_occurrences("Occurs_1_time", obj)
+        logging.debug("Occurs_1_time should = 1 and = " + str(occurrences))
+        self.assertTrue(occurrences == 1)
 
-        # have to +2 because the search variable 
-        # and src query spec is also in the stdout
-        self.assertTrue(occurences == 1 + 2)
-
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "Occurs_3_times", o)]))
-        self.assertTrue(occurences == 1 + 4)
-
+        occurrences = quilt_test_core.get_pattern_occurrences("Occurs_3_times", obj)
+        logging.debug("Occurs_3_times should = 3 and = " + str(occurrences))
+        self.assertTrue(occurrences == 3)
 
         # have no + 1, these are defaults set from src pattern
-        
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "src default for pat2 occurs twice", o)]))
-        self.assertTrue(occurences ==  3)
+        occurrences = quilt_test_core.get_pattern_occurrences(
+                "src default for pat2 occurs twice", obj)
+        logging.debug("src default for pat2 occurs twice should = 2 and = " + str(occurrences))
+        self.assertTrue(occurrences == 2)
 
-        occurences = (
-            len([m.start() for m in re.finditer(
-                "src default for pat1 occurs once", o)]))
-        self.assertTrue(occurences ==  2)
-
-
+        occurrences = quilt_test_core.get_pattern_occurrences(
+                "src default for pat1 occurs once", obj)
+        logging.debug("src default for pat1 occurs once should = 1 and = " + str(occurrences))
+        self.assertTrue(occurrences == 1)
 
 if __name__ == "__main__":
     quilt_test_core.unittest_main_helper(

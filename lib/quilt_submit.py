@@ -40,7 +40,7 @@ class QuiltSubmit(quilt_core.QueryMasterClient):
                 str(queryId))
 
             if not self._args.confirm_query:
-                quilt_core.ui_show(queryMetricMsg)
+                quilt_core.ui_show([queryMetricMsg])
                 prompt = "Would you like to confirm query? [y,n]: "
                 yes = quilt_core.EquivalenceClass('yes',['Y','y'])
                 no = quilt_core.EquivalenceClass('no',['N','n'])

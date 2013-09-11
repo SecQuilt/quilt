@@ -6,6 +6,7 @@ import quilt_core
 import sei_core
 import time
 import logging
+import pickle
 
 def get_quilt_test_lib_dir():
     """grab the location of quilt test scritps"""
@@ -49,6 +50,23 @@ def unittest_main_helper(description='',argv=sys.argv):
 
     quilt_core.common_init(os.path.basename(sys.argv[0]), level)
 
+def retrieve_objects(script_output):
+    objs = []
+    fileNames = script_output.split("\n")
+    for fileName in fileNames:
+        try:
+            fileName = fileName.strip("'")
+            fp = open(fileName, "rb")
+            while 1:
+                try:
+                    obj = pickle.load(fp)
+                    objs.append(obj)
+                except (EOFError):
+                    break
+        except (IOError):
+            pass
+    return objs
+
 def call_quilt_script( scriptName, args = None, checkCall=True):
     """
     returns the stdoutput of the script, checks for bad error code and
@@ -73,15 +91,85 @@ def call_quilt_script( scriptName, args = None, checkCall=True):
 
     return out
 
+def log_objs(header, objs):
+    for obj in objs:
+        try:
+            logging.debug(header + ": " + str(obj))
+        except:
+            pass
+
+def pattern_found(pattern, dictionary):
+    try:
+        for name, value in dictionary.items():
+            if name.startswith(pattern):
+                return True
+    except:
+        pass
+    return False
+
+def get_pattern(pattern, dictionary):
+    try:
+        for name, value in dictionary.items():
+            if name.startswith(pattern):
+                return value
+    except:
+        pass
+    return ''
+
+def get_pattern_occurrences2(pattern, dictionary):
+    occurrences = 0
+    try:
+        if 'results' in dictionary:
+            results = dictionary['results']
+            for result in results:
+                if 'holiday' in result:
+                    holiday = result['holiday']
+                    if holiday == pattern:
+                        occurrences = occurrences + 1
+    except:
+        pass
+    return occurrences
+
+def get_pattern_occurrences(pattern, dictionary):
+    occurrences = 0
+    try:
+        if 'results' in dictionary:
+            results = dictionary['results']
+            for result in results:
+                if 'content' in result:
+                    content = result['content']
+                    if pattern in content:
+                        occurrences = occurrences + 1
+    except:
+        pass
+    return occurrences
+
 def get_source_name(partialName):
+    srcName = ''
     # call quilt status and parse out the name of the syslog source
     # fix with ISSUE008
-    cmd = os.path.join(get_quilt_lib_dir(),"quilt_status.py") + (
-        " | grep " + partialName + 
-        " | sed 's/.*syslog/syslog/' | grep syslog | cut -d\"'\" -f1")
-        #" | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\" -e \"s/'//g\" ")
-    srcName = sei_core.run_process(cmd, whichReturn=sei_core.STDOUT, 
+    cmd1 = os.path.join(get_quilt_lib_dir(), "quilt_status.py")
+    o = sei_core.run_process(cmd1, whichReturn=sei_core.STDOUT, 
         logToPython=False, shell=True)
+    objs = retrieve_objects(o)
+    for obj in objs:
+        try:
+            objasdict = dict(obj)
+            for name, value in objasdict.items():
+                if name.startswith(partialName):
+                    srcName = name
+                    break
+        except:
+            pass
+
+    #cmd2 = ("cat " + fileName + " | grep " + partialName + 
+    #    " | sed 's/.*" + partialName + "/" + partialName + 
+    #    "/' | cut -d\"'\" -f1 | uniq ")
+    #" | head -n 1 | awk '{print $1}' | sed  -e \"s/{'//\" -e \"s/'://\" -e \"s/'//g\" ")
+    #logging.debug("get_source_name cmd2 = " + cmd2)
+    #srcName = sei_core.run_process(cmd2, whichReturn=sei_core.STDOUT, 
+    #    logToPython=False, shell=True)
+
     return srcName
 
 def sleep_small():

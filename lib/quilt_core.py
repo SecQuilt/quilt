@@ -14,6 +14,9 @@ import time
 import quilt_data
 import lockfile
 import pprint
+import sys
+import pickle
+import datetime
 
 class EquivalenceClass:
     def __init__(self, symbol=None, equivalent_things=None):
@@ -21,17 +24,24 @@ class EquivalenceClass:
         self.equivalent_things = equivalent_things
 
 def ui_show(to_be_displayed):
-    output = ""
-    for item in to_be_displayed:
-        output = output + str(item)
-    #     output = output + pprint.pformat(item).lstrip("'")
-    print output
+    testing = True #make this a parameter
+    if testing:
+        fn = "/tmp/quilt" + datetime.datetime.now().isoformat() + ".tmp"
+        logging.debug("---------- file = " + fn)
+        fp = open(fn, "wb")
+        for x in to_be_displayed:
+            pickle.dump(x, fp)
+            logging.debug("---------- data = " + str(x))
+        print pprint.pformat(fn)
+    else:
+        for x in to_be_displayed:
+            print pprint.pformat(x)
 
 # returns the _symbol of the first EquivalenceClass in the list valid_inputs 
 # that has a member found in what's read from stdin
 def ui_tell(prompt, valid_inputs):
     while True:
-        ui_show(prompt)
+        ui_show([prompt])
         whats_read = sys.stdin.readline()
         for ec in valid_inputs: #item should be EquivalenceClass
             if contains_any(whats_read, ec.equivalent_things):

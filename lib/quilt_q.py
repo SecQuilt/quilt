@@ -19,7 +19,7 @@ class QuiltQueue(quilt_core.QueryMasterClient):
                 o = qm.TryGetQuery(self._args.query_id)
             
         if o != None:
-            quilt_core.ui_show(o)
+            quilt_core.ui_show([o])
         
         # return false (prevent event loop from beginning)
         return False

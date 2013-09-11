@@ -133,7 +133,7 @@ class QueryMaster:
         the finalized (unique) name of the pattern"""
 
         try:
-            logging.debug("patternSpec = " + str(patternSpec))
+            logging.debug("A. patternSpec = " + str(patternSpec))
             # determine unique name for the pattern based off suggested name
             #   in the spec
             rootName = quilt_data.pat_spec_tryget(patternSpec, name=True)
@@ -207,7 +207,7 @@ class QueryMaster:
                 patternSpec = quilt_data.pat_specs_get(
                     self._patterns, patternName).copy()
 
-                logging.debug("patternSpec = " + str(patternSpec));
+                logging.debug("B. patternSpec = " + str(patternSpec));
 
                 # generate a query id
                 baseqid = submitterNameKey + "_" + patternName

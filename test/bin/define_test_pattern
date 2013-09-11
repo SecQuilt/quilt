@@ -4,15 +4,16 @@
 # set config dir to test config
 source $(dirname ${BASH_SOURCE[0]})/testenv.rc
 #srcName=$($QUILT_HOME/bin/quilt_status | grep syslog | head -n 1 | awk '{print $1}' | sed  -e "s/{'//" -e "s/'://" -e "s/'//g")
-srcName=$($QUILT_HOME/bin/quilt_status | sed 's/.*syslog/syslog/' | grep syslog | cut -d"'" -f1)
+fileName=$($QUILT_HOME/bin/quilt_status | sed -e "s/'//g")
+srcName=$(cat $fileName | grep syslog | sed "s/.*syslog/syslog/" | uniq | cut -d"'" -f1)
 echo
 echo
 echo
 echo
-echo
+echo "---------------------------------------------------------"
+echo "srcName = "
 echo $srcName
-echo
-echo
+echo "---------------------------------------------------------"
 echo
 echo
 echo

@@ -77,7 +77,7 @@ def log_process(
                     handled=True
                 
                 if not handled:
-                    quilt_core.ui_show(lineos[:-1])
+                    quilt_core.ui_show([lineos[:-1]])
 
                 somethingHappened = True
 
