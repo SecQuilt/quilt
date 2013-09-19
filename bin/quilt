@@ -128,8 +128,6 @@ case "$1" in
     mkdir -p $QUILT_LOG_DIR
     mkdir -p $QUILT_LOCK_DIR
 
-    dostart
-
     echo "All daemons are now configured
     Manually edit $SCRIPT_PATH/quilt change which daemons are started.
     Also, optionally set the port used for the name server in $QUILT_CFG_DIR/quilt.cfg
