@@ -1,4 +1,5 @@
 *.pyc
 sweng/0.1/cnt/*
 test/var/log/*
+var/*
 
