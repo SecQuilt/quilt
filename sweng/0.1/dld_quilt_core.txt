@@ -416,6 +416,13 @@ Schema:
     [registrar]
     port : None           # port used by nameserver 'name' default is random
     host : None           # host used by nameserver default is localhost
+#TODO
+# After experimenting, provide bettwr description
+    enableBroadcast : True  # see pyro nameserver documentation
+    bchost : None   # see pyro nameserver documentation
+    bcport : None   # see pyro nameserver documentation
+    nathost : None  # see pyro nameserver documentation
+    natport : None  # see pyro nameserver documentation
 
     # the location of the query master.  This section is for the client's
     # to be able to find the query master.  The query master machine does
@@ -430,8 +437,21 @@ Schema:
                              # pyro nameservers on system)
     name : 'query_master'    # name for of the query master instance
 
+# TODO
+# after testing reveals more about these paramters, improve descriptions
+    host : None     # host/ip address of interface to bind to
+    port : None     # port to bind
+    nathost : None  # host for network address translation
+    natport : None  # port for network address translation
+
     [source_managers]
     config_dir  : '$QUILT_CFG/smd.d'    # directory containing smd configs
+# TODO
+# after testing reveals more about these paramters, improve descriptions
+    host : None     # host/ip address of interface to bind to
+    port : None     # port to bind
+    nathost : None  # host for network address translation
+    natport : None  # port for network address translation
 
     [testing]
     includes    :   ['*_testcase.py']    # file globs to run as testing 
