@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2013 Carnegie Mellon University 
 #  
 # This material is based upon work funded and supported by the Department of Defense under Contract No. FA8721-
@@ -32,49 +31,3 @@
 # Carnegie Mellon(r), CERT(r) and CERT Coordination Center(r) are registered marks of Carnegie Mellon University. 
 #  
 # DM-0000632 
-
-def create():
-    """return an empty variable dictionary"""
-    return {}
-
-
-def _set(outerDict, key, append):
-    if outerDict is None:
-        return None
-    if key in outerDict:
-        innerDict = outerDict[key]
-    elif not append:
-        return None
-    else:
-        innerDict = {}
-        outerDict[key] = innerDict
-    return innerDict
-
-
-def src(varDict, source, append=True):
-    """add a source to the varDict"""
-    return _set(varDict, source, append)
-
-
-def src_pat(varDict, source, sourcePattern, append=True):
-    """add a source pattern to the varDict"""
-    srcDict = src(varDict, source, append)
-    return _set(srcDict, sourcePattern, append)
-
-
-def src_pat_inst(varDict, source, sourcePattern,
-        sourcePatternInstance, append=True):
-    """add a source pattern instance to the varDict"""
-    srcPatDict = src_pat(varDict, source, sourcePattern, append)
-    return _set(srcPatDict, sourcePatternInstance, append)
-
-
-def set_var(varDict, source, sourcePattern, sourcePatternInstance,
-        sourceVariable, variable, append=True):
-    """add a complete variable mapping to the varDict"""
-    instDict = src_pat_inst(varDict, source, sourcePattern,
-        sourcePatternInstance, append)
-    if instDict is not None:
-        instDict[sourceVariable] = variable
-
-
