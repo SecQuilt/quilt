@@ -143,7 +143,22 @@ Classes:
                                    #    to dictionary of source manager's
                                    #    configuration data
             # call GetSourceManagersUtil helper function to get specs
-            
+
+
+        def GetConnectionParams(whichDaemon)
+            """
+            Get the arguments needed for connection to the specified
+            daemon from thier respective configuraiton section.  Return
+            arguments in a dictionary.
+            whichDaemon    :   string, one of "source_managers",
+                                or "query_master", or "registrar"
+            """
+
+            # use GetValue function for specified sectionName
+            # try get value for port, host, nathost, and natport
+            # if value found and not equal to default
+                # set in returning dictionary
+            # return result parameter dicutionary
 
 
     class QueryMasterClient 
@@ -283,6 +298,8 @@ Functions:
                                    # host as pyro objects)
         # Use QuiltConfig to read in configuration 
         # access the registrar's host and port number from config
+        # get the source manager connection paramters from config
+        # create a pyro daemon with the connection parameters
         # iterate the names and objects in clientObjectDic
             # register the clientObject with the local PyRo Daemon with 
             # use the key name as the object name        

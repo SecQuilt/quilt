@@ -404,6 +404,29 @@ c15.daemonize
 
     adhock test for syslog supporut
 
+c16.wan
+
+    DESIGN
+
+    discovered extra parameters that can be passed to daemon's so
+    that they will get a deterministic port, should enable wan federation
+
+    TEST
+
+    Run query master and 1 source manager on home server
+    Create source manager on ec2
+    All use home server registrar
+    assert working
+    use seperate registrat for each server
+    assert working
+    use registrar on ec2
+    assert working
+    move source manager to ec2.
+
+    Record configuraiton notes, apply lessons learned to documentation
+
+
+
 cX.lessthanBinning
 
     DESIGN

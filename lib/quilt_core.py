@@ -200,7 +200,7 @@ class QuiltDaemon(object):
         try:
             daemon_runner = runner.DaemonRunner(self)
 
-            
+
             # setup loggging for the daemon
             # get the currently configured logger
             logger = logging.getLogger()
@@ -256,7 +256,7 @@ class QuiltDaemon(object):
             if daemon_runner.daemon_context.files_preserve is None:
                 daemon_runner.daemon_context.files_preserve = []
             daemon_runner.daemon_context.files_preserve.append(handle)
-        
+
             daemon_runner.do_action()
 
 

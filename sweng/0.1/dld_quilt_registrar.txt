@@ -37,8 +37,11 @@ class Registrar : QuiltDaemon
         setup daemon pid/io stuff with QuiltDaemon.setup_process
     def run():
         # Use QuiltConfig to read in configuration 
-        # access the registrar's port number from config
-        # start the pyro nameserver
+        # access the registrar's common connection parameters
+        #   from the config
+        # access other config parameters for
+        #   enableBroadcat, bchost, bcport, and set into param dictionary
+        # start the pyro nameserver with specified connection parameters
         
 
 

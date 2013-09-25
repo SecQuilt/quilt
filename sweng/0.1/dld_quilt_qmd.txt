@@ -30,7 +30,9 @@ Classes:
         def run():
             # Use QuiltConfig to read in configuration 
             # access the registrar's host and port number from config
-            # Create the Query Master object
+            # access the query master daemon's connection paramters from the
+            #   config
+            # Create the Query Master object with specified connection params
             # access the query master's name from the config file
             # register the Query Master with the PyRo Daemon
             # start the Daemon's event loop
