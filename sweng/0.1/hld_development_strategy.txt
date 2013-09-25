@@ -422,6 +422,9 @@ c16.wan
     use registrar on ec2
     assert working
     move source manager to ec2.
+    assert working
+    move to one registrar on ec2
+    assert working
 
     Record configuraiton notes, apply lessons learned to documentation
 

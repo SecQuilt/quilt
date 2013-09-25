@@ -133,6 +133,31 @@ class QuiltConfig:
     def GetSourceManagerSpecs(self):
         return self.GetSourceManagersUtil("specs")
 
+    def GetConnectionParams(self, whichDaemon):
+        """
+        Get the arguments needed for connection to the specified
+        daemon from their respective config section.  Return
+        arguments in a dictionary.
+        whichDaemon    :   string, one of "source_managers",
+                            or "query_master", or "registrar"
+        """
+
+        # try get value for port, host, nathost, and natport
+        common_keys = ['host','port','nathost','natport']
+        retdict = {}
+        for key in common_keys:
+            # use GetValue function for specified sectionName
+            val = self.GetValue(whichDaemon, key, None)
+            if val is None:
+                continue
+
+            # if value found and not equal to default
+            # set in returning dictionary
+            retdict[key] = val
+
+        # return result parameter dicutionary
+        return retdict
+
 
 def GetQueryMasterProxyDEPRECATED(config=None):
     """Access configuration to find query master, return proxy to it"""
@@ -443,12 +468,9 @@ def query_master_client_main_helper(
     registrarPort = cfg.GetValue(
         'registrar', 'port', None, int)
 
-    #TODO Hardening, make sure when exceptions are thrown that clients are removed
-    # HACK FIXME, need to specify this from config
-    try:
-        daemon = Pyro4.Daemon(Pyro4.socketutil.getIpAddress())
-    except:
-        daemon = Pyro4.Daemon()
+
+    daemonArgs = cfg.GetConnectionParams("")
+    daemon = Pyro4.Daemon()
 
 
     with Pyro4.locateNS(registrarHost, registrarPort) as ns:
