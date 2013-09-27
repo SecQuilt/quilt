@@ -19,10 +19,10 @@ $ sudo bin/quilt install
 Now. edit bin/quilt script.  Modify the dostart and dostop functions to
 control which daemons will run on this machine.
 
-You may also neet to add and edit configuration files.  Example files can be
+You may also need to add and edit configuration files.  Example files can be
 taken from test/etc/quilt and placed in the project root
 
-Then you could start and stop quilt with
+Then you can start and stop quilt with
 
 $ sudo quilt stop
 $ sudo quilt start
